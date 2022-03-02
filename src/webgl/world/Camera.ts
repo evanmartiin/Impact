@@ -1,6 +1,6 @@
 import type Sizes from "@/controllers/webglControllers/Sizes";
 import { PerspectiveCamera, Scene } from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Experience from "../Experience";
 
 export default class Camera {
