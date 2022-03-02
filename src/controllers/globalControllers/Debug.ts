@@ -1,6 +1,7 @@
 import { hsvToRgb } from "@tweakpane/core/dist/cjs/input-binding/color/model/color-model";
 import StatsGUI from "@/controllers/webglControllers/Stats";
 import { Pane } from "tweakpane";
+import convertRGBtoHex from "@/utils/convertRGBtoHex";
 
 export default class Debug {
   public active: boolean = window.location.hash === "#debug";
@@ -40,7 +41,7 @@ export default class Debug {
             if (["number", "string", "boolean"].includes(typeof value)) {
               formattedTest[el.title][prop.label] = value;
             } else if (typeof value === "object") {
-              const color = RGBtoHex(
+              const color = convertRGBtoHex(
                 hsvToRgb(
                   Math.floor(value.comps_[0]),
                   Math.floor(value.comps_[1]),
@@ -76,17 +77,3 @@ export default class Debug {
     }
   }
 }
-
-const colorToHex = (color: number) => {
-  const hexadecimal = color.toString(16);
-  return hexadecimal.length == 1 ? "0" + hexadecimal : hexadecimal;
-};
-
-const RGBtoHex = (color: number[]) => {
-  return (
-    "#" +
-    colorToHex(Math.floor(color[0])) +
-    colorToHex(Math.floor(color[1])) +
-    colorToHex(Math.floor(color[2]))
-  );
-};
