@@ -1,5 +1,5 @@
-import { hsvToRgb } from "@tweakpane/core/dist/cjs/input-binding/color/model/color-model";
 import StatsGUI from "@/controllers/webglControllers/Stats";
+import { hsvToRgb } from "@tweakpane/core/dist/cjs/input-binding/color/model/color-model";
 import { Pane } from "tweakpane";
 import convertRGBtoHex from "@/utils/convertRGBtoHex";
 
@@ -21,12 +21,12 @@ export default class Debug {
         title: "Copy presets",
       });
       exportBtn.on("click", () => {
-        const formattedTest: any = {};
+        const formattedTest: { [key: string]: any } = {};
         const discordInput: any = this.ui?.children.filter(
           (el: any) => el.label === "discord"
         )[0].controller_;
 
-        const formatDiscord = discordInput?.binding.value.rawValue_;
+        const formatDiscord = discordInput.binding.value.rawValue_;
 
         const folders = this.ui?.children.filter((el: any) => el.children);
         folders?.forEach((el: any) => {
