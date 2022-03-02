@@ -31,7 +31,7 @@ export default class Camera {
   }
 
   setControls() {
-    if (this.instance) {
+    if (this.instance && this.canvas) {
       this.controls = new OrbitControls(this.instance, this.canvas);
       this.controls.enableDamping = true;
     }
