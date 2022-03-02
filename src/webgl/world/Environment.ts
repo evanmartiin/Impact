@@ -2,6 +2,7 @@ import type Debug from "@/controllers/globalControllers/Debug";
 import { AmbientLight, DirectionalLight, Scene } from "three";
 import type { FolderApi } from "tweakpane";
 import Experience from "@/webgl/Experience";
+import SceneFog from "./SceneFog";
 
 export default class Environment {
   private experience: Experience = new Experience();
@@ -11,8 +12,11 @@ export default class Environment {
   private sunLight: DirectionalLight | null = null;
   private ambientLight: AmbientLight | null = null;
   private time = 0;
+  private fog: SceneFog | null;
 
   constructor() {
+    this.fog = new SceneFog();
+
     this.setAmbientLight();
     this.setSunLight();
 
