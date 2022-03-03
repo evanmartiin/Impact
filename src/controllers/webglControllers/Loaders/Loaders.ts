@@ -1,14 +1,15 @@
 import EventEmitter from "@/controllers/globalControllers/EventEmitter";
+import type { ILoaders, TfileLoader } from "@/models/webgl/loaders.model";
 import type { ISource } from "@/models/webgl/source.model";
-import { TextureLoader } from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { Texture, TextureLoader } from "three";
+import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 
 export default class Loaders extends EventEmitter {
   private sources: ISource[];
-  public items: any;
+  public items: { [key: string]: TfileLoader };
   private toLoad: number | null = null;
-  private loaded = 0;
-  private loaders: any;
+  private loaded: number = 0;
+  private loaders: ILoaders = {};
 
   constructor(sources: ISource[]) {
     super();
@@ -30,13 +31,13 @@ export default class Loaders extends EventEmitter {
   startLoading() {
     if (this.sources) {
       // Load each source
-      for (const source of this.sources as any) {
+      for (const source of this.sources) {
         if (source.type === "gltfModel") {
-          this.loaders.gltfLoader.load(source.path, (file: any) => {
+          this.loaders.gltfLoader?.load(source.path, (file) => {
             this.sourceLoaded(source, file);
           });
         } else if (source.type === "texture") {
-          this.loaders.textureLoader.load(source.path, (file: any) => {
+          this.loaders.textureLoader?.load(source.path, (file) => {
             this.sourceLoaded(source, file);
           });
         }
@@ -44,7 +45,7 @@ export default class Loaders extends EventEmitter {
     }
   }
 
-  sourceLoaded(source: any, file: any) {
+  sourceLoaded(source: ISource, file: TfileLoader) {
     this.items[source.name] = file;
 
     this.loaded++;
