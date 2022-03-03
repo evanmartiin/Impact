@@ -27,7 +27,7 @@ export default class Earth {
     this.setGeometry();
     this.setMaterial();
     this.setMesh();
-    this.setCubes();
+    this.setTrees();
 
     this.setDebug();
   }
@@ -69,7 +69,7 @@ export default class Earth {
     }
   }
 
-  setCubes() {
+  setTrees() {
     const GPSPosArray: GPSPos[] = [];
 
     for (let i = 0; i < 100; i++) {
