@@ -27,7 +27,7 @@ export default class Earth {
     this.setGeometry();
     this.setMaterial();
     this.setMesh();
-    this.setCubes();
+    this.setTrees();
 
     this.setDebug();
   }
@@ -59,31 +59,17 @@ export default class Earth {
         outputFragment
       );
     };
-
-    // this.material = new ShaderMaterial({
-    //     uniforms: {
-    //         scale: {
-    //             value: 3.5
-    //         },
-    //         texture1: {
-    //             value: this.loaders.items.earthTestTexture
-    //         }
-    //     },
-    //     vertexShader: vert,
-    //     fragmentShader: frag
-    // })
   }
 
   setMesh() {
     if (this.geometry && this.material) {
       this.mesh = new Mesh(this.geometry, this.material);
-      this.mesh.rotation.x = -Math.PI * 0.5;
       this.mesh.receiveShadow = true;
       this.scene.add(this.mesh);
     }
   }
 
-  setCubes() {
+  setTrees() {
     const GPSPosArray: GPSPos[] = [];
 
     for (let i = 0; i < 100; i++) {
@@ -104,11 +90,7 @@ export default class Earth {
       this.debugFolder = this.debug.ui?.addFolder({ title: "Earth" });
 
       if (this.material) {
-        this.debugFolder?.addInput(this.material, "wireframe", {
-          min: 2,
-          max: 15,
-          step: 0.01,
-        });
+        this.debugFolder?.addInput(this.material, "wireframe");
       }
 
       const _detail = { detail: this.geometry?.parameters.detail || 10 };
