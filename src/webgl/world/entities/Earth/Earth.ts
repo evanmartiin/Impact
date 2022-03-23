@@ -1,72 +1,45 @@
 import type Debug from "@/controllers/globalControllers/Debug";
 import type Loaders from "@/controllers/webglControllers/Loaders/Loaders";
 import type { GPSPos } from "@/models/webgl/GPSPos.model";
-import { IcosahedronGeometry, Mesh, MeshStandardMaterial, Scene } from "three";
-import type { FolderApi } from "tweakpane";
 import Experience from "@/webgl/Experience";
+import anime from "animejs";
+import { Group, Scene } from "three";
+import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
+import type { FolderApi } from "tweakpane";
 import Tree from "../Tree/Tree";
-import beginVertex from "./shaders/beginVertex.glsl?raw";
-import commonFragment from "./shaders/commonFragment.glsl?raw";
-import commonVertex from "./shaders/commonVertex.glsl?raw";
-import outputFragment from "./shaders/outputFragment.glsl?raw";
-// import vert from './vert.glsl?raw'
-// import frag from './frag.glsl?raw'
 
 export default class Earth {
   private experience: Experience = new Experience();
   private scene: Scene = this.experience.scene as Scene;
   private loaders: Loaders = this.experience.loaders as Loaders;
-  private geometry: IcosahedronGeometry | null = null;
-  private material: MeshStandardMaterial | null = null;
-  private mesh: Mesh | null = null;
   private debug: Debug = this.experience.debug as Debug;
-  private debugFolder: FolderApi | undefined;
+  private debugFolder: FolderApi | undefined = undefined;
   private trees: Tree[] | null = null;
+  private earth: Group | null = null;
 
   constructor() {
     this.setGeometry();
     this.setMaterial();
     this.setMesh();
     this.setTrees();
+    this.appear();
 
     this.setDebug();
   }
 
-  setGeometry() {
-    this.geometry = new IcosahedronGeometry(3, 5);
-  }
+  setGeometry() {}
 
-  setMaterial() {
-    this.material = new MeshStandardMaterial({ flatShading: true });
-    this.material.onBeforeCompile = (shader) => {
-      shader.uniforms.scale = { value: 3 };
-      shader.uniforms.texture1 = { value: this.loaders.items.earthTestTexture };
-
-      shader.vertexShader = shader.vertexShader.replace(
-        "#include <common>",
-        commonVertex
-      );
-      shader.vertexShader = shader.vertexShader.replace(
-        "#include <begin_vertex>",
-        beginVertex
-      );
-      shader.fragmentShader = shader.fragmentShader.replace(
-        "#include <common>",
-        commonFragment
-      );
-      shader.fragmentShader = shader.fragmentShader.replace(
-        "#include <output_fragment>",
-        outputFragment
-      );
-    };
-  }
+  setMaterial() {}
 
   setMesh() {
-    if (this.geometry && this.material) {
-      this.mesh = new Mesh(this.geometry, this.material);
-      this.mesh.receiveShadow = true;
-      this.scene.add(this.mesh);
-    }
+    const earthModel = this.loaders.items["earth"] as GLTF;
+
+    this.earth = new Group();
+    earthModel.scene.children.map((child) => {
+      this.earth?.add(child);
+    });
+    this.earth.scale.set(3, 3, 3);
+    this.scene.add(this.earth);
   }
 
   setTrees() {
@@ -84,31 +57,49 @@ export default class Earth {
       this.trees?.push(cube);
     });
   }
+  appear() {
+    anime({
+      targets: this.earth?.position,
+      y: [-5, 0],
+      x: [-5, 0],
+      easing: "easeInOutQuart",
+      // loop: true,
+      // direction: "alternate",
+      duration: 1000,
+    });
+  }
+  disappear() {
+    anime({
+      targets: this.earth?.position,
+      y: [0, -5],
+      x: [0, -5],
+      easing: "easeInOutQuart",
+      // loop: true,
+      // direction: "alternate",
+      duration: 1000,
+    });
+  }
 
   setDebug() {
     if (this.debug.active) {
       this.debugFolder = this.debug.ui?.addFolder({ title: "Earth" });
-
-      if (this.material) {
-        this.debugFolder?.addInput(this.material, "wireframe");
+      if (this.earth?.position) {
+        this.debugFolder?.addInput(this.earth?.position, "x", {
+          min: -10,
+          max: 10,
+          step: 0.1,
+        });
+        this.debugFolder?.addInput(this.earth.position, "y", {
+          min: -10,
+          max: 10,
+          step: 0.1,
+        });
+        this.debugFolder?.addInput(this.earth.position, "z", {
+          min: -10,
+          max: 10,
+          step: 0.1,
+        });
       }
-
-      const _detail = { detail: this.geometry?.parameters.detail || 10 };
-      const inputDetail = this.debugFolder?.addInput(_detail, "detail", {
-        min: 1,
-        max: 20,
-        step: 1,
-      });
-      inputDetail?.on("change", () => {
-        if (this.mesh) this.scene.remove(this.mesh);
-        this.mesh?.geometry.dispose();
-        this.geometry = null;
-        this.geometry = new IcosahedronGeometry(
-          3,
-          parseInt(_detail.detail.toString())
-        );
-        this.setMesh();
-      });
     }
   }
   destroy() {

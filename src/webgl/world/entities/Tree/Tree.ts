@@ -1,9 +1,10 @@
 import type Loaders from "@/controllers/webglControllers/Loaders/Loaders";
 import type { GPSPos } from "@/models/webgl/GPSPos.model";
-import { Group, Mesh, MeshToonMaterial, Object3D, Scene } from "three";
-import Experience from "@/webgl/Experience";
-import TreeMaterial from "./TreeMaterial";
 import calcPosFromGPS from "@/utils/calcPosFromGPS";
+import Experience from "@/webgl/Experience";
+import { Group, Mesh, MeshToonMaterial, Object3D, Scene } from "three";
+import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
+import TreeMaterial from "./TreeMaterial";
 
 export default class Tree {
   private experience: Experience = new Experience();
@@ -17,7 +18,7 @@ export default class Tree {
 
   constructor(lat: number, lon: number) {
     this.GPSPos = { lat, lon };
-    this.resource = this.loaders.items.tree2.scene;
+    this.resource = (this.loaders.items.tree2 as GLTF).scene;
 
     this._model = this.resource.clone();
 
