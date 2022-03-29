@@ -30,7 +30,6 @@ export default class Debug {
 
         const folders = this.ui?.children.filter((el: any) => el.children);
         folders?.forEach((el: any) => {
-          console.log(el);
 
           formattedTest[el.title] = {};
 

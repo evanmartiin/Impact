@@ -1,6 +1,7 @@
 import Debug from "@/controllers/globalControllers/Debug";
 import Loaders from "@/controllers/webglControllers/Loaders/Loaders";
 import Sources from "@/controllers/webglControllers/Loaders/sources";
+import Mouse from "@/controllers/webglControllers/Mouse";
 import Sizes from "@/controllers/webglControllers/Sizes";
 import Time from "@/controllers/webglControllers/Time";
 import type { ISource } from "@/models/webgl/source.model";
@@ -21,6 +22,7 @@ export default class Experience {
   public canvas: HTMLCanvasElement | null = null;
   public debug: Debug | null = null;
   public sizes: Sizes | null = null;
+  public mouse: Mouse | null = null;
   public time: Time | null = null;
   public scene: Scene | null = null;
   public loaders: Loaders | null = null;
@@ -28,7 +30,7 @@ export default class Experience {
   public renderer: Renderer | null = null;
 
   private sources: ISource[] | null = null;
-  private world: World | null = null;
+  public world: World | null = null;
 
   constructor(_canvas?: HTMLCanvasElement) {
     if (Experience.instance) {
@@ -44,12 +46,13 @@ export default class Experience {
     this.sources = Sources;
     this.loaders = new Loaders(this.sources);
     this.sizes = new Sizes();
+    this.mouse = new Mouse();
     this.time = new Time();
     this.debug = new Debug();
     this.scene = new Scene();
     this.camera = new Camera();
-    this.renderer = new Renderer();
     this.world = new World();
+    this.renderer = new Renderer();
 
     // Resize event
     this.sizes.on("resize", () => {
@@ -61,11 +64,13 @@ export default class Experience {
       this.update();
     });
 
+    this.sizes.setViewSizeAtDepth();
     this.setAxis();
   }
 
   setAxis() {
     const axesHelper = new AxesHelper(5);
+
     this.scene?.add(axesHelper);
   }
 
@@ -76,7 +81,7 @@ export default class Experience {
 
   update() {
     this.camera?.update();
-    this.world?.update()
+    this.world?.update();
     this.renderer?.update();
     this.debug?.update();
   }
@@ -84,6 +89,7 @@ export default class Experience {
   destroy() {
     this.sizes?.off("resize");
     this.time?.off("tick");
+    this.mouse?.destroy();
     // Traverse the whole scene
     this.scene?.traverse((child) => {
       // Test if it's a mesh

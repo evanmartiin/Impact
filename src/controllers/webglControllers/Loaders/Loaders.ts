@@ -1,8 +1,8 @@
 import EventEmitter from "@/controllers/globalControllers/EventEmitter";
 import type { ILoaders, TfileLoader } from "@/models/webgl/loaders.model";
 import type { ISource } from "@/models/webgl/source.model";
-import { Texture, TextureLoader } from "three";
-import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader";
+import { TextureLoader } from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 export default class Loaders extends EventEmitter {
   private sources: ISource[];

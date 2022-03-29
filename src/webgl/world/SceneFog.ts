@@ -1,8 +1,7 @@
 import type Debug from "@/controllers/globalControllers/Debug";
-import { Fog, Vector3, type ColorRepresentation, type Scene } from "three";
+import { type ColorRepresentation, Fog, type Scene, type Vector3 } from "three";
 import type { FolderApi } from "tweakpane";
 import Experience from "../Experience";
-
 export default class SceneFog {
   private experience: Experience = new Experience();
   private scene: Scene = this.experience.scene as Scene;
@@ -31,7 +30,7 @@ export default class SceneFog {
         this.experience.camera.controls?.target as Vector3
       );
       this.instance.far = dist;
-      this.instance.near = dist - 4;
+      this.instance.near = dist - 1;
     }
   }
   setDebug() {
