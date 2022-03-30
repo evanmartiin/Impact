@@ -4,6 +4,7 @@ import type Sizes from "@/controllers/webglControllers/Sizes";
 import {
   CineonToneMapping,
   Color,
+  Object3D,
   PCFSoftShadowMap,
   Raycaster,
   Scene,
@@ -36,6 +37,7 @@ export default class Renderer {
   private composer: EffectComposer | undefined;
   private outlinePass: OutlinePass | undefined;
   private districtNames: string[] = ["maison", "ville", "mamie"];
+  public hoveredDistrict: Object3D | undefined;
 
   constructor() {
     this.setInstance();
@@ -92,10 +94,12 @@ export default class Renderer {
           let selectedObjects = [];
           if (this.intersects.length > 0 && this.districtNames.includes(this.intersects[0].object.name)) {
             this.outlinePass.edgeStrength = 3;
-            selectedObjects.push(this.intersects[0].object);
+            this.hoveredDistrict = this.intersects[0].object;
+            selectedObjects.push(this.hoveredDistrict);
           } else {
             this.outlinePass.edgeStrength = 1.5;
             selectedObjects = this.experience.world.earth.earthGroup.children[0].children.filter((model) => this.districtNames.includes(model.name));
+            this.hoveredDistrict = undefined;
           }
           this.outlinePass.selectedObjects = selectedObjects;
         }

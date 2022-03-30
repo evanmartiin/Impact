@@ -1,5 +1,5 @@
 import type Sizes from "@/controllers/webglControllers/Sizes";
-import { PerspectiveCamera, Scene } from "three";
+import { PerspectiveCamera, Scene, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Experience from "../Experience";
 
@@ -33,6 +33,7 @@ export default class Camera {
     if (this.instance && this.canvas) {
       this.controls = new OrbitControls(this.instance, this.canvas);
       this.controls.enableDamping = true;
+      this.controls.enableZoom = false;
     }
   }
 
