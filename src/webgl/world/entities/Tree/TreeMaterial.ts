@@ -1,5 +1,4 @@
 import type Debug from "@/controllers/globalControllers/Debug";
-import Experience from "@/webgl/Experience";
 import {
   Color,
   DataTexture,
@@ -8,6 +7,7 @@ import {
   RedFormat,
 } from "three";
 import type { FolderApi } from "tweakpane";
+import Experience from "@/webgl/Experience";
 
 export default class TreeMaterial {
   static instance: TreeMaterial;
@@ -16,7 +16,7 @@ export default class TreeMaterial {
 
   private experience: Experience = new Experience();
   private debug: Debug = this.experience.debug as Debug;
-  private debugFolder: FolderApi | undefined = undefined;
+  private debugFolder: FolderApi | undefined;
 
   constructor() {
     if (TreeMaterial.instance) {

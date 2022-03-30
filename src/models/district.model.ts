@@ -1,1 +1,0 @@
-export type district = "earth" | "district1";
