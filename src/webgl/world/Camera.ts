@@ -24,13 +24,14 @@ export default class Camera {
       0.1,
       100
     );
+    this.instance.rotation.reorder("YXZ");
     this.instance.position.set(15, 0, 0);
 
     this.scene.add(this.instance);
   }
 
   setControls() {
-    if (this.instance && this.canvas) {
+    if (this.instance) {
       this.controls = new OrbitControls(this.instance, this.canvas);
       this.controls.enableDamping = true;
     }

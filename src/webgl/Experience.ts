@@ -4,7 +4,8 @@ import Sources from "@/controllers/webglControllers/Loaders/sources";
 import Sizes from "@/controllers/webglControllers/Sizes";
 import Time from "@/controllers/webglControllers/Time";
 import type { ISource } from "@/models/webgl/source.model";
-import { AxesHelper, Mesh, Scene } from "three";
+import { AxesHelper, Fog, Mesh, Scene } from "three";
+import type { FolderApi } from "tweakpane";
 import Renderer from "./Renderer";
 import Camera from "./world/Camera";
 import World from "./world/World";
@@ -29,6 +30,7 @@ export default class Experience {
 
   private sources: ISource[] | null = null;
   private world: World | null = null;
+  private debugFolder: FolderApi | null = null;
 
   constructor(_canvas?: HTMLCanvasElement) {
     if (Experience.instance) {
@@ -62,6 +64,9 @@ export default class Experience {
     });
 
     this.setAxis();
+
+    this.setSceneFog();
+    this.setDebug();
   }
 
   setAxis() {
@@ -106,5 +111,33 @@ export default class Experience {
     this.renderer?.instance?.dispose();
 
     if (this.debug?.active) this.debug.ui?.dispose();
+  }
+
+  setSceneFog() {
+    if (this.scene) {
+      this.scene.fog = new Fog(0x000000, 12, 16);
+    }
+  }
+
+  setDebug() {
+    if (this.debug?.active) {
+      if (this.scene) {
+        if (this.debug.ui)
+          this.debugFolder = this.debug.ui.addFolder({ title: "Fog" });
+        if (this.scene.fog) {
+          this.debugFolder?.addInput(this.scene.fog, "color");
+          this.debugFolder?.addInput(this.scene.fog as Fog, "near", {
+            min: 0,
+            max: 20,
+            step: 1,
+          });
+          this.debugFolder?.addInput(this.scene.fog as Fog, "far", {
+            min: 0,
+            max: 50,
+            step: 1,
+          });
+        }
+      }
+    }
   }
 }
