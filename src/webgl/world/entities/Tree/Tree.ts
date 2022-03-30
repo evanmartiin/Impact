@@ -1,9 +1,7 @@
 import type Loaders from "@/controllers/webglControllers/Loaders/Loaders";
 import type { GPSPos } from "@/models/webgl/GPSPos.model";
-import calcPosFromGPS from "@/utils/calcPosFromGPS";
-import Experience from "@/webgl/Experience";
 import { Group, Mesh, MeshToonMaterial, Object3D, Scene } from "three";
-import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
+import Experience from "@/webgl/Experience";
 import TreeMaterial from "./TreeMaterial";
 
 export default class Tree {
@@ -18,7 +16,7 @@ export default class Tree {
 
   constructor(lat: number, lon: number) {
     this.GPSPos = { lat, lon };
-    this.resource = (this.loaders.items.tree2 as GLTF).scene;
+    this.resource = this.loaders.items.tree2.scene;
 
     this._model = this.resource.clone();
 
@@ -58,3 +56,14 @@ export default class Tree {
     this.material.dispose();
   }
 }
+
+const calcPosFromGPS = (lat: number, lon: number, radius: number) => {
+  const phi = (90 - lat) * (Math.PI / 180);
+  const theta = (lon + 180) * (Math.PI / 180);
+
+  const x = -(radius * Math.sin(phi) * Math.cos(theta));
+  const z = radius * Math.sin(phi) * Math.sin(theta);
+  const y = radius * Math.cos(phi);
+
+  return { x, y, z };
+};
