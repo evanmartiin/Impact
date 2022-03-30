@@ -53,10 +53,12 @@ export default class Renderer {
   }
 
   IntersActions() {
-    this.intersectionController.dispatchInterAction(
-      this.intersects[0].object.name,
-      this.intersects[0].object
-    );
+    if (this.intersects.length > 0) {
+      this.intersectionController.dispatchInterAction(
+        this.intersects[0].object.name,
+        this.intersects[0].object
+      );
+    }
   }
 
   update() {

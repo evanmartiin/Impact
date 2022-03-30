@@ -1,6 +1,5 @@
 import EventEmitter from "@/controllers/globalControllers/EventEmitter";
 import type Sizes from "@/controllers/webglControllers/Sizes";
-import throttle from "@/utils/throttle";
 import Experience from "@/webgl/Experience";
 import { Vector2 } from "three";
 
@@ -26,12 +25,8 @@ export default class Mouse extends EventEmitter {
     document.addEventListener("mouseenter", () => this.setIsInScreen(true));
     document.addEventListener("mouseleave", () => this.setIsInScreen(false));
     document.addEventListener("mouseleave", () => this.setIsInScreen(false));
-    const dispatchClickEvent = throttle(() => {
-      this.trigger("click");
-    }, 1000);
     document.addEventListener("mousedown", () => {
-      dispatchClickEvent();
-      console.log("click");
+      this.trigger("click");
     });
   }
 
