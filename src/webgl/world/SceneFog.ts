@@ -8,7 +8,7 @@ export default class SceneFog {
   private debug: Debug = this.experience.debug as Debug;
   private debugFolder: FolderApi | undefined = undefined;
 
-  private color: ColorRepresentation = "#F9F7E8";
+  private color: ColorRepresentation = "#45D7CE";
   private near: number = 15;
   private far: number = 20;
   private instance: Fog | null = null;

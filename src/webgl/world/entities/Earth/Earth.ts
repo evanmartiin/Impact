@@ -28,22 +28,11 @@ export default class Earth {
   private model: GLTF | null = null;
 
   constructor() {
-    this.setGeometry();
-    this.setMaterial();
     this.setMesh();
     // this.setTrees();
 
     this.setDebug();
   }
-
-  setGeometry() {
-    // const geometry = new BoxGeometry(1, 1, 1);
-    // const material = new MeshBasicMaterial({ color: 0x00ff00 });
-    // const cube = new Mesh(geometry, material);
-    // this.scene.add(cube);
-  }
-
-  setMaterial() {}
 
   setMesh() {
     this.model = this.loaders.items["earthWithBuildingSketch"] as GLTF;

@@ -18,26 +18,27 @@ export default class Districts extends EventEmitter {
   private currentDistrict: district = "earth";
   public district1: District1 | null = null;
 
+  private shift = { lat: 30, lon: -20 };
   private districtPositions = [
     {
       name: "mamie",
       pos: {
-        lat: 20,
-        lon: -180
+        lat: 25 - this.shift.lat,
+        lon: -180 - this.shift.lon
       }
     },
     {
       name: "ville",
       pos: {
-        lat: 40,
-        lon: -30
+        lat: 45 - this.shift.lat,
+        lon: -30 - this.shift.lon
       }
     },
     {
       name: "maison",
       pos: {
-        lat: 19,
-        lon: 72
+        lat: 24 - this.shift.lat,
+        lon: 72 - this.shift.lon
       }
     }
   ]

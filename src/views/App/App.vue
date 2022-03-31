@@ -3,6 +3,8 @@ import Experience from "@/webgl/Experience";
 import { onMounted, ref } from "vue";
 import { RouterLink, RouterView } from "vue-router";
 import { webglStore } from '@/stores/webglStore'
+import DistrictCard from '@/components/DistrictCard.vue'
+import Lifebar from '@/components/Lifebar.vue'
 
 const selectedDistrict = ref('');
 
@@ -22,15 +24,16 @@ onMounted(() => {
 </script>
 
 <template>
-  <canvas id="webgl"></canvas>
-  <nav id="nav">
-    <RouterLink to="/">Home</RouterLink>
-    <RouterLink to="/experience">Experience</RouterLink>
-    <RouterLink to="/credits">Credits</RouterLink>
-  </nav>
   <main>
+    <canvas id="webgl"></canvas>
+    <nav id="nav">
+      <RouterLink to="/">Home</RouterLink>
+      <RouterLink to="/experience">Experience</RouterLink>
+      <RouterLink to="/credits">Credits</RouterLink>
+    </nav>
     <RouterView />
-    <p id="districtCard">{{ selectedDistrict }}</p>
+    <Lifebar />
+    <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
   </main>
 </template>
 
