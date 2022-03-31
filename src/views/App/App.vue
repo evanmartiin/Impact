@@ -1,9 +1,23 @@
 <script setup lang="ts">
 import Experience from "@/webgl/Experience";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { RouterLink, RouterView } from "vue-router";
+import { webglStore } from '@/stores/webglStore'
+
+const selectedDistrict = ref('');
+
 onMounted(() => {
-  new Experience(document.getElementById("webgl") as HTMLCanvasElement);
+  const experience = new Experience(document.getElementById("webgl") as HTMLCanvasElement);
+  const store = webglStore();
+  store.$state = { experience };
+  store.experience.loaders.on('ready', () => {
+    store.experience.world.districts.on('district_selected', (district) => {
+      selectedDistrict.value = district.name;
+    })
+    store.experience.world.districts.on('no_district_selected', () => {
+      selectedDistrict.value = '';
+    })
+  })
 });
 </script>
 
@@ -16,6 +30,7 @@ onMounted(() => {
   </nav>
   <main>
     <RouterView />
+    <p id="districtCard">{{ selectedDistrict }}</p>
   </main>
 </template>
 

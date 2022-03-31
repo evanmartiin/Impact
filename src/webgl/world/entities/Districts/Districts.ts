@@ -1,3 +1,4 @@
+import EventEmitter from "@/controllers/globalControllers/EventEmitter";
 import type Mouse from "@/controllers/webglControllers/Mouse";
 import calcGPSFromPos from "@/utils/calcGPSFromPos";
 import calcPosFromGPS from "@/utils/calcPosFromGPS";
@@ -8,7 +9,7 @@ import type { district } from "./../../../../models/district.model";
 import type { GPSPos } from "./../../../../models/webgl/GPSPos.model";
 import District1 from "./District1/district1";
 
-export default class District {
+export default class Districts extends EventEmitter {
   private experience: Experience = new Experience();
   private scene: Scene = this.experience.scene as Scene;
   private mouse: Mouse = this.experience.mouse as Mouse;
@@ -42,10 +43,18 @@ export default class District {
   ]
 
   constructor() {
+    super();
+
     this.setModels();
-    this.mouse.on('click', () => {
+
+    this.mouse.on('click_start', () => {
+      this.trigger('no_district_selected');
+    });
+
+    this.mouse.on('click_end', () => {
       this.hoveredDistrict = this.experience.renderer?.hoveredDistrict;
       if (this.hoveredDistrict) {
+        this.trigger('district_selected', [this.hoveredDistrict]);
         const districtPos = this.districtPositions.filter((district) => district.name === this.hoveredDistrict?.name)[0].pos;
         this.rotateTo(districtPos);
       }
@@ -63,6 +72,10 @@ export default class District {
     
     newGPSPos.lon = currentGPSPos.lon + min * sign;
 
+    if (this.experience.camera?.controls) {
+      this.experience.camera.controls.enableRotate = false;
+    }
+
     const tl = anime.timeline({});
     tl.add(
       {
@@ -74,6 +87,11 @@ export default class District {
         update: () => {
           const newPos = calcPosFromGPS(currentGPSPos, radius as number);
           this.experience.camera?.instance?.position.copy(newPos);
+        },
+        complete: () => {
+          if (this.experience.camera?.controls) {
+            this.experience.camera.controls.enableRotate = true;
+          }
         }
       },
       0

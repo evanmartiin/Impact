@@ -26,7 +26,10 @@ export default class Mouse extends EventEmitter {
     document.addEventListener("mouseleave", () => this.setIsInScreen(false));
     document.addEventListener("mouseleave", () => this.setIsInScreen(false));
     document.addEventListener("mousedown", () => {
-      this.trigger("click");
+      this.trigger("click_start");
+    });
+    document.addEventListener("mouseup", () => {
+      this.trigger("click_end");
     });
   }
 
