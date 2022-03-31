@@ -55,6 +55,14 @@ export default class District {
   rotateTo(newGPSPos: GPSPos) {
     const radius = this.experience.camera?.instance?.position.distanceTo(new Vector3());
     const currentGPSPos = calcGPSFromPos(this.experience.camera?.instance?.position as Vector3, this.experience.camera?.instance?.position.distanceTo(new Vector3()) as number);
+
+    const dist1 = Math.round(Math.abs(currentGPSPos.lon - newGPSPos.lon));
+    const dist2 = Math.round(360 - dist1);
+    const min = Math.min(dist1, dist2);
+    const sign = -Math.sign((((newGPSPos.lon + 180) + (360 - (currentGPSPos.lon + 180))) % 360) - 180);
+    
+    newGPSPos.lon = currentGPSPos.lon + min * sign;
+
     const tl = anime.timeline({});
     tl.add(
       {
