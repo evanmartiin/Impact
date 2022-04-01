@@ -5,6 +5,7 @@ import { RouterLink, RouterView } from "vue-router";
 import { webglStore } from '@/stores/webglStore'
 import DistrictCard from '@/components/DistrictCard.vue'
 import Lifebar from '@/components/Lifebar.vue'
+import Toolbar from '@/components/Toolbar.vue'
 
 const selectedDistrict = ref('');
 
@@ -26,13 +27,14 @@ onMounted(() => {
 <template>
   <main>
     <canvas id="webgl"></canvas>
-    <nav id="nav">
+    <!-- <nav id="nav">
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/experience">Experience</RouterLink>
       <RouterLink to="/credits">Credits</RouterLink>
-    </nav>
-    <RouterView />
+    </nav> -->
+    <!-- <RouterView /> -->
     <Lifebar />
+    <Toolbar />
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
   </main>
 </template>

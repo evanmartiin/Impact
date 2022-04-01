@@ -16,6 +16,7 @@ export default class Mouse extends EventEmitter {
   public speedX = 0;
   public speedY = 0;
   public mouseVector = new Vector2();
+  private mouseClicking: Boolean = false;
 
   constructor() {
     super();
@@ -26,10 +27,16 @@ export default class Mouse extends EventEmitter {
     document.addEventListener("mouseleave", () => this.setIsInScreen(false));
     document.addEventListener("mouseleave", () => this.setIsInScreen(false));
     document.addEventListener("mousedown", () => {
-      this.trigger("click_start");
+      this.mouseClicking = true;
     });
     document.addEventListener("mouseup", () => {
       this.trigger("click_end");
+      this.mouseClicking = false;
+    });
+    document.addEventListener("mousemove", () => {
+      if (this.mouseClicking) {
+        this.trigger("mouse_grab");
+      }
     });
   }
 

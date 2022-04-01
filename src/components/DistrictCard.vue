@@ -22,10 +22,12 @@ const props = defineProps({
     <div class="available-transport">
         <p>Available means of transport</p>
         <div>
-            <Icon image="bus" />
+            <Icon image="bus" :disabled="true" />
             <Icon image="bike" />
         </div>
     </div>
+
+    <button>Move here</button>
 
     <div class="selector"></div>
 </div>
@@ -36,9 +38,10 @@ const props = defineProps({
     background-color: #FAF7F1;
     padding: 20px;
     position: relative;
-    top: 40vh;
-    left: 15vw;
-    transform: translateY(-50%);
+    top: 50vh;
+    left: 50vw;
+    width: 300px;
+    transform: translate(calc(-50% - 400px), calc(-50% - 50px));
     padding: 30px 30px;
     border-radius: 50px;
     color: #84807E;

@@ -3,13 +3,16 @@ const props = defineProps({
     image: {
         type: String,
         required: true
+    },
+    disabled: {
+        type: Boolean
     }
 })
 </script>
 
 <template>
 <div class="icon">
-    <img :src="`images/${image}.png`" alt="">
+    <img :src="`images/${image}.png`" :class="{ disabled: props.disabled }" alt="">
 </div>
 </template>
 
@@ -28,6 +31,10 @@ const props = defineProps({
 
     img {
         width: 80px;
+
+        &.disabled {
+            filter: grayscale(1);
+        }
     }
 }
 </style>

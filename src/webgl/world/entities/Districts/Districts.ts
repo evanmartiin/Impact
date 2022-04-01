@@ -48,7 +48,7 @@ export default class Districts extends EventEmitter {
 
     this.setModels();
 
-    this.mouse.on('click_start', () => {
+    this.mouse.on('mouse_grab', () => {
       this.trigger('no_district_selected');
     });
 
