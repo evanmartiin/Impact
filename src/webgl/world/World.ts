@@ -8,7 +8,6 @@ import type { district } from "./../../models/district.model";
 import Districts from "./entities/Districts/Districts";
 import Earth from "./entities/Earth/Earth";
 import Environment from "./Environment";
-import Toolbox from './Toolbox';
 import Character from "./entities/Character/Character";
 
 export default class World {
@@ -23,7 +22,6 @@ export default class World {
   private debugFolder: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
   public currentScene: district = "earth";
-  public toolbox: Toolbox = new Toolbox();
   public character: Character | null = null;
 
   constructor() {
@@ -78,6 +76,5 @@ export default class World {
 
   destroy() {
     this.environment?.destroy();
-    this.earth?.destroy();
   }
 }

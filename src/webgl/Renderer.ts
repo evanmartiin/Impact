@@ -3,13 +3,11 @@ import type Mouse from "@/webgl/controllers/Mouse";
 import type Sizes from "@/webgl/controllers/Sizes";
 import {
   CineonToneMapping,
-  Color,
   Object3D,
   PCFSoftShadowMap,
   Raycaster,
   Scene,
   sRGBEncoding,
-  Vector2,
   WebGLRenderer,
   type Intersection,
 } from "three";
@@ -80,22 +78,16 @@ export default class Renderer {
         .map((object) => {
           this.intersects.push(object);
         });
-
-      let selectedObjects = [];
-      if (
-        this.intersects.length > 0 &&
-        this.districtNames.includes(this.intersects[0].object.name)
-      ) {
-        this.hoveredDistrict = this.intersects[0].object;
-        selectedObjects.push(this.hoveredDistrict);
-      } else {
-        selectedObjects =
-          this.experience.world.earth.earthGroup.children[0].children.filter(
-            (model) => this.districtNames.includes(model.name)
-          );
-        this.hoveredDistrict = undefined;
-      }
-
+        
+          let selectedObjects = [];
+          if (this.intersects.length > 0 && this.districtNames.includes(this.intersects[0].object.name)) {
+            this.hoveredDistrict = this.intersects[0].object;
+            selectedObjects.push(this.hoveredDistrict);
+          } else {
+            selectedObjects = this.experience.world.earth.earthGroup.children[0].children.filter((model) => this.districtNames.includes(model.name));
+            this.hoveredDistrict = undefined;
+          }
+        
       this.instance?.render(this.scene, this.camera.instance);
     }
   }

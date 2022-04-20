@@ -9,20 +9,17 @@ import anime from "animejs";
 import { Group, MeshBasicMaterial, Object3D, Scene, Mesh } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi } from "tweakpane";
-import Tree from "../Tree/Tree";
 import type Time from "@/webgl/controllers/Time";
 
 export default class Earth {
   private experience: Experience = new Experience();
   private scene: Scene = this.experience.scene as Scene;
-  private mouse: Mouse = this.experience.mouse as Mouse;
   private sizes: Sizes = this.experience.sizes as Sizes;
   private time: Time = this.experience.time as Time;
   private camera: Camera = this.experience.camera as Camera;
   private loaders: Loaders = this.experience.loaders as Loaders;
   private debug: Debug = this.experience.debug as Debug;
   private debugFolder: FolderApi | undefined = undefined;
-  private trees: Tree[] | null = null;
   private earth: Group | null = null;
   public earthGroup: Group = new Group();
   private model: GLTF | null = null;
@@ -31,13 +28,11 @@ export default class Earth {
 
   constructor() {
     this.setMesh();
-
     this.setDebug();
   }
 
   setMesh() {
-
-    this.model = this.loaders.items["earthv1"] as GLTF;
+    this.model = this.loaders.items["earthv2"] as GLTF;
     this.earth = new Group();
     const meshes = [];
     meshes.push(...this.model.scene.children);
@@ -45,18 +40,10 @@ export default class Earth {
     meshes.map((child) => {
       if (typeof child === "object") {
         this.earth?.add(child);
-        if (
-          child.name === "ville" ||
-          child.name === "mamie" ||
-          child.name === "maison"
-        ) {
-          if (child instanceof Mesh) {
-            child.material = new MeshBasicMaterial({
-              color: 0xffffff,
-              transparent: true,
-            });
-            this.districtsMeshes.push(child);
-          }
+        
+        if ((child.name === "zone_maison001" || child.name === "zone_mamie" || child.name === "zone_maison") && child instanceof Mesh) {
+          child.material = new MeshBasicMaterial({ color: 0xffffff, transparent: true })
+          this.districtsMeshes.push(child);
         }
       }
     });
@@ -115,6 +102,7 @@ export default class Earth {
       this.isDisplayed = true;
     }
   }
+
   disappear() {
     if (this.isDisplayed) {
       const tl = anime.timeline({});
@@ -189,6 +177,5 @@ export default class Earth {
     });
   }
   destroy() {
-    this.trees?.map((tree) => tree.destroy());
   }
 }

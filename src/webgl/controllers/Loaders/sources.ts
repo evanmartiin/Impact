@@ -2,19 +2,9 @@ import type { ISource } from "@/models/webgl/source.model";
 
 const Sources: ISource[] = [
   {
-    name: "earthHeightTexture",
-    type: "texture",
-    path: "/textures/earth-height.png",
-  },
-  {
-    name: "district1",
+    name: "house",
     type: "gltfModel",
-    path: "/models/mapRoad.glb",
-  },
-  {
-    name: "earthWithBuildingSketch",
-    type: "gltfModel",
-    path: "/models/earthWithBuildingSketch.glb",
+    path: "/models/district1.glb",
   },
   {
     name: "character",
@@ -22,14 +12,9 @@ const Sources: ISource[] = [
     path: "/models/character.glb",
   },
   {
-    name: "house",
+    name: "earthv2",
     type: "gltfModel",
-    path: "/models/house.glb",
-  },
-  {
-    name: "earthv1",
-    type: "gltfModel",
-    path: "/models/earthv1.glb",
+    path: "/models/earthv2.glb",
   },
   {
     name: "housev1",
