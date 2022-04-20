@@ -14,7 +14,6 @@ import type Time from "@/webgl/controllers/Time";
 export default class Earth {
   private experience: Experience = new Experience();
   private scene: Scene = this.experience.scene as Scene;
-  private mouse: Mouse = this.experience.mouse as Mouse;
   private sizes: Sizes = this.experience.sizes as Sizes;
   private time: Time = this.experience.time as Time;
   private camera: Camera = this.experience.camera as Camera;
@@ -42,15 +41,11 @@ export default class Earth {
     meshes.map((child) => {
       if (typeof child === "object") {
         this.earth?.add(child);
-        console.log(child.name);
         
         if (child.name === "zone_maison001" || child.name === "zone_mamie" || child.name === "zone_maison") {
           child.material = new MeshBasicMaterial({ color: 0xffffff, transparent: true })
           this.districtsMeshes.push(child);
         }
-        // if (child.name === "zone_ville" || child.name === "zone_mamie" || child.name === "zone_maison") {
-        //   child.material = new MeshBasicMaterial({ color: 0x00ff00 })
-        // }
       }
     });
     this.districtsMeshes = [...new Set(this.districtsMeshes)];
@@ -207,7 +202,7 @@ export default class Earth {
     ) {
       this.earthGroup.position.copy(this.camera.instance.position);
       this.earthGroup.rotation.copy(this.camera.instance.rotation);
-      this.earthGroup.updateMatrix(); // this line seems unnecessary;
+      this.earthGroup.updateMatrix();
       if (this.earth && this.experience.time?.delta)
         this.earth.rotation.y += this.experience.time?.delta * 0.0001;
       this.earthGroup.translateZ(-1);
@@ -218,6 +213,5 @@ export default class Earth {
     this.districtsMeshes.forEach((district) => {
       district.material.opacity = (Math.cos(this.time.elapsed/300)+1)/2;
     })
-    
   }
 }
