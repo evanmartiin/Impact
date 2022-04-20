@@ -16,6 +16,11 @@ const Sources: ISource[] = [
     type: "gltfModel",
     path: "/models/earthv2.glb",
   },
+  {
+    name: "housev1",
+    type: "gltfModel",
+    path: "/models/housev1.glb",
+  },
 ];
 
 export default Sources;

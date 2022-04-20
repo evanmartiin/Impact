@@ -6,7 +6,7 @@ import type { GPSPos } from "@/models/webgl/GPSPos.model";
 import Experience from "@/webgl/Experience";
 import type Camera from "@/webgl/world/Camera";
 import anime from "animejs";
-import { Group, MeshBasicMaterial, Object3D, Scene } from "three";
+import { Group, MeshBasicMaterial, Object3D, Scene, Mesh } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi } from "tweakpane";
 import type Time from "@/webgl/controllers/Time";
@@ -22,10 +22,9 @@ export default class Earth {
   private debugFolder: FolderApi | undefined = undefined;
   private earth: Group | null = null;
   public earthGroup: Group = new Group();
-  private isMiniWorld = false;
-  private miniWorldTranslateY = { value: -5 };
   private model: GLTF | null = null;
   private districtsMeshes: Object3D[] = [];
+  private isDisplayed = false;
 
   constructor() {
     this.setMesh();
@@ -42,7 +41,7 @@ export default class Earth {
       if (typeof child === "object") {
         this.earth?.add(child);
         
-        if (child.name === "zone_maison001" || child.name === "zone_mamie" || child.name === "zone_maison") {
+        if ((child.name === "zone_maison001" || child.name === "zone_mamie" || child.name === "zone_maison") && child instanceof Mesh) {
           child.material = new MeshBasicMaterial({ color: 0xffffff, transparent: true })
           this.districtsMeshes.push(child);
         }
@@ -70,26 +69,13 @@ export default class Earth {
         0
       );
     }
+    this.isDisplayed = true;
   }
 
   appear() {
-    if (this.isMiniWorld) {
-      if (this.sizes.viewSizeAtDepth) {
-      }
+    if (!this.isDisplayed) {
       if (this.earthGroup && this.camera.instance && this.camera.controls) {
         const tl = anime.timeline({});
-        tl.add(
-          {
-            targets: this.miniWorldTranslateY,
-            value: [0.2, 1],
-            easing: "easeInOutQuart",
-            duration: 300,
-            complete: () => {
-              this.isMiniWorld = false;
-            },
-          },
-          0
-        );
         tl.add(
           {
             targets: this.earthGroup?.position,
@@ -113,11 +99,12 @@ export default class Earth {
           300
         );
       }
+      this.isDisplayed = true;
     }
   }
 
   disappear() {
-    if (!this.isMiniWorld) {
+    if (this.isDisplayed) {
       const tl = anime.timeline({});
       tl.add(
         {
@@ -138,21 +125,10 @@ export default class Earth {
           z: [this.earthGroup?.scale.z, 0.1],
           easing: "easeInOutQuart",
           duration: 700,
-          complete: () => {
-            this.isMiniWorld = true;
-          },
         },
         0
       );
-      tl.add(
-        {
-          targets: this.miniWorldTranslateY,
-          value: [1, 0.2],
-          easing: "easeInOutQuart",
-          duration: 300,
-        },
-        700
-      );
+      this.isDisplayed = false;
     }
   }
 
@@ -194,24 +170,12 @@ export default class Earth {
     }
   }
   update() {
-    if (
-      this.earthGroup &&
-      this.camera.instance &&
-      this.isMiniWorld &&
-      this.sizes.viewSizeAtDepth
-    ) {
-      this.earthGroup.position.copy(this.camera.instance.position);
-      this.earthGroup.rotation.copy(this.camera.instance.rotation);
-      this.earthGroup.updateMatrix();
-      if (this.earth && this.experience.time?.delta)
-        this.earth.rotation.y += this.experience.time?.delta * 0.0001;
-      this.earthGroup.translateZ(-1);
-      this.earthGroup.translateX(0.2);
-      this.earthGroup.translateY(-this.miniWorldTranslateY.value);
-    }
-    
     this.districtsMeshes.forEach((district) => {
-      district.material.opacity = (Math.cos(this.time.elapsed/300)+1)/2;
-    })
+      if (district instanceof Mesh) {
+        district.material.opacity = (Math.cos(this.time.elapsed / 300) + 1) / 2;
+      }
+    });
+  }
+  destroy() {
   }
 }

@@ -30,7 +30,7 @@ const store = webglStore();
         </div>
     </div>
 
-    <button @click="() => { store.experience.world.changeScene('district1') }">Move here</button>
+    <button @click="() => { store.experience.world.changeScene('home') }">Move here</button>
 
     <div class="selector"></div>
 </div>
