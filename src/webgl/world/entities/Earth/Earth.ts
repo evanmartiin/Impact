@@ -6,7 +6,7 @@ import type { GPSPos } from "@/models/webgl/GPSPos.model";
 import Experience from "@/webgl/Experience";
 import type Camera from "@/webgl/world/Camera";
 import anime from "animejs";
-import { Group, MeshBasicMaterial, Object3D, Scene } from "three";
+import { Group, MeshBasicMaterial, Object3D, Scene, Mesh } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi } from "tweakpane";
 import Tree from "../Tree/Tree";
@@ -25,19 +25,18 @@ export default class Earth {
   private trees: Tree[] | null = null;
   private earth: Group | null = null;
   public earthGroup: Group = new Group();
-  private isMiniWorld = false;
-  private miniWorldTranslateY = { value: -5 };
   private model: GLTF | null = null;
   private districtsMeshes: Object3D[] = [];
+  private isDisplayed = false;
 
   constructor() {
     this.setMesh();
-    // this.setTrees();
 
     this.setDebug();
   }
 
   setMesh() {
+
     this.model = this.loaders.items["earthv1"] as GLTF;
     this.earth = new Group();
     const meshes = [];
@@ -46,13 +45,19 @@ export default class Earth {
     meshes.map((child) => {
       if (typeof child === "object") {
         this.earth?.add(child);
-        if (child.name === "ville" || child.name === "mamie" || child.name === "maison") {
-          child.material = new MeshBasicMaterial({ color: 0xffffff, transparent: true })
-          this.districtsMeshes.push(child);
+        if (
+          child.name === "ville" ||
+          child.name === "mamie" ||
+          child.name === "maison"
+        ) {
+          if (child instanceof Mesh) {
+            child.material = new MeshBasicMaterial({
+              color: 0xffffff,
+              transparent: true,
+            });
+            this.districtsMeshes.push(child);
+          }
         }
-        // if (child.name === "zone_ville" || child.name === "zone_mamie" || child.name === "zone_maison") {
-        //   child.material = new MeshBasicMaterial({ color: 0x00ff00 })
-        // }
       }
     });
     this.districtsMeshes = [...new Set(this.districtsMeshes)];
@@ -77,41 +82,13 @@ export default class Earth {
         0
       );
     }
+    this.isDisplayed = true;
   }
 
-  setTrees() {
-    const GPSPosArray: GPSPos[] = [];
-
-    for (let i = 0; i < 100; i++) {
-      GPSPosArray.push({
-        lat: Math.round(Math.random() * 360 - 180),
-        lon: Math.round(Math.random() * 360 - 180),
-      });
-    }
-
-    GPSPosArray.forEach((GPSpos: GPSPos) => {
-      const cube = new Tree(GPSpos.lat, GPSpos.lon);
-      this.trees?.push(cube);
-    });
-  }
   appear() {
-    if (this.isMiniWorld) {
-      if (this.sizes.viewSizeAtDepth) {
-      }
+    if (!this.isDisplayed) {
       if (this.earthGroup && this.camera.instance && this.camera.controls) {
         const tl = anime.timeline({});
-        tl.add(
-          {
-            targets: this.miniWorldTranslateY,
-            value: [0.2, 1],
-            easing: "easeInOutQuart",
-            duration: 300,
-            complete: () => {
-              this.isMiniWorld = false;
-            },
-          },
-          0
-        );
         tl.add(
           {
             targets: this.earthGroup?.position,
@@ -135,10 +112,11 @@ export default class Earth {
           300
         );
       }
+      this.isDisplayed = true;
     }
   }
   disappear() {
-    if (!this.isMiniWorld) {
+    if (this.isDisplayed) {
       const tl = anime.timeline({});
       tl.add(
         {
@@ -159,21 +137,10 @@ export default class Earth {
           z: [this.earthGroup?.scale.z, 0.1],
           easing: "easeInOutQuart",
           duration: 700,
-          complete: () => {
-            this.isMiniWorld = true;
-          },
         },
         0
       );
-      tl.add(
-        {
-          targets: this.miniWorldTranslateY,
-          value: [1, 0.2],
-          easing: "easeInOutQuart",
-          duration: 300,
-        },
-        700
-      );
+      this.isDisplayed = false;
     }
   }
 
@@ -215,26 +182,11 @@ export default class Earth {
     }
   }
   update() {
-    if (
-      this.earthGroup &&
-      this.camera.instance &&
-      this.isMiniWorld &&
-      this.sizes.viewSizeAtDepth
-    ) {
-      this.earthGroup.position.copy(this.camera.instance.position);
-      this.earthGroup.rotation.copy(this.camera.instance.rotation);
-      this.earthGroup.updateMatrix(); // this line seems unnecessary;
-      if (this.earth && this.experience.time?.delta)
-        this.earth.rotation.y += this.experience.time?.delta * 0.0001;
-      this.earthGroup.translateZ(-1);
-      this.earthGroup.translateX(0.2);
-      this.earthGroup.translateY(-this.miniWorldTranslateY.value);
-    }
-    
     this.districtsMeshes.forEach((district) => {
-      district.material.opacity = (Math.cos(this.time.elapsed/300)+1)/2;
-    })
-    
+      if (district instanceof Mesh) {
+        district.material.opacity = (Math.cos(this.time.elapsed / 300) + 1) / 2;
+      }
+    });
   }
   destroy() {
     this.trees?.map((tree) => tree.destroy());

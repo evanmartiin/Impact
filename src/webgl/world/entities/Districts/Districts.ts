@@ -1,4 +1,3 @@
-
 import calcGPSFromPos from "@/utils/calcGPSFromPos";
 import calcPosFromGPS from "@/utils/calcPosFromGPS";
 import EventEmitter from "@/webgl/controllers/EventEmitter";
@@ -66,20 +65,24 @@ export default class Districts extends EventEmitter {
   }
 
   enableMovements() {
-    document.addEventListener('keydown', (e) => { this.handleMovements(e) });
+    document.addEventListener("keydown", (e) => {
+      this.handleMovements(e);
+    });
   }
 
   disableMovements() {
-    document.removeEventListener('keydown', (e) => { this.handleMovements(e) });
+    document.removeEventListener("keydown", (e) => {
+      this.handleMovements(e);
+    });
   }
 
   handleMovements(e: any) {
     e = e || window.event;
 
-     if (e.key === "ArrowLeft") {
-      this.experience.camera?.rotate(-.1);
+    if (e.key === "ArrowLeft") {
+      this.experience.camera?.rotate(-0.1);
     } else if (e.key === "ArrowRight") {
-      this.experience.camera?.rotate(.1);
+      this.experience.camera?.rotate(0.1);
     }
   }
 

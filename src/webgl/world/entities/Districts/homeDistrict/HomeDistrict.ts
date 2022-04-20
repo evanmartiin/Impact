@@ -18,7 +18,7 @@ export default class HomeDistrict {
   }
 
   init() {
-    const districtModel = this.loaders.items["house"] as GLTF;
+    const districtModel = this.loaders.items["housev1"] as GLTF;
     this.instance.add(districtModel.scene);
     const scale = 0.2;
     this.instance.position.set(0, -20, 0);

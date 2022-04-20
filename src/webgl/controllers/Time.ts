@@ -3,7 +3,7 @@ import EventEmitter from "@/webgl/controllers/EventEmitter";
 export default class Time extends EventEmitter {
   private start: number | null = null;
   private current: number | null = null;
-  protected elapsed = 0;
+  public elapsed = 0;
   public delta = 16;
 
   constructor() {

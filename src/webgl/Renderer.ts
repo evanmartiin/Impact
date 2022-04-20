@@ -13,11 +13,6 @@ import {
   WebGLRenderer,
   type Intersection,
 } from "three";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
-import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader.js";
 import Experience from "./Experience";
 import type Camera from "./world/Camera";
 
@@ -33,15 +28,11 @@ export default class Renderer {
   public raycaster: Raycaster = new Raycaster();
   private intersects: Intersection[] = [];
   private intersectionController = new intersectionController();
-
-  private composer: EffectComposer | undefined;
-  private outlinePass: OutlinePass | undefined;
   private districtNames: string[] = ["maison", "ville", "mamie"];
   public hoveredDistrict: Object3D | undefined;
 
   constructor() {
     this.setInstance();
-    // this.setOutlines();
   }
 
   setInstance() {
@@ -89,48 +80,23 @@ export default class Renderer {
         .map((object) => {
           this.intersects.push(object);
         });
-        
-        // if (this.outlinePass) {
-          let selectedObjects = [];
-          if (this.intersects.length > 0 && this.districtNames.includes(this.intersects[0].object.name)) {
-            // this.outlinePass.edgeStrength = 3;
-            this.hoveredDistrict = this.intersects[0].object;
-            selectedObjects.push(this.hoveredDistrict);
-          } else {
-            // this.outlinePass.edgeStrength = 1.5;
-            selectedObjects = this.experience.world.earth.earthGroup.children[0].children.filter((model) => this.districtNames.includes(model.name));
-            this.hoveredDistrict = undefined;
-          }
-          // this.outlinePass.selectedObjects = selectedObjects;
-        // }
-        
+
+      let selectedObjects = [];
+      if (
+        this.intersects.length > 0 &&
+        this.districtNames.includes(this.intersects[0].object.name)
+      ) {
+        this.hoveredDistrict = this.intersects[0].object;
+        selectedObjects.push(this.hoveredDistrict);
+      } else {
+        selectedObjects =
+          this.experience.world.earth.earthGroup.children[0].children.filter(
+            (model) => this.districtNames.includes(model.name)
+          );
+        this.hoveredDistrict = undefined;
+      }
+
       this.instance?.render(this.scene, this.camera.instance);
-      // this.composer?.render();
-    }
-  }
-
-  setOutlines() {
-    if (this.instance && this.camera.instance) {
-      this.composer = new EffectComposer(this.instance);
-
-      const renderPass = new RenderPass(this.scene, this.camera.instance);
-      this.composer.addPass(renderPass);
-
-      this.outlinePass = new OutlinePass(
-        new Vector2(this.sizes.width, this.sizes.height),
-        this.scene,
-        this.camera.instance
-      );
-      this.outlinePass.visibleEdgeColor = new Color("#ffffff");
-      this.outlinePass.edgeStrength = 1.5;
-      this.composer.addPass(this.outlinePass);
-
-      const effectFXAA = new ShaderPass(FXAAShader);
-      effectFXAA.uniforms["resolution"].value.set(
-        1 / this.sizes.width,
-        1 / this.sizes.height
-      );
-      this.composer.addPass(effectFXAA);
     }
   }
 }
