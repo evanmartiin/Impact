@@ -1,13 +1,15 @@
-import type Loaders from "@/controllers/webglControllers/Loaders/Loaders";
+import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import anime from "animejs";
 import { Group } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
+import Character from "@/webgl/world/entities/Character/Character";
 
-export default class District1 {
+export default class HomeDistrict {
   private experience: Experience = new Experience();
   private loaders: Loaders = this.experience.loaders as Loaders;
   public instance: Group = new Group();
+  private character: Character = new Character();
   private isInit = false;
   private isDisplayed = false;
 
@@ -16,12 +18,47 @@ export default class District1 {
   }
 
   init() {
-    const districtModel = this.loaders.items["map"] as GLTF;
+    const districtModel = this.loaders.items["house"] as GLTF;
     this.instance.add(districtModel.scene);
     const scale = 0.2;
     this.instance.position.set(0, -20, 0);
     this.instance.scale.set(scale, scale, scale);
     this.instance.visible = false;
+    this.isInit = true;
+  }
+
+  handleArrowDown(event: KeyboardEvent) {
+    switch (event.key) {
+      case "ArrowLeft":
+        this.character.walkLeft("down");
+        break;
+      case "ArrowRight":
+        this.character.walkRight("down");
+        break;
+      case "ArrowUp":
+        // Up pressed
+        break;
+      case "ArrowDown":
+        // Down pressed
+        break;
+    }
+  }
+
+  handleArrowUp(event: KeyboardEvent) {
+    switch (event.key) {
+      case "ArrowLeft":
+        this.character.walkLeft("up");
+        break;
+      case "ArrowRight":
+        this.character.walkRight("up");
+        break;
+      case "ArrowUp":
+        // Up pressed
+        break;
+      case "ArrowDown":
+        // Down pressed
+        break;
+    }
   }
 
   appear() {
@@ -41,7 +78,10 @@ export default class District1 {
         easing: "easeInOutQuart",
         duration: 1000,
       });
+      this.character.appear();
     }
+    addEventListener("keydown", this.handleArrowDown);
+    addEventListener("keyup", this.handleArrowUp);
   }
   disappear() {
     if (!this.isDisplayed) {
@@ -66,6 +106,9 @@ export default class District1 {
           // });
         },
       });
+      this.character.disappear();
+      removeEventListener("keydown", this.handleArrowDown);
+      removeEventListener("keyup", this.handleArrowUp);
     }
   }
 }

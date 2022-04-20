@@ -1,4 +1,4 @@
-import type Sizes from "@/controllers/webglControllers/Sizes";
+import type Sizes from "@/webgl/controllers/Sizes";
 import { PerspectiveCamera, Scene } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Experience from "../Experience";

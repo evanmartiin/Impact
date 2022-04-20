@@ -1,4 +1,4 @@
-import EventEmitter from "@/controllers/globalControllers/EventEmitter";
+import EventEmitter from "@/webgl/controllers/EventEmitter";
 
 export default class Time extends EventEmitter {
   private start: number | null = null;

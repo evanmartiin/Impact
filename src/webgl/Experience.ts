@@ -1,9 +1,10 @@
-import Debug from "@/controllers/globalControllers/Debug";
-import Loaders from "@/controllers/webglControllers/Loaders/Loaders";
-import Sources from "@/controllers/webglControllers/Loaders/sources";
-import Mouse from "@/controllers/webglControllers/Mouse";
-import Sizes from "@/controllers/webglControllers/Sizes";
-import Time from "@/controllers/webglControllers/Time";
+import Debug from "@/webgl/controllers/Debug";
+import AnimationController from "@/webgl/controllers/AnimationController";
+import Loaders from "@/webgl/controllers/Loaders/Loaders";
+import Sources from "@/webgl/controllers/Loaders/sources";
+import Mouse from "@/webgl/controllers/Mouse";
+import Sizes from "@/webgl/controllers/Sizes";
+import Time from "@/webgl/controllers/Time";
 import type { ISource } from "@/models/webgl/source.model";
 import { AxesHelper, Mesh, Scene } from "three";
 import Renderer from "./Renderer";
@@ -28,6 +29,7 @@ export default class Experience {
   public loaders: Loaders | null = null;
   public camera: Camera | null = null;
   public renderer: Renderer | null = null;
+  public animationController: AnimationController | null = null;
 
   private sources: ISource[] | null = null;
   public world: World | null = null;
@@ -51,6 +53,7 @@ export default class Experience {
     this.debug = new Debug();
     this.scene = new Scene();
     this.camera = new Camera();
+    this.animationController = new AnimationController();
     this.world = new World();
     this.renderer = new Renderer();
 
@@ -80,6 +83,7 @@ export default class Experience {
   }
 
   update() {
+    if (this.time) this.animationController?.update(this.time?.delta);
     this.camera?.update();
     this.world?.update();
     this.renderer?.update();

@@ -1,1 +1,1 @@
-export type district = "earth" | "district1";
+export type district = "earth" | "home";
