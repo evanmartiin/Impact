@@ -8,6 +8,7 @@ import Lifebar from '@/components/Lifebar.vue'
 import Toolbar from '@/components/Toolbar.vue'
 
 const selectedDistrict = ref('');
+const ownedTools = ref([]);
 
 onMounted(() => {
   const experience = new Experience(document.getElementById("webgl") as HTMLCanvasElement);
@@ -21,6 +22,13 @@ onMounted(() => {
       selectedDistrict.value = '';
     })
   })
+  store.experience.world.toolbox.on('tool_added', (tool) => {
+    ownedTools.value.push(tool);
+  })
+  store.experience.world.toolbox.on('tool_removed', (tool) => {
+    const index = ownedTools.value.findIndex((el) => el === tool);
+    ownedTools.value.splice(index, 1);
+  })
 });
 </script>
 
@@ -33,8 +41,8 @@ onMounted(() => {
       <RouterLink to="/credits">Credits</RouterLink>
     </nav> -->
     <!-- <RouterView /> -->
-    <Lifebar />
-    <Toolbar />
+    <!-- <Lifebar /> -->
+    <!-- <Toolbar :tools="ownedTools" /> -->
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
   </main>
 </template>

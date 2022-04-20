@@ -1,5 +1,6 @@
 <script setup>
 import Icon from './Icon.vue';
+import { webglStore } from '@/stores/webglStore'
 
 const props = defineProps({
   name: {
@@ -7,6 +8,8 @@ const props = defineProps({
     required: true
   }
 })
+
+const store = webglStore();
 </script>
 
 <template>
@@ -27,7 +30,7 @@ const props = defineProps({
         </div>
     </div>
 
-    <button>Move here</button>
+    <button @click="() => { store.experience.world.changeScene('district1') }">Move here</button>
 
     <div class="selector"></div>
 </div>

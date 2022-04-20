@@ -41,7 +41,7 @@ export default class Renderer {
 
   constructor() {
     this.setInstance();
-    this.setOutlines();
+    // this.setOutlines();
   }
 
   setInstance() {
@@ -90,22 +90,22 @@ export default class Renderer {
           this.intersects.push(object);
         });
         
-        if (this.outlinePass) {
+        // if (this.outlinePass) {
           let selectedObjects = [];
           if (this.intersects.length > 0 && this.districtNames.includes(this.intersects[0].object.name)) {
-            this.outlinePass.edgeStrength = 3;
+            // this.outlinePass.edgeStrength = 3;
             this.hoveredDistrict = this.intersects[0].object;
             selectedObjects.push(this.hoveredDistrict);
           } else {
-            this.outlinePass.edgeStrength = 1.5;
+            // this.outlinePass.edgeStrength = 1.5;
             selectedObjects = this.experience.world.earth.earthGroup.children[0].children.filter((model) => this.districtNames.includes(model.name));
             this.hoveredDistrict = undefined;
           }
-          this.outlinePass.selectedObjects = selectedObjects;
-        }
+          // this.outlinePass.selectedObjects = selectedObjects;
+        // }
         
-      // this.instance?.render(this.scene, this.camera.instance);
-      this.composer?.render();
+      this.instance?.render(this.scene, this.camera.instance);
+      // this.composer?.render();
     }
   }
 

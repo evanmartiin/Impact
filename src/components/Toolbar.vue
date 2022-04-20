@@ -1,11 +1,19 @@
 <script setup>
 import Icon from './Icon.vue';
+
+const props = defineProps({
+    tools: {
+        type: Array,
+        required: true
+    }
+})
 </script>
 
 <template>
 <div class="toolbar">
-    <Icon image="phone" />
-    <Icon image="bike" />
+    <div v-for="tool in tools" :key="tool">
+        <Icon :image="tool" />
+    </div>
 </div>
 </template>
 

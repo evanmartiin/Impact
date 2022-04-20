@@ -49,18 +49,6 @@ export default class SceneFog {
               this.scene.fog = null;
             }
           });
-
-          // this.debugFolder?.addInput(this.scene.fog, "color");
-          // this.debugFolder?.addInput(this.scene.fog as Fog, "near", {
-          //   min: 0,
-          //   max: 100,
-          //   step: 0.1,
-          // });
-          // this.debugFolder?.addInput(this.scene.fog as Fog, "far", {
-          //   min: 0,
-          //   max: 100,
-          //   step: 0.1,
-          // });
         }
       }
     }

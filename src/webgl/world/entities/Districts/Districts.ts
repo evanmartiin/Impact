@@ -23,54 +23,83 @@ export default class Districts extends EventEmitter {
     {
       name: "mamie",
       pos: {
-        lat: 25 - this.shift.lat,
-        lon: -180 - this.shift.lon
-      }
+        lat: -10 - this.shift.lat,
+        lon: -10 - this.shift.lon,
+      },
     },
     {
       name: "ville",
       pos: {
-        lat: 45 - this.shift.lat,
-        lon: -30 - this.shift.lon
-      }
+        lat: 35 - this.shift.lat,
+        lon: 120 - this.shift.lon,
+      },
     },
     {
       name: "maison",
       pos: {
-        lat: 24 - this.shift.lat,
-        lon: 72 - this.shift.lon
-      }
-    }
-  ]
+        lat: 40 - this.shift.lat,
+        lon: -150 - this.shift.lon,
+      },
+    },
+  ];
 
   constructor() {
     super();
 
     this.setModels();
 
-    this.mouse.on('mouse_grab', () => {
-      this.trigger('no_district_selected');
+    this.mouse.on("mouse_grab", () => {
+      this.trigger("no_district_selected");
     });
 
-    this.mouse.on('click_end', () => {
+    this.mouse.on("click_end", () => {
       this.hoveredDistrict = this.experience.renderer?.hoveredDistrict;
       if (this.hoveredDistrict) {
-        this.trigger('district_selected', [this.hoveredDistrict]);
-        const districtPos = this.districtPositions.filter((district) => district.name === this.hoveredDistrict?.name)[0].pos;
+        this.trigger("district_selected", [this.hoveredDistrict]);
+        const districtPos = this.districtPositions.filter(
+          (district) => district.name === this.hoveredDistrict?.name
+        )[0].pos;
         this.rotateTo(districtPos);
       }
-    })
+    });
+  }
+
+  enableMovements() {
+    document.addEventListener('keydown', (e) => { this.handleMovements(e) });
+  }
+
+  disableMovements() {
+    document.removeEventListener('keydown', (e) => { this.handleMovements(e) });
+  }
+
+  handleMovements(e: any) {
+    e = e || window.event;
+
+     if (e.key === "ArrowLeft") {
+      this.experience.camera?.rotate(-.1);
+    } else if (e.key === "ArrowRight") {
+      this.experience.camera?.rotate(.1);
+    }
   }
 
   rotateTo(newGPSPos: GPSPos) {
-    const radius = this.experience.camera?.instance?.position.distanceTo(new Vector3());
-    const currentGPSPos = calcGPSFromPos(this.experience.camera?.instance?.position as Vector3, this.experience.camera?.instance?.position.distanceTo(new Vector3()) as number);
+    const radius = this.experience.camera?.instance?.position.distanceTo(
+      new Vector3()
+    );
+    const currentGPSPos = calcGPSFromPos(
+      this.experience.camera?.instance?.position as Vector3,
+      this.experience.camera?.instance?.position.distanceTo(
+        new Vector3()
+      ) as number
+    );
 
     const dist1 = Math.round(Math.abs(currentGPSPos.lon - newGPSPos.lon));
     const dist2 = Math.round(360 - dist1);
     const min = Math.min(dist1, dist2);
-    const sign = -Math.sign((((newGPSPos.lon + 180) + (360 - (currentGPSPos.lon + 180))) % 360) - 180);
-    
+    const sign = -Math.sign(
+      ((newGPSPos.lon + 180 + (360 - (currentGPSPos.lon + 180))) % 360) - 180
+    );
+
     newGPSPos.lon = currentGPSPos.lon + min * sign;
 
     if (this.experience.camera?.controls) {
@@ -93,7 +122,7 @@ export default class Districts extends EventEmitter {
           if (this.experience.camera?.controls) {
             this.experience.camera.controls.enableRotate = true;
           }
-        }
+        },
       },
       0
     );

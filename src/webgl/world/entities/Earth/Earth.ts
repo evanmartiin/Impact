@@ -2,11 +2,12 @@ import type Debug from "@/controllers/globalControllers/Debug";
 import type Loaders from "@/controllers/webglControllers/Loaders/Loaders";
 import type Mouse from "@/controllers/webglControllers/Mouse";
 import type Sizes from "@/controllers/webglControllers/Sizes";
+import type Time from "@/controllers/webglControllers/Time";
 import type { GPSPos } from "@/models/webgl/GPSPos.model";
 import Experience from "@/webgl/Experience";
 import type Camera from "@/webgl/world/Camera";
 import anime from "animejs";
-import { Group, Scene } from "three";
+import { Group, MeshBasicMaterial, Object3D, Scene } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi } from "tweakpane";
 import Tree from "../Tree/Tree";
@@ -16,6 +17,7 @@ export default class Earth {
   private scene: Scene = this.experience.scene as Scene;
   private mouse: Mouse = this.experience.mouse as Mouse;
   private sizes: Sizes = this.experience.sizes as Sizes;
+  private time: Time = this.experience.time as Time;
   private camera: Camera = this.experience.camera as Camera;
   private loaders: Loaders = this.experience.loaders as Loaders;
   private debug: Debug = this.experience.debug as Debug;
@@ -26,6 +28,7 @@ export default class Earth {
   private isMiniWorld = false;
   private miniWorldTranslateY = { value: -5 };
   private model: GLTF | null = null;
+  private districtsMeshes: Object3D[] = [];
 
   constructor() {
     this.setMesh();
@@ -35,7 +38,7 @@ export default class Earth {
   }
 
   setMesh() {
-    this.model = this.loaders.items["earthWithBuildingSketch"] as GLTF;
+    this.model = this.loaders.items["earthv1"] as GLTF;
     this.earth = new Group();
     const meshes = [];
     meshes.push(...this.model.scene.children);
@@ -43,8 +46,17 @@ export default class Earth {
     meshes.map((child) => {
       if (typeof child === "object") {
         this.earth?.add(child);
+        if (child.name === "ville" || child.name === "mamie" || child.name === "maison") {
+          child.material = new MeshBasicMaterial({ color: 0xffffff, transparent: true })
+          this.districtsMeshes.push(child);
+        }
+        // if (child.name === "zone_ville" || child.name === "zone_mamie" || child.name === "zone_maison") {
+        //   child.material = new MeshBasicMaterial({ color: 0x00ff00 })
+        // }
       }
     });
+    this.districtsMeshes = [...new Set(this.districtsMeshes)];
+
     this.earth.rotateY(Math.PI);
     this.earth.scale.set(1, 1, 1);
     this.earthGroup.add(this.earth);
@@ -219,6 +231,11 @@ export default class Earth {
       this.earthGroup.translateX(0.2);
       this.earthGroup.translateY(-this.miniWorldTranslateY.value);
     }
+    
+    this.districtsMeshes.forEach((district) => {
+      district.material.opacity = (Math.cos(this.time.elapsed/300)+1)/2;
+    })
+    
   }
   destroy() {
     this.trees?.map((tree) => tree.destroy());
