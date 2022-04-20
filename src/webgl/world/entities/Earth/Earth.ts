@@ -1,7 +1,7 @@
-import type Debug from "@/controllers/globalControllers/Debug";
-import type Loaders from "@/controllers/webglControllers/Loaders/Loaders";
-import type Mouse from "@/controllers/webglControllers/Mouse";
-import type Sizes from "@/controllers/webglControllers/Sizes";
+import type Debug from "@/webgl/controllers/Debug";
+import type Loaders from "@/webgl/controllers/Loaders/Loaders";
+import type Mouse from "@/webgl/controllers/Mouse";
+import type Sizes from "@/webgl/controllers/Sizes";
 import type { GPSPos } from "@/models/webgl/GPSPos.model";
 import Experience from "@/webgl/Experience";
 import type Camera from "@/webgl/world/Camera";
@@ -95,7 +95,6 @@ export default class Earth {
   }
   appear() {
     if (this.isMiniWorld) {
-      console.log(this.earthGroup.children[0].children);
       if (this.sizes.viewSizeAtDepth) {
       }
       if (this.earthGroup && this.camera.instance && this.camera.controls) {

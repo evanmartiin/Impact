@@ -1,4 +1,4 @@
-import EventEmitter from "@/controllers/globalControllers/EventEmitter";
+import EventEmitter from "@/webgl/controllers/EventEmitter";
 import type { IviewSizeAtDepth } from "@/models/webgl/sizes.model";
 import getViewSizeAtDepth from "@/utils/getViewSizeAtDepth";
 import Experience from "@/webgl/Experience";

@@ -1,5 +1,5 @@
-import EventEmitter from "@/controllers/globalControllers/EventEmitter";
-import type Sizes from "@/controllers/webglControllers/Sizes";
+import EventEmitter from "@/webgl/controllers/EventEmitter";
+import type Sizes from "@/webgl/controllers/Sizes";
 import Experience from "@/webgl/Experience";
 import { Vector2 } from "three";
 

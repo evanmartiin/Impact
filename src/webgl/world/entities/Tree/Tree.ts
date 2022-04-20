@@ -1,4 +1,4 @@
-import type Loaders from "@/controllers/webglControllers/Loaders/Loaders";
+import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import type { GPSPos } from "@/models/webgl/GPSPos.model";
 import calcPosFromGPS from "@/utils/calcPosFromGPS";
 import Experience from "@/webgl/Experience";

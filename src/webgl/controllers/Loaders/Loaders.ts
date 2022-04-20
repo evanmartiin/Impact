@@ -1,4 +1,4 @@
-import EventEmitter from "@/controllers/globalControllers/EventEmitter";
+import EventEmitter from "@/webgl/controllers/EventEmitter";
 import type { ILoaders, TfileLoader } from "@/models/webgl/loaders.model";
 import type { ISource } from "@/models/webgl/source.model";
 import { TextureLoader } from "three";
