@@ -9,7 +9,6 @@ import anime from "animejs";
 import { Group, MeshBasicMaterial, Object3D, Scene } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi } from "tweakpane";
-import Tree from "../Tree/Tree";
 import type Time from "@/webgl/controllers/Time";
 
 export default class Earth {
@@ -22,7 +21,6 @@ export default class Earth {
   private loaders: Loaders = this.experience.loaders as Loaders;
   private debug: Debug = this.experience.debug as Debug;
   private debugFolder: FolderApi | undefined = undefined;
-  private trees: Tree[] | null = null;
   private earth: Group | null = null;
   public earthGroup: Group = new Group();
   private isMiniWorld = false;
@@ -32,13 +30,11 @@ export default class Earth {
 
   constructor() {
     this.setMesh();
-    // this.setTrees();
-
     this.setDebug();
   }
 
   setMesh() {
-    this.model = this.loaders.items["earthv1"] as GLTF;
+    this.model = this.loaders.items["earthv2"] as GLTF;
     this.earth = new Group();
     const meshes = [];
     meshes.push(...this.model.scene.children);
@@ -46,7 +42,9 @@ export default class Earth {
     meshes.map((child) => {
       if (typeof child === "object") {
         this.earth?.add(child);
-        if (child.name === "ville" || child.name === "mamie" || child.name === "maison") {
+        console.log(child.name);
+        
+        if (child.name === "zone_maison001" || child.name === "zone_mamie" || child.name === "zone_maison") {
           child.material = new MeshBasicMaterial({ color: 0xffffff, transparent: true })
           this.districtsMeshes.push(child);
         }
@@ -79,21 +77,6 @@ export default class Earth {
     }
   }
 
-  setTrees() {
-    const GPSPosArray: GPSPos[] = [];
-
-    for (let i = 0; i < 100; i++) {
-      GPSPosArray.push({
-        lat: Math.round(Math.random() * 360 - 180),
-        lon: Math.round(Math.random() * 360 - 180),
-      });
-    }
-
-    GPSPosArray.forEach((GPSpos: GPSPos) => {
-      const cube = new Tree(GPSpos.lat, GPSpos.lon);
-      this.trees?.push(cube);
-    });
-  }
   appear() {
     if (this.isMiniWorld) {
       if (this.sizes.viewSizeAtDepth) {
@@ -137,6 +120,7 @@ export default class Earth {
       }
     }
   }
+
   disappear() {
     if (!this.isMiniWorld) {
       const tl = anime.timeline({});
@@ -235,8 +219,5 @@ export default class Earth {
       district.material.opacity = (Math.cos(this.time.elapsed/300)+1)/2;
     })
     
-  }
-  destroy() {
-    this.trees?.map((tree) => tree.destroy());
   }
 }
