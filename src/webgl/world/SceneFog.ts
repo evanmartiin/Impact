@@ -8,7 +8,7 @@ export default class SceneFog {
   private debug: Debug = this.experience.debug as Debug;
   private debugFolder: FolderApi | undefined = undefined;
 
-  private color: ColorRepresentation = "#F9F7E8";
+  private color: ColorRepresentation = "#45D7CE";
   private near: number = 15;
   private far: number = 20;
   private instance: Fog | null = null;
@@ -49,18 +49,6 @@ export default class SceneFog {
               this.scene.fog = null;
             }
           });
-
-          // this.debugFolder?.addInput(this.scene.fog, "color");
-          // this.debugFolder?.addInput(this.scene.fog as Fog, "near", {
-          //   min: 0,
-          //   max: 100,
-          //   step: 0.1,
-          // });
-          // this.debugFolder?.addInput(this.scene.fog as Fog, "far", {
-          //   min: 0,
-          //   max: 100,
-          //   step: 0.1,
-          // });
         }
       }
     }

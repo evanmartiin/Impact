@@ -4,6 +4,7 @@ import type Sizes from "@/webgl/controllers/Sizes";
 import {
   CineonToneMapping,
   Color,
+  Object3D,
   PCFSoftShadowMap,
   Raycaster,
   Scene,
@@ -36,6 +37,7 @@ export default class Renderer {
   private composer: EffectComposer | undefined;
   private outlinePass: OutlinePass | undefined;
   private districtNames: string[] = ["maison", "ville", "mamie"];
+  public hoveredDistrict: Object3D | undefined;
 
   constructor() {
     this.setInstance();
@@ -53,7 +55,7 @@ export default class Renderer {
     this.instance.toneMappingExposure = 1.75;
     this.instance.shadowMap.enabled = true;
     this.instance.shadowMap.type = PCFSoftShadowMap;
-    this.instance.setClearColor("#F9F7E8");
+    this.instance.setClearColor("#0C1B51");
     this.instance.setSize(this.sizes.width, this.sizes.height);
     this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 2));
     this.mouse.on("click", () => this.IntersActions());
@@ -87,25 +89,21 @@ export default class Renderer {
         .map((object) => {
           this.intersects.push(object);
         });
-
-      // if (this.outlinePass) {
-      let selectedObjects = [];
-      if (
-        this.intersects.length > 0 &&
-        this.districtNames.includes(this.intersects[0].object.name)
-      ) {
-        // this.outlinePass.edgeStrength = 3;
-        selectedObjects.push(this.intersects[0].object);
-      } else {
-        // this.outlinePass.edgeStrength = 1.5;
-        selectedObjects =
-          this.experience.world.earth.earthGroup.children[0].children.filter(
-            (model) => this.districtNames.includes(model.name)
-          );
-      }
-      // this.outlinePass.selectedObjects = selectedObjects;
-      // }
-
+        
+        // if (this.outlinePass) {
+          let selectedObjects = [];
+          if (this.intersects.length > 0 && this.districtNames.includes(this.intersects[0].object.name)) {
+            // this.outlinePass.edgeStrength = 3;
+            this.hoveredDistrict = this.intersects[0].object;
+            selectedObjects.push(this.hoveredDistrict);
+          } else {
+            // this.outlinePass.edgeStrength = 1.5;
+            selectedObjects = this.experience.world.earth.earthGroup.children[0].children.filter((model) => this.districtNames.includes(model.name));
+            this.hoveredDistrict = undefined;
+          }
+          // this.outlinePass.selectedObjects = selectedObjects;
+        // }
+        
       this.instance?.render(this.scene, this.camera.instance);
       // this.composer?.render();
     }

@@ -19,9 +19,9 @@ class intersectionController {
 
   cityClick = antiSpamClick(() => {
     if (this.world && this.world.districts && this.world.currentScene) {
-      this.world.earth?.disappear();
-      this.world.districts?.switchDistrict("district1");
-      this.world.currentScene = "district1";
+      // this.world.earth?.disappear();
+      // this.world.districts?.switchDistrict("district1");
+      // this.world.currentScene = "district1";
     }
   }, 300);
 }
