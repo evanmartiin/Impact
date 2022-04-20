@@ -1,4 +1,4 @@
-import StatsGUI from "@/controllers/webglControllers/Stats";
+import StatsGUI from "@/webgl/controllers/Stats";
 import { hsvToRgb } from "@tweakpane/core/dist/cjs/input-binding/color/model/color-model";
 import { Pane } from "tweakpane";
 import convertRGBtoHex from "@/utils/convertRGBtoHex";

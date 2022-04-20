@@ -1,13 +1,14 @@
-import EventEmitter from "@/controllers/globalControllers/EventEmitter";
-import type Mouse from "@/controllers/webglControllers/Mouse";
+
 import calcGPSFromPos from "@/utils/calcGPSFromPos";
 import calcPosFromGPS from "@/utils/calcPosFromGPS";
+import EventEmitter from "@/webgl/controllers/EventEmitter";
+import type Mouse from "@/webgl/controllers/Mouse";
 import Experience from "@/webgl/Experience";
 import anime from "animejs";
 import { Group, Vector3, type Scene } from "three";
 import type { district } from "./../../../../models/district.model";
 import type { GPSPos } from "./../../../../models/webgl/GPSPos.model";
-import District1 from "./District1/district1";
+import HomeDistrict from "./homeDistrict/HomeDistrict";
 
 export default class Districts extends EventEmitter {
   private experience: Experience = new Experience();
@@ -16,7 +17,7 @@ export default class Districts extends EventEmitter {
   private hoveredDistrict = this.experience.renderer?.hoveredDistrict;
   private instance: Group = new Group();
   private currentDistrict: district = "earth";
-  public district1: District1 | null = null;
+  public homeDistrict: HomeDistrict | null = null;
 
   private shift = { lat: 30, lon: -20 };
   private districtPositions = [
@@ -129,21 +130,21 @@ export default class Districts extends EventEmitter {
   }
 
   setModels() {
-    this.district1 = new District1();
-    this.instance.add(this.district1.instance);
+    this.homeDistrict = new HomeDistrict();
+    this.instance.add(this.homeDistrict.instance);
     this.scene.add(this.instance);
   }
   switchDistrict(district: district) {
     this.currentDistrict = district;
     switch (district) {
       case "earth":
-        this.district1?.disappear();
+        this.homeDistrict?.disappear();
         break;
-      case "district1":
-        this.district1?.appear();
+      case "home":
+        this.homeDistrict?.appear();
         break;
       default:
-        this.district1?.disappear();
+        this.homeDistrict?.disappear();
         break;
     }
   }

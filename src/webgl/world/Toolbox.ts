@@ -1,6 +1,7 @@
-import type Debug from "@/controllers/globalControllers/Debug";
-import EventEmitter from "@/controllers/globalControllers/EventEmitter";
+
 import type { FolderApi } from "tweakpane";
+import type Debug from "../controllers/Debug";
+import EventEmitter from "../controllers/EventEmitter";
 import Experience from "../Experience";
 
 export default class Toolbox extends EventEmitter {

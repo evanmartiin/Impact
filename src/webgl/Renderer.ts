@@ -1,6 +1,6 @@
-import intersectionController from "@/controllers/webglControllers/intertectionsActions";
-import type Mouse from "@/controllers/webglControllers/Mouse";
-import type Sizes from "@/controllers/webglControllers/Sizes";
+import intersectionController from "@/webgl/controllers/IntersectionController";
+import type Mouse from "@/webgl/controllers/Mouse";
+import type Sizes from "@/webgl/controllers/Sizes";
 import {
   CineonToneMapping,
   Color,
@@ -13,13 +13,13 @@ import {
   WebGLRenderer,
   type Intersection,
 } from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
+import { FXAAShader } from "three/examples/jsm/shaders/FXAAShader.js";
 import Experience from "./Experience";
 import type Camera from "./world/Camera";
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
-import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 
 export default class Renderer {
   private experience: Experience = new Experience();
@@ -116,13 +116,20 @@ export default class Renderer {
       const renderPass = new RenderPass(this.scene, this.camera.instance);
       this.composer.addPass(renderPass);
 
-      this.outlinePass = new OutlinePass(new Vector2(this.sizes.width, this.sizes.height), this.scene, this.camera.instance);
+      this.outlinePass = new OutlinePass(
+        new Vector2(this.sizes.width, this.sizes.height),
+        this.scene,
+        this.camera.instance
+      );
       this.outlinePass.visibleEdgeColor = new Color("#ffffff");
       this.outlinePass.edgeStrength = 1.5;
       this.composer.addPass(this.outlinePass);
 
       const effectFXAA = new ShaderPass(FXAAShader);
-      effectFXAA.uniforms['resolution'].value.set(1/this.sizes.width, 1/this.sizes.height);
+      effectFXAA.uniforms["resolution"].value.set(
+        1 / this.sizes.width,
+        1 / this.sizes.height
+      );
       this.composer.addPass(effectFXAA);
     }
   }

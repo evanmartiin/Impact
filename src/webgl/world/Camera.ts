@@ -1,4 +1,4 @@
-import type Sizes from "@/controllers/webglControllers/Sizes";
+import type Sizes from "@/webgl/controllers/Sizes";
 import anime from "animejs";
 import { PerspectiveCamera, Scene, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";

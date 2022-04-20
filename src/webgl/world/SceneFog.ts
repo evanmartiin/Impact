@@ -1,4 +1,4 @@
-import type Debug from "@/controllers/globalControllers/Debug";
+import type Debug from "@/webgl/controllers/Debug";
 import { type ColorRepresentation, Fog, type Scene, type Vector3 } from "three";
 import type { FolderApi } from "tweakpane";
 import Experience from "../Experience";

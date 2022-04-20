@@ -1,4 +1,4 @@
-import type Loaders from "@/controllers/webglControllers/Loaders/Loaders";
+import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import type { GPSPos } from "@/models/webgl/GPSPos.model";
 import calcPosFromGPS from "@/utils/calcPosFromGPS";
 import Experience from "@/webgl/Experience";
@@ -27,7 +27,7 @@ export default class Tree {
 
   setModel() {
     this._model.scale.set(0.2, 0.2, 0.2);
-    this.setPos();
+    // this.setPos();
 
     this._model.traverse((child: Object3D) => {
       if (child instanceof Mesh) {
@@ -38,15 +38,15 @@ export default class Tree {
     this.scene.add(this._model);
   }
 
-  setPos() {
-    const _pos = calcPosFromGPS(this.GPSPos.lat, this.GPSPos.lon, 3.5);
-    this._model.position.set(_pos.x, _pos.y, _pos.z);
+  // setPos() {
+  //   const _pos = calcPosFromGPS(this.GPSPos.lat, this.GPSPos.lon, 3.5);
+  //   this._model.position.set(_pos.x, _pos.y, _pos.z);
 
-    const _lookAt = calcPosFromGPS(this.GPSPos.lat, this.GPSPos.lon, 4);
-    this._model.lookAt(_lookAt.x, _lookAt.y, _lookAt.z);
+  //   const _lookAt = calcPosFromGPS(this.GPSPos.lat, this.GPSPos.lon, 4);
+  //   this._model.lookAt(_lookAt.x, _lookAt.y, _lookAt.z);
 
-    this._model.rotateX(Math.PI / 2);
-  }
+  //   this._model.rotateX(Math.PI / 2);
+  // }
 
   destroy() {
     this._model.traverse((child) => {
