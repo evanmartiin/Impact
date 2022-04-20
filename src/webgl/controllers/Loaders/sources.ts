@@ -2,9 +2,9 @@ import type { ISource } from "@/models/webgl/source.model";
 
 const Sources: ISource[] = [
   {
-    name: "district1",
+    name: "house",
     type: "gltfModel",
-    path: "/models/mapRoad.glb",
+    path: "/models/district1.glb",
   },
   {
     name: "character",
