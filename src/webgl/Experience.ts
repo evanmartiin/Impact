@@ -68,7 +68,7 @@ export default class Experience {
     });
 
     this.sizes.setViewSizeAtDepth();
-    // this.setAxis();
+    this.setAxis();
   }
 
   setAxis() {

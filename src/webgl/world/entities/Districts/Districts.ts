@@ -7,6 +7,7 @@ import anime from "animejs";
 import { Group, Vector3, type Scene } from "three";
 import type { district } from "./../../../../models/district.model";
 import type { GPSPos } from "./../../../../models/webgl/GPSPos.model";
+import CityDistrict from "./cityDistrict/CityDistrict";
 import HomeDistrict from "./homeDistrict/HomeDistrict";
 
 export default class Districts extends EventEmitter {
@@ -17,6 +18,7 @@ export default class Districts extends EventEmitter {
   private instance: Group = new Group();
   private currentDistrict: district = "earth";
   public homeDistrict: HomeDistrict | null = null;
+  public cityDistrict: CityDistrict | null = null;
 
   private shift = { lat: 30, lon: -20 };
   private districtPositions = [
@@ -135,20 +137,34 @@ export default class Districts extends EventEmitter {
   setModels() {
     this.homeDistrict = new HomeDistrict();
     this.instance.add(this.homeDistrict.instance);
+    this.cityDistrict = new CityDistrict();
+    this.instance.add(this.cityDistrict.instance);
     this.scene.add(this.instance);
   }
   switchDistrict(district: district) {
     this.currentDistrict = district;
+    
     switch (district) {
       case "earth":
         this.homeDistrict?.disappear();
+        this.cityDistrict?.disappear();
         break;
-      case "home":
+        case "maison":
         this.homeDistrict?.appear();
+        this.cityDistrict?.disappear();
+        break;
+        case "ville":
+        this.homeDistrict?.disappear();
+        this.cityDistrict?.appear();
         break;
       default:
         this.homeDistrict?.disappear();
+        this.cityDistrict?.disappear();
         break;
     }
+  }
+
+  update() {
+    this.cityDistrict?.update();
   }
 }
