@@ -9,10 +9,12 @@ import Waste from "./Waste";
 import Trash from "./Trash";
 import type Debug from "@/webgl/controllers/Debug";
 import type { FolderApi } from "tweakpane";
+import type Scoreboard from "../Scoreboard";
 
 export default class CityDistrict {
   private experience: Experience = new Experience();
   private scene: Scene = this.experience.scene as Scene;
+  private scoreboard: Scoreboard = this.experience.world?.districts?.scoreboard as Scoreboard;
   private time: Time = this.experience.time as Time;
   private loaders: Loaders = this.experience.loaders as Loaders;
   public instance: Group = new Group();
@@ -24,8 +26,6 @@ export default class CityDistrict {
   private debugFolder: FolderApi | undefined = undefined;
 
   static isPlaying: boolean = false;
-  static score: number = 0;
-  static startTime: number = 0;
   static MAX_TIME: number = 10000;
 
   constructor() {
@@ -44,36 +44,38 @@ export default class CityDistrict {
   }
 
   startGame() {
-    this.trash = new Trash();
-    console.log(this.trash);
-    
-    this.scene.add(Waste.wasteMeshes);
-    CityDistrict.score = 0;
-    CityDistrict.startTime = this.time.elapsed;
-    CityDistrict.isPlaying = true;
+    if (!CityDistrict.isPlaying) {
+      this.trash = new Trash();
+      this.scene.add(Waste.wasteMeshes);
+  
+      if (!this.scoreboard) this.scoreboard = this.experience.world?.districts?.scoreboard as Scoreboard;
+      this.scoreboard.startTimer(CityDistrict.MAX_TIME);
+      this.scoreboard.on("timer_ended", () => {
+        this.stopGame();
+      });
+  
+      CityDistrict.isPlaying = true;
+    }
   }
 
   stopGame() {
-    CityDistrict.isPlaying = false;
-    console.log('Ended, score:', CityDistrict.score);
-
-    this.trash?.destroy();
-    this.trash = null;
-    Waste.destroy();
-
-    this.scene.remove(Waste.wasteMeshes);
-  }
-
-  increaseScore() {
-    CityDistrict.score++;
-    console.log('Score:', CityDistrict.score);
+    if (CityDistrict.isPlaying) {
+      console.log('Ended, score:', this.scoreboard?.score);
+      this.scoreboard?.off("timer_ended");
+  
+      this.trash?.destroy();
+      this.trash = null;
+      Waste.destroy();
+      this.scene.remove(Waste.wasteMeshes);
+  
+      CityDistrict.isPlaying = false;
+    }
   }
 
   update() {
     if (CityDistrict.isPlaying) {
-      if (this.time.elapsed - CityDistrict.startTime >= CityDistrict.MAX_TIME) {
-        this.stopGame();
-      } else if (this.time.elapsed - Waste.lastSpawn > Waste.SPAWN_COOLDOWN) {
+      this.scoreboard?.update();
+      if (this.time.elapsed - Waste.lastSpawn > Waste.SPAWN_COOLDOWN) {
         Waste.lastSpawn = this.time.elapsed;
         new Waste();
       };

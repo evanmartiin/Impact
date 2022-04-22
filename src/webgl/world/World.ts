@@ -40,7 +40,7 @@ export default class World {
     this.environment?.update();
     this.districts?.update();
   }
-
+ 
   changeScene(scene: district) {
     this.earth?.disappear();
     this.districts?.switchDistrict(scene);

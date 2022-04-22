@@ -9,6 +9,7 @@ import type { district } from "./../../../../models/district.model";
 import type { GPSPos } from "./../../../../models/webgl/GPSPos.model";
 import CityDistrict from "./cityDistrict/CityDistrict";
 import HomeDistrict from "./homeDistrict/HomeDistrict";
+import Scoreboard from "./Scoreboard";
 
 export default class Districts extends EventEmitter {
   private experience: Experience = new Experience();
@@ -19,6 +20,7 @@ export default class Districts extends EventEmitter {
   private currentDistrict: district = "earth";
   public homeDistrict: HomeDistrict | null = null;
   public cityDistrict: CityDistrict | null = null;
+  public scoreboard: Scoreboard | null = null;
 
   private shift = { lat: 30, lon: -20 };
   private districtPositions = [
@@ -47,6 +49,8 @@ export default class Districts extends EventEmitter {
 
   constructor() {
     super();
+
+    this.scoreboard = new Scoreboard();
 
     this.setModels();
 

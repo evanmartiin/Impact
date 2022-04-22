@@ -1,7 +1,7 @@
 import Experience from "@/webgl/Experience";
 import { BoxBufferGeometry, Group, Mesh, MeshBasicMaterial, Object3D } from "three";
+import type Scoreboard from "../Scoreboard";
 import type CityDistrict from "./CityDistrict";
-import type Trash from "./Trash";
 
 interface position {
   x: number,
@@ -39,6 +39,7 @@ export default class Waste {
     
     private experience: Experience = new Experience();
     private cityDistrict: CityDistrict = this.experience.world?.districts?.cityDistrict as CityDistrict;
+    private scoreboard: Scoreboard = this.experience.world?.districts?.scoreboard as Scoreboard;
 
   constructor() {
     this.mesh = new Mesh(Waste.geometry, Waste.material);
@@ -53,7 +54,7 @@ export default class Waste {
         if (this.mesh.position.y < Waste.DESPAWN_HEIGHT) {
             this.destroy();
         } else if (this.mesh.position.y < .6 && this.mesh.position.x === this.cityDistrict.trash?.mesh?.position.x) {
-            this.cityDistrict.increaseScore();
+            this.scoreboard.increaseScore();
             this.destroy();
         } else {
             this.mesh.position.y -= Waste.FALL_SPEED;
