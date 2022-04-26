@@ -37,9 +37,11 @@ export default class World {
   update() {
     this.character?.update();
     this.earth?.update();
+    this.earth?.fire?.update();
     this.environment?.update();
+    this.districts?.update();
   }
-
+ 
   changeScene(scene: district) {
     this.earth?.disappear();
     this.districts?.switchDistrict(scene);
@@ -50,14 +52,24 @@ export default class World {
   setDebug() {
     this.debugFolder = this.debug.ui?.addFolder({ title: "District" });
 
-    const switchDistricts = this.debugFolder?.addButton({
-      title: "District1",
+    const switchHome = this.debugFolder?.addButton({
+      title: "Maison",
     });
     if (this.districts && this.earth) {
-      switchDistricts?.on("click", () => {
+      switchHome?.on("click", () => {
         this.earth?.disappear();
-        this.districts?.switchDistrict("home");
-        this.currentScene = "home";
+        this.districts?.switchDistrict("maison");
+        this.currentScene = "maison";
+      });
+    }
+    const switchCity = this.debugFolder?.addButton({
+      title: "Ville",
+    });
+    if (this.districts && this.earth) {
+      switchCity?.on("click", () => {
+        this.earth?.disappear();
+        this.districts?.switchDistrict("ville");
+        this.currentScene = "ville";
       });
     }
 
