@@ -151,4 +151,7 @@ export default class Districts extends EventEmitter {
         break;
     }
   }
+  update() {
+    this.homeDistrict?.update();
+  }
 }

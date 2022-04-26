@@ -1,5 +1,4 @@
 import type Debug from "@/webgl/controllers/Debug";
-import type AnimationController from "@/webgl/controllers/AnimationController";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import type { Scene } from "three";
@@ -15,27 +14,25 @@ export default class World {
   private loaders: Loaders = this.experience.loaders as Loaders;
   protected environment: Environment | null = null;
   protected scene: Scene = this.experience.scene as Scene;
-  private animationController: AnimationController = this.experience
-    .animationController as AnimationController;
   public earth: Earth | null = null;
   public districts: Districts | null = null;
   private debugFolder: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
   public currentScene: district = "earth";
-  public character: Character | null = null;
 
   constructor() {
     this.loaders.on("ready", () => {
       this.environment = new Environment();
       this.earth = new Earth();
       this.districts = new Districts();
-      this.character = new Character();
       this.setDebug();
+      // this.earth?.disappear();
+      // this.districts?.switchDistrict("home");
     });
   }
 
   update() {
-    this.character?.update();
+    this.districts?.update();
     this.earth?.update();
     this.environment?.update();
   }
@@ -51,7 +48,7 @@ export default class World {
     this.debugFolder = this.debug.ui?.addFolder({ title: "District" });
 
     const switchDistricts = this.debugFolder?.addButton({
-      title: "District1",
+      title: "homeDistrict",
     });
     if (this.districts && this.earth) {
       switchDistricts?.on("click", () => {

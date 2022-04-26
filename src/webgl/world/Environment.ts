@@ -2,7 +2,7 @@ import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
 import { AmbientLight, DirectionalLight, Scene } from "three";
 import type { FolderApi } from "tweakpane";
-import SceneFog from "./SceneFog";
+// import SceneFog from "./SceneFog";
 
 export default class Environment {
   private experience: Experience = new Experience();
@@ -12,10 +12,10 @@ export default class Environment {
   private sunLight: DirectionalLight | null = null;
   private ambientLight: AmbientLight | null = null;
   private time = 0;
-  private fog: SceneFog | null;
+  // private fog: SceneFog | null;
 
   constructor() {
-    this.fog = new SceneFog();
+    // this.fog = new SceneFog();
 
     this.setAmbientLight();
     this.setSunLight();
@@ -62,7 +62,7 @@ export default class Environment {
   }
 
   update() {
-    this.fog?.update();
+    // this.fog?.update();
     if (this.experience.camera?.instance) {
       this.sunLight?.position.copy(this.experience.camera?.instance?.position);
     }

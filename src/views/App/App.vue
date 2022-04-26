@@ -11,6 +11,7 @@ onMounted(() => {
   const experience = new Experience(document.getElementById("webgl") as HTMLCanvasElement);
   const store = webglStore();
   store.$state = { experience };
+  
   store.experience.loaders.on('ready', () => {
     store.experience.world.districts.on('district_selected', (district) => {
       selectedDistrict.value = district.name;

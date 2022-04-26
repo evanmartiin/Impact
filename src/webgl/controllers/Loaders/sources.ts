@@ -12,6 +12,11 @@ const Sources: ISource[] = [
     path: "/models/character.glb",
   },
   {
+    name: "homeGameCharacter",
+    type: "gltfModel",
+    path: "/models/homeGameCharacter.glb",
+  },
+  {
     name: "earthv2",
     type: "gltfModel",
     path: "/models/earthv2.glb",
@@ -19,7 +24,7 @@ const Sources: ISource[] = [
   {
     name: "housev1",
     type: "gltfModel",
-    path: "/models/housev1.glb",
+    path: "/models/housev2.glb",
   },
 ];
 
