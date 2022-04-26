@@ -19,8 +19,6 @@ export default class Environment {
 
     this.setAmbientLight();
     this.setSunLight();
-
-    this.setDebug();
   }
 
   setAmbientLight() {
@@ -36,29 +34,6 @@ export default class Environment {
     this.sunLight.shadow.normalBias = 0.05;
     this.sunLight.position.set(200, 0, 200);
     this.scene.add(this.sunLight);
-  }
-
-  sunRotate() {
-    this.time += 0.02;
-    this.sunLight?.position.set(
-      Math.cos(this.time) * 40,
-      40,
-      Math.sin(this.time) * 40
-    );
-  }
-
-  setDebug() {
-    if (this.debug.active) {
-      if (this.sunLight) {
-        this.debugFolder = this.debug.ui?.addFolder({ title: "Sun" });
-
-        this.debugFolder?.addInput(this.sunLight, "intensity", {
-          min: 0,
-          max: 10,
-          step: 0.01,
-        });
-      }
-    }
   }
 
   update() {

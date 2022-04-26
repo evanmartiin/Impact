@@ -61,6 +61,16 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/baked.jpg",
   },
+  {
+    name: "satellite-model",
+    type: "gltfModel",
+    path: "/models/satellite.glb",
+  },
+  {
+    name: "satellite-texture",
+    type: "texture",
+    path: "/textures/satellite.jpg",
+  },
 ];
 
 export default Sources;

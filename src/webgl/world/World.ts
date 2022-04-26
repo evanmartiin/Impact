@@ -9,6 +9,7 @@ import Districts from "./entities/Districts/Districts";
 import Earth from "./entities/Earth/Earth";
 import Environment from "./Environment";
 import Character from "./entities/Character/Character";
+import Sky from "./entities/Sky/Sky";
 
 export default class World {
   private experience: Experience = new Experience();
@@ -23,6 +24,7 @@ export default class World {
   private debug: Debug = this.experience.debug as Debug;
   public currentScene: district = "earth";
   public character: Character | null = null;
+  public sky: Sky = new Sky();
 
   constructor() {
     this.loaders.on("ready", () => {

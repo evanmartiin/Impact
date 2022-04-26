@@ -9,6 +9,7 @@ import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi } from "tweakpane";
 import type Time from "@/webgl/controllers/Time";
 import Fire from "../Fire/Fire";
+import ISS from "../ISS/ISS";
 
 export default class Earth {
   private experience: Experience = new Experience();
@@ -25,12 +26,14 @@ export default class Earth {
   private districtsMeshes: Object3D[] = [];
   private isDisplayed = false;
   public fire: Fire | null = null;
+  public ISS: ISS | null = null;
 
   constructor() {
     this.setMesh();
     this.setDebug();
     
     this.fire = new Fire();
+    this.ISS = new ISS();
   }
 
   setMesh() {
@@ -156,48 +159,16 @@ export default class Earth {
 
   setDebug() {
     if (this.debug.active) {
-      this.debugFolder = this.debug.ui?.addFolder({ title: "Earth" });
-      if (this.earthGroup?.position) {
-        this.debugFolder?.addInput(this.earthGroup?.position, "x", {
-          min: -10,
-          max: 10,
-          step: 0.1,
-        });
-        this.debugFolder?.addInput(this.earthGroup.position, "y", {
-          min: -10,
-          max: 10,
-          step: 0.1,
-        });
-        this.debugFolder?.addInput(this.earthGroup.position, "z", {
-          min: -10,
-          max: 10,
-          step: 0.1,
-        });
-        this.debugFolder?.addInput(this.earthGroup.scale, "x", {
-          min: -10,
-          max: 10,
-          step: 0.1,
-        });
-        this.debugFolder?.addInput(this.earthGroup.scale, "y", {
-          min: -10,
-          max: 10,
-          step: 0.1,
-        });
-        this.debugFolder?.addInput(this.earthGroup.scale, "z", {
-          min: -10,
-          max: 10,
-          step: 0.1,
-        });
-      }
+
     }
   }
+
   update() {
     this.districtsMeshes.forEach((district) => {
       if (district instanceof Mesh) {
         district.material.opacity = (Math.cos(this.time.elapsed / 300) + 1) / 2;
       }
     });
-  }
-  destroy() {
+    this.ISS?.update();
   }
 }
