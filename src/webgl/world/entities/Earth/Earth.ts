@@ -1,15 +1,14 @@
 import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
-import type Mouse from "@/webgl/controllers/Mouse";
 import type Sizes from "@/webgl/controllers/Sizes";
-import type { GPSPos } from "@/models/webgl/GPSPos.model";
 import Experience from "@/webgl/Experience";
 import type Camera from "@/webgl/world/Camera";
 import anime from "animejs";
-import { Group, MeshBasicMaterial, Object3D, Scene, Mesh } from "three";
+import { Group, MeshBasicMaterial, Object3D, Scene, Mesh, Texture, sRGBEncoding } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi } from "tweakpane";
 import type Time from "@/webgl/controllers/Time";
+import Fire from "../Fire/Fire";
 
 export default class Earth {
   private experience: Experience = new Experience();
@@ -25,28 +24,51 @@ export default class Earth {
   private model: GLTF | null = null;
   private districtsMeshes: Object3D[] = [];
   private isDisplayed = false;
+  public fire: Fire | null = null;
 
   constructor() {
     this.setMesh();
     this.setDebug();
+    
+    this.fire = new Fire();
   }
 
   setMesh() {
-    this.model = this.loaders.items["earthv2"] as GLTF;
+    this.model = this.loaders.items["earth-baked-model"] as GLTF;
+    const bakedTexture = this.loaders.items["earth-baked-texture"] as Texture;
+    
+    bakedTexture.flipY = false;
+    bakedTexture.encoding = sRGBEncoding;
+    const bakedMaterial = new MeshBasicMaterial({ map: bakedTexture });
+
+    this.model.scene.traverse((child) => {
+      (child as Mesh).material = bakedMaterial;
+    })
+    this.earthGroup.add(this.model.scene);
+    
     this.earth = new Group();
-    const meshes = [];
-    meshes.push(...this.model.scene.children);
-    meshes.push(...this.model.scenes[0].children);
-    meshes.map((child) => {
-      if (typeof child === "object") {
-        this.earth?.add(child);
+    // const meshes = [];
+    // meshes.push(...this.model.scene.children);
+    // meshes.push(...this.model.scenes[0].children);
+    // bakedTexture.flipY = false;
+    
+    
+    
+    // meshes.map((child) => {
+    //   if (typeof child === "object") {
+    //     this.earth?.add(child);
+    //     console.log(child);
         
-        if ((child.name === "zone_maison001" || child.name === "zone_mamie" || child.name === "zone_maison") && child instanceof Mesh) {
-          child.material = new MeshBasicMaterial({ color: 0xffffff, transparent: true })
-          this.districtsMeshes.push(child);
-        }
-      }
-    });
+    //     if (child instanceof Mesh) {
+    //       if ((child.name === "zone_maison001" || child.name === "zone_mamie" || child.name === "zone_maison")) {
+    //         child.material = new MeshBasicMaterial({ color: 0xffffff, transparent: true })
+    //         this.districtsMeshes.push(child);
+    //       } else {
+    //         child.material = bakedMaterial;
+    //       }
+    //     }
+    //   }
+    // });
     this.districtsMeshes = [...new Set(this.districtsMeshes)];
 
     this.earth.rotateY(Math.PI);
