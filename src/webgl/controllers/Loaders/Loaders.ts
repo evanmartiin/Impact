@@ -3,6 +3,7 @@ import type { ILoaders, TfileLoader } from "@/models/webgl/loaders.model";
 import type { ISource } from "@/models/webgl/source.model";
 import { TextureLoader } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
 export default class Loaders extends EventEmitter {
   private sources: ISource[];
@@ -26,6 +27,8 @@ export default class Loaders extends EventEmitter {
     this.loaders = {};
     this.loaders.gltfLoader = new GLTFLoader();
     this.loaders.textureLoader = new TextureLoader();
+    const draco = new DRACOLoader().setDecoderPath('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/js/libs/draco/');    
+    this.loaders.gltfLoader.setDRACOLoader(draco);
   }
 
   startLoading() {

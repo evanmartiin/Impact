@@ -17,6 +17,21 @@ const Sources: ISource[] = [
     path: "/models/earthv2.glb",
   },
   {
+    name: "earthv3",
+    type: "gltfModel",
+    path: "/models/earthv3.glb",
+  },
+  {
+    name: "earthv4",
+    type: "gltfModel",
+    path: "/models/earthv4.glb",
+  },
+  {
+    name: "earthv5",
+    type: "gltfModel",
+    path: "/models/earthv5.glb",
+  },
+  {
     name: "housev1",
     type: "gltfModel",
     path: "/models/housev1.glb",
@@ -25,6 +40,26 @@ const Sources: ISource[] = [
     name: "city",
     type: "gltfModel",
     path: "/models/city.glb",
+  },
+  {
+    name: "earth-baked-texture",
+    type: "texture",
+    path: "/textures/earth-baked.jpg",
+  },
+  {
+    name: "earth-baked-model",
+    type: "gltfModel",
+    path: "/models/earth-baked.glb",
+  },
+  {
+    name: "glb-example",
+    type: "gltfModel",
+    path: "/models/portal.glb",
+  },
+  {
+    name: "baked-example",
+    type: "texture",
+    path: "/textures/baked.jpg",
   },
 ];
 

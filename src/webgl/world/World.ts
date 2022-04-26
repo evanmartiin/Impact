@@ -37,6 +37,7 @@ export default class World {
   update() {
     this.character?.update();
     this.earth?.update();
+    this.earth?.fire?.update();
     this.environment?.update();
     this.districts?.update();
   }
