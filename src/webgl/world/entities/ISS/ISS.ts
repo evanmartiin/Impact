@@ -1,10 +1,6 @@
-import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
-import { Scene, Mesh, BufferGeometry, PointsMaterial, Points, Texture, sRGBEncoding, MeshBasicMaterial, Vector3, Group } from "three";
-import type { FolderApi } from "tweakpane";
+import { Scene, Mesh, Texture, sRGBEncoding, MeshBasicMaterial, Vector3, AxesHelper, Euler } from "three";
 import type Time from "@/webgl/controllers/Time";
-import vert from './vert.glsl?raw'
-import frag from './frag.glsl?raw'
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import Trail from "./Trail";
@@ -13,19 +9,18 @@ export default class ISS {
   private experience: Experience = new Experience();
   private scene: Scene = this.experience.scene as Scene;
   private time: Time = this.experience.time as Time;
-  private debug: Debug = this.experience.debug as Debug;
   private loaders: Loaders = this.experience.loaders as Loaders;
-  private debugFolder: FolderApi | undefined = undefined;
-  private geometry: BufferGeometry | null = null;
-  private material: PointsMaterial | null = null;
-  private model: GLTF | null = null;
-  public trailsInstances: Trail[] = [];
-  public trailsMeshes: Group = new Group();
+  public model: GLTF | null = null;
+  private leftTrail: Trail | null = null;
+  private rightTrail: Trail | null = null;
+  private axisHelper: Mesh | null = null;
 
   constructor() {
     this.setMesh();
-    this.setTrails();
-    this.setDebug();
+    // this.setAxis();
+
+    this.leftTrail = new Trail();
+    this.rightTrail = new Trail();
   }
 
   setMesh() {
@@ -44,33 +39,34 @@ export default class ISS {
     this.scene.add(this.model.scene);
   }
 
-  setTrails() {
-    this.scene.add(this.trailsMeshes);
+  setAxis() {
+    const axis = new AxesHelper(.4);
+    this.axisHelper = new Mesh();
+    this.axisHelper.add(axis);
+    this.scene.add(this.axisHelper);
   }
 
   update() {
     if (this.model) {
       this.model.scene.position.x = Math.cos(this.time.elapsed/2000) * 1.4;
+      // this.model.scene.position.y = Math.sin(this.time.elapsed/2000);
       this.model.scene.position.y = Math.sin(this.time.elapsed/2000) * 1.4;
-      const target = new Vector3(
-        Math.cos(this.time.elapsed/2000) * .1,
-        Math.sin(this.time.elapsed/2000) * .1,
-        0
-      )
-      this.model.scene.lookAt(target);
+      this.model.scene.lookAt(new Vector3());
     }
+    this.axisHelper?.position.copy(this.model?.scene.position as Vector3);
+    this.axisHelper?.rotation.copy(this.model?.scene.rotation as Euler);
+
+    const leftTrailBase = new Vector3().copy(this.model?.scene.position as Vector3);
+    leftTrailBase.z -= .25;
+    const rightTrailBase = new Vector3().copy(this.model?.scene.position as Vector3);
+    rightTrailBase.z += .25;
+
     if (Date.now() - Trail.lastInstance > Trail.cooldown) {
-      this.trailsInstances.push(new Trail(this.model?.scene.position as Vector3));
+      this.leftTrail?.add(leftTrailBase);
+      this.rightTrail?.add(rightTrailBase);
     }
     
-    this.trailsInstances.forEach((trail: Trail) => {
-      trail.update();
-    })
-  }
-
-  setDebug() {
-    if (this.debug.active) {
-      this.debugFolder = this.debug.ui?.addFolder({ title: "Sky" });
-    }
+    this.leftTrail?.update(leftTrailBase);
+    this.rightTrail?.update(rightTrailBase);
   }
 }

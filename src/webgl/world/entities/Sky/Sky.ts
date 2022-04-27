@@ -1,10 +1,8 @@
 import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
-import { Scene, Mesh, BufferGeometry, PointsMaterial, SphereBufferGeometry, Points, BufferAttribute, AdditiveBlending } from "three";
+import { Scene, BufferGeometry, PointsMaterial, Points, BufferAttribute, AdditiveBlending } from "three";
 import type { FolderApi } from "tweakpane";
 import type Time from "@/webgl/controllers/Time";
-import vert from './vert.glsl?raw'
-import frag from './frag.glsl?raw'
 
 export default class Sky {
   private experience: Experience = new Experience();

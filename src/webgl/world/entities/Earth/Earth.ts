@@ -1,12 +1,9 @@
-import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
-import type Sizes from "@/webgl/controllers/Sizes";
 import Experience from "@/webgl/Experience";
 import type Camera from "@/webgl/world/Camera";
 import anime from "animejs";
 import { Group, MeshBasicMaterial, Object3D, Scene, Mesh, Texture, sRGBEncoding } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
-import type { FolderApi } from "tweakpane";
 import type Time from "@/webgl/controllers/Time";
 import Fire from "../Fire/Fire";
 import ISS from "../ISS/ISS";
@@ -14,12 +11,9 @@ import ISS from "../ISS/ISS";
 export default class Earth {
   private experience: Experience = new Experience();
   private scene: Scene = this.experience.scene as Scene;
-  private sizes: Sizes = this.experience.sizes as Sizes;
   private time: Time = this.experience.time as Time;
   private camera: Camera = this.experience.camera as Camera;
   private loaders: Loaders = this.experience.loaders as Loaders;
-  private debug: Debug = this.experience.debug as Debug;
-  private debugFolder: FolderApi | undefined = undefined;
   private earth: Group | null = null;
   public earthGroup: Group = new Group();
   private model: GLTF | null = null;
@@ -30,7 +24,6 @@ export default class Earth {
 
   constructor() {
     this.setMesh();
-    this.setDebug();
     
     this.fire = new Fire();
     this.ISS = new ISS();
@@ -50,18 +43,16 @@ export default class Earth {
     this.scene.add(this.model.scene);
     
     this.earth = new Group();
+
     // const meshes = [];
     // meshes.push(...this.model.scene.children);
     // meshes.push(...this.model.scenes[0].children);
     // bakedTexture.flipY = false;
     
-    
-    
     // meshes.map((child) => {
     //   if (typeof child === "object") {
     //     this.earth?.add(child);
     //     console.log(child);
-        
     //     if (child instanceof Mesh) {
     //       if ((child.name === "zone_maison001" || child.name === "zone_mamie" || child.name === "zone_maison")) {
     //         child.material = new MeshBasicMaterial({ color: 0xffffff, transparent: true })
@@ -72,6 +63,7 @@ export default class Earth {
     //     }
     //   }
     // });
+
     this.districtsMeshes = [...new Set(this.districtsMeshes)];
 
     this.earth.rotateY(Math.PI);
@@ -154,12 +146,6 @@ export default class Earth {
         0
       );
       this.isDisplayed = false;
-    }
-  }
-
-  setDebug() {
-    if (this.debug.active) {
-
     }
   }
 
