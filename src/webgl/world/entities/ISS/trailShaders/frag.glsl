@@ -1,4 +1,5 @@
 uniform vec3 uISSPos;
+uniform float uOpacityRatio;
 
 varying vec3 vPosition;
 
@@ -12,6 +13,7 @@ void main() {
 
     float opacity = .8 - distanceFromISS;
     opacity *= distanceFromISS * 2.;
+    opacity *= uOpacityRatio;
 
     gl_FragColor = vec4(vec3(1.), opacity);
 }

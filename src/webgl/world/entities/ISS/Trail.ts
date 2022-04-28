@@ -21,11 +21,12 @@ export default class Trail {
   private PARAMS: any = {
     'ISSPosition': new Vector3(),
     'radiusFromEarth': 1,
-    'instancesCount': 40,
-    'spreadRatio': .05,
-    'scaleMin': 25,
-    'scaleMax': 50,
-    'speed': .5,
+    'instancesCount': 120,
+    'spreadRatio': .02,
+    'scaleMin': 0,
+    'scaleMax': 10,
+    'speed': .2,
+    'blending': true
   }
 
   private positionsArray: Float32Array | null = null;
@@ -83,15 +84,18 @@ export default class Trail {
         uISSPos: { value: ISSPosition },
         uRadius: { value: radiusFromEarth },
         uLength: { value: .5 },
-        uOffset: { value: .05 }
+        uOffset: { value: .05 },
+        uOpacityRatio: { value: .35 }
       },
       vertexShader: vert,
       fragmentShader: frag,
       side: DoubleSide,
       transparent: true,
-      depthWrite: false,
-      blending: AdditiveBlending
+      depthWrite: false
     })
+    if (this.PARAMS.blending) {
+      this.material.blending = AdditiveBlending;
+    }
   }
 
   setMesh() {
@@ -139,6 +143,11 @@ export default class Trail {
 
       const speedInput = this.debugFolder?.addInput(this.PARAMS, "speed", { min: 0, max: 2 });
       speedInput?.on("change", () => { this.regenerate() });
+
+      const blendingInput = this.debugFolder?.addInput(this.PARAMS, "blending" );
+      blendingInput?.on("change", () => { this.regenerate() });
+
+      this.debugFolder?.addInput(this.material?.uniforms.uOpacityRatio as IUniform, "value", { min: 0, max: 1, label: 'opacity' });
     }
   }
 }
