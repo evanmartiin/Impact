@@ -68,11 +68,11 @@ export default class Experience {
     });
 
     this.sizes.setViewSizeAtDepth();
-    // this.setAxis();
+    this.setAxis();
   }
 
   setAxis() {
-    const axesHelper = new AxesHelper(5);
+    const axesHelper = new AxesHelper(1);
 
     this.scene?.add(axesHelper);
   }

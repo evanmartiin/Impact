@@ -1,26 +1,28 @@
 import Experience from "@/webgl/Experience";
-import { Scene, Mesh, Texture, sRGBEncoding, MeshBasicMaterial, Vector3, AxesHelper, Euler } from "three";
+import { Scene, Mesh, Texture, sRGBEncoding, MeshBasicMaterial, Vector3, ShaderMaterial } from "three";
 import type Time from "@/webgl/controllers/Time";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import Trail from "./Trail";
+import type Debug from "@/webgl/controllers/Debug";
+import type { FolderApi } from "tweakpane";
 
 export default class ISS {
   private experience: Experience = new Experience();
   private scene: Scene = this.experience.scene as Scene;
   private time: Time = this.experience.time as Time;
   private loaders: Loaders = this.experience.loaders as Loaders;
+  private debug: Debug = this.experience.debug as Debug;
+  public debugFolder: FolderApi | undefined = undefined;
   public model: GLTF | null = null;
-  private leftTrail: Trail | null = null;
-  private rightTrail: Trail | null = null;
-  private axisHelper: Mesh | null = null;
+  private trail: Trail | null = null;
+
+  static radiusFromEarth: number = 1.4;
 
   constructor() {
     this.setMesh();
-    // this.setAxis();
-
-    this.leftTrail = new Trail();
-    this.rightTrail = new Trail();
+    this.setTrail();
+    this.setDebug();
   }
 
   setMesh() {
@@ -34,39 +36,45 @@ export default class ISS {
       (child as Mesh).material = bakedMaterial;
     })
     this.model.scene.scale.set(.01, .01, .01);
-    this.model.scene.position.set(1.4, 0, 0);
+    this.model.scene.position.set(ISS.radiusFromEarth, 0, 0);
     this.model.scene.lookAt(0, 0, 0);
     this.scene.add(this.model.scene);
   }
 
-  setAxis() {
-    const axis = new AxesHelper(.4);
-    this.axisHelper = new Mesh();
-    this.axisHelper.add(axis);
-    this.scene.add(this.axisHelper);
+  setTrail() {
+    const ISSPosition = new Vector3().copy(this.model?.scene.position as Vector3);
+    this.trail = new Trail(ISSPosition, ISS.radiusFromEarth);
   }
 
   update() {
     if (this.model) {
-      this.model.scene.position.x = Math.cos(this.time.elapsed/2000) * 1.4;
+      this.model.scene.position.x = Math.cos(this.time.elapsed/2000) * ISS.radiusFromEarth;
       // this.model.scene.position.y = Math.sin(this.time.elapsed/2000);
-      this.model.scene.position.y = Math.sin(this.time.elapsed/2000) * 1.4;
+      this.model.scene.position.z = Math.sin(this.time.elapsed/2000) * ISS.radiusFromEarth;
       this.model.scene.lookAt(new Vector3());
+      this.model.scene.rotateZ(90);
     }
-    this.axisHelper?.position.copy(this.model?.scene.position as Vector3);
-    this.axisHelper?.rotation.copy(this.model?.scene.rotation as Euler);
 
-    const leftTrailBase = new Vector3().copy(this.model?.scene.position as Vector3);
-    leftTrailBase.z -= .25;
-    const rightTrailBase = new Vector3().copy(this.model?.scene.position as Vector3);
-    rightTrailBase.z += .25;
+    const ISSPosition = new Vector3().copy(this.model?.scene.position as Vector3);
+    this.trail?.update(ISSPosition);
+  }
 
-    if (Date.now() - Trail.lastInstance > Trail.cooldown) {
-      this.leftTrail?.add(leftTrailBase);
-      this.rightTrail?.add(rightTrailBase);
+  setDebug() {
+    if (this.debug.active) {
+      this.debugFolder = this.debug.ui?.addFolder({ title: "ISS" });
+      const PARAMS = {
+        radius: ISS.radiusFromEarth
+      };
+      const radiusInput = this.debugFolder?.addInput(PARAMS, "radius", {
+        min: 1,
+        max: 2
+      });
+      radiusInput?.on("change", (e) => {
+        ISS.radiusFromEarth = e.value;
+        if (this.trail?.mesh) {
+          (this.trail.mesh.material as ShaderMaterial).uniforms.uRadius.value = e.value;
+        }
+      })
     }
-    
-    this.leftTrail?.update(leftTrailBase);
-    this.rightTrail?.update(rightTrailBase);
   }
 }
