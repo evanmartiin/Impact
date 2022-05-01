@@ -17,8 +17,8 @@ export default class Environment {
   constructor() {
     // this.fog = new SceneFog();
 
-    this.setAmbientLight();
-    this.setSunLight();
+    // this.setAmbientLight();
+    // this.setSunLight();
   }
 
   setAmbientLight() {

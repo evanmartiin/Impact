@@ -73,20 +73,20 @@ export default class Renderer {
       this.intersects = [];
       this.raycaster
         .intersectObjects(
-          this.experience.world.earth.earthGroup.children[0].children
+          this.experience.world.earth.earthGroup.children
         )
         .map((object) => {
           this.intersects.push(object);
         });
         
-          let selectedObjects = [];
-          if (this.intersects.length > 0 && this.districtNames.includes(this.intersects[0].object.name)) {
-            this.hoveredDistrict = this.intersects[0].object;
-            selectedObjects.push(this.hoveredDistrict);
-          } else {
-            selectedObjects = this.experience.world.earth.earthGroup.children[0].children.filter((model) => this.districtNames.includes(model.name));
-            this.hoveredDistrict = undefined;
-          }
+        let selectedObjects = [];
+        if (this.intersects.length > 0 && this.districtNames.includes(this.intersects[0].object.name)) {
+          this.hoveredDistrict = this.intersects[0].object;
+          selectedObjects.push(this.hoveredDistrict);
+        } else {
+          selectedObjects = this.experience.world.earth.earthGroup.children[0].children.filter((model) => this.districtNames.includes(model.name));
+          this.hoveredDistrict = undefined;
+        }
         
       this.instance?.render(this.scene, this.camera.instance);
     }

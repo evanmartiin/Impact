@@ -71,6 +71,73 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/satellite.jpg",
   },
+
+
+  {
+    name: "oceans-model",
+    type: "gltfModel",
+    path: "/models/oceans.glb",
+  },
+  {
+    name: "oceans-texture",
+    type: "texture",
+    path: "/textures/oceans.jpg",
+  },
+
+
+  {
+    name: "continents-model",
+    type: "gltfModel",
+    path: "/models/continents.glb",
+  },
+  {
+    name: "continents-texture",
+    type: "texture",
+    path: "/textures/continents.jpg",
+  },
+
+
+  {
+    name: "house-mini-model",
+    type: "gltfModel",
+    path: "/models/house-mini.glb",
+  },
+  {
+    name: "house-mini-texture",
+    type: "texture",
+    path: "/textures/house-mini.jpg",
+  },
+
+
+  {
+    name: "city-mini-model",
+    type: "gltfModel",
+    path: "/models/city-mini.glb",
+  },
+  {
+    name: "city-mini-texture",
+    type: "texture",
+    path: "/textures/city-mini.jpg",
+  },
+
+
+  {
+    name: "granny-mini-model",
+    type: "gltfModel",
+    path: "/models/granny-mini.glb",
+  },
+  {
+    name: "granny-mini-texture",
+    type: "texture",
+    path: "/textures/granny-mini.jpg",
+  },
+
+
+  {
+    name: "zones-model",
+    type: "gltfModel",
+    path: "/models/zones.glb",
+  },
 ];
 
 export default Sources;

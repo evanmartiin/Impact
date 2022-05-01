@@ -21,11 +21,11 @@ export default class Trail {
   private PARAMS: any = {
     'ISSPosition': new Vector3(),
     'radiusFromEarth': 1,
-    'instancesCount': 120,
-    'spreadRatio': .02,
-    'scaleMin': 0,
-    'scaleMax': 10,
-    'speed': .2,
+    'instancesCount': 90,
+    'spreadRatio': .05,
+    'scaleMin': 15,
+    'scaleMax': 20,
+    'speed': .4,
     'blending': true
   }
 
