@@ -2,17 +2,16 @@ import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import type Camera from "@/webgl/world/Camera";
 import anime from "animejs";
-import { Group, MeshBasicMaterial, Object3D, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, ShaderMaterial, type Shader, type IUniform, Uniform } from "three";
+import { Group, MeshBasicMaterial, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, type IUniform, Vector2 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Time from "@/webgl/controllers/Time";
 import Fire from "../Fire/Fire";
 import ISS from "../ISS/ISS";
 import commonVertex from "./shaders/commonVertex.glsl?raw";
 import beginVertex from "./shaders/beginVertex.glsl?raw";
-import commonFragment from "./shaders/commonFragment.glsl?raw";
-import outputFragment from "./shaders/outputFragment.glsl?raw";
 import type Debug from "@/webgl/controllers/Debug";
 import type { FolderApi } from "tweakpane";
+import type Mouse from "@/webgl/controllers/Mouse";
 
 export default class Earth {
   private experience: Experience = new Experience();
@@ -20,6 +19,7 @@ export default class Earth {
   private time: Time = this.experience.time as Time;
   private camera: Camera = this.experience.camera as Camera;
   private loaders: Loaders = this.experience.loaders as Loaders;
+  private mouse: Mouse = this.experience.mouse as Mouse;
   private debug: Debug = this.experience.debug as Debug;
   private debugFolder: FolderApi | undefined = undefined;
   public earthGroup: Group = new Group();
@@ -28,18 +28,17 @@ export default class Earth {
   private zones: Group = new Group();
   private zoneMaterial: MeshBasicMaterial = new MeshBasicMaterial({ color: 0xffffff, transparent: true });
   private movementMaterial: MeshBasicMaterial = new MeshBasicMaterial({ transparent: true });
-  private movementShader: Shader | null = null;
-  private movementShaderUniforms: { [uniform: string]: IUniform<any>; } = {
-    'uTime': { value: this.time.elapsed },
-    'uForce': { value: this.camera.rotateSpeed },
-    'uDirection': { value: this.camera.rotateDirection }
-  }
+  private movementShaderUniforms: { [uniform: string]: IUniform<any> } = {
+    'uDirection': { value: new Vector2() },
+    'uBounceRatio': { value: 2.5 }
+  };
   private isDisplayed = false;
   public fire: Fire | null = null;
   public ISS: ISS | null = null;
 
   constructor() {
     this.setMesh();
+    this.setDebug();
     
     this.fire = new Fire();
     this.ISS = new ISS();
@@ -65,9 +64,6 @@ export default class Earth {
     this.models.forEach((model, index) => {
       if (this.textures && this.textures[index]) {
         const bakedMaterial = new MeshBasicMaterial({ map: this.textures[index] });
-        if (model.scene.children[0].name === "mamie") {
-          bakedMaterial.side = DoubleSide;
-        }
         this.textures[index].flipY = false;
         this.textures[index].encoding = sRGBEncoding;
         model.scene.traverse((child) => {
@@ -76,11 +72,7 @@ export default class Earth {
               const customMaterial = this.movementMaterial.clone();
               customMaterial.map = this.textures[index];
               customMaterial.onBeforeCompile = (shader) => {
-                // shader.uniforms.uTime = { value: this.time.elapsed };
-                // shader.uniforms.uForce = { value: this.camera.rotateSpeed };
-                // shader.uniforms.uDirection = { value: this.camera.rotateDirection };
                 shader.uniforms = {...this.movementShaderUniforms, ...shader.uniforms};
-          
                 shader.vertexShader = shader.vertexShader.replace(
                   "#include <common>",
                   commonVertex
@@ -89,18 +81,15 @@ export default class Earth {
                   "#include <begin_vertex>",
                   beginVertex
                 );
-                // shader.fragmentShader = shader.fragmentShader.replace(
-                //   "#include <common>",
-                //   commonFragment
-                // );
-                // shader.fragmentShader = shader.fragmentShader.replace(
-                //   "#include <output_fragment>",
-                //   outputFragment
-                // );
-                this.movementShader = shader;
-
-                this.setDebug();
               };
+              if (child.name === "ville") {
+                child.rotateY(Math.PI * .13);
+              } else if (child.name === "maison") {
+                child.rotateY(Math.PI * .65);
+              } else if (child.name === "mamie") {
+                customMaterial.side = DoubleSide;
+                child.rotateY(Math.PI * -.1);
+              }
               child.material = customMaterial;
             } else {
               child.material = bakedMaterial;
@@ -119,6 +108,10 @@ export default class Earth {
         this.earthGroup.add(this.zones);
       }
     });
+
+    this.mouse.on("mouse_grab", () => {
+      this.movementShaderUniforms.uDirection.value = this.mouse.mouseInertia.clone();
+    })
 
     this.scene.add(this.earthGroup);
     this.earthGroup.position.set(10, 0, 0);
@@ -202,20 +195,15 @@ export default class Earth {
 
   update() {
     this.zoneMaterial.opacity = (Math.cos(this.time.elapsed / 300) + 1) / 2;
-    if (this.movementShaderUniforms) {
-      this.movementShaderUniforms.uTime.value = this.time.elapsed;
-      this.movementShaderUniforms.uForce.value = this.camera.rotateSpeed;
-      this.movementShaderUniforms.uDirection.value = this.camera.rotateDirection;
-    }
     this.ISS?.update();
   }
 
   setDebug() {
     if (this.debug.active) {
       this.debugFolder = this.debug.ui?.addFolder({ title: "Earth" });
-      if (this.movementShader) {
-        this.debugFolder?.addInput(this.movementShader.uniforms.uForce, "value")
-      }
+      this.debugFolder?.addInput(this.movementShaderUniforms.uBounceRatio, "value", {
+        min: 0, max: 5, label: "bounce"
+      });
     }
   }
 }

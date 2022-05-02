@@ -1,7 +1,6 @@
 #include <common>
 
-uniform float uForce;
-uniform float uTime;
-uniform vec3 uDirection;
+uniform vec2 uDirection;
+uniform float uBounceRatio;
 
 varying float vHeight;
