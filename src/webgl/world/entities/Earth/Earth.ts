@@ -2,11 +2,17 @@ import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import type Camera from "@/webgl/world/Camera";
 import anime from "animejs";
-import { Group, MeshBasicMaterial, Object3D, Scene, Mesh, Texture, sRGBEncoding, DoubleSide } from "three";
+import { Group, MeshBasicMaterial, Object3D, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, ShaderMaterial, type Shader, type IUniform, Uniform } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Time from "@/webgl/controllers/Time";
 import Fire from "../Fire/Fire";
 import ISS from "../ISS/ISS";
+import commonVertex from "./shaders/commonVertex.glsl?raw";
+import beginVertex from "./shaders/beginVertex.glsl?raw";
+import commonFragment from "./shaders/commonFragment.glsl?raw";
+import outputFragment from "./shaders/outputFragment.glsl?raw";
+import type Debug from "@/webgl/controllers/Debug";
+import type { FolderApi } from "tweakpane";
 
 export default class Earth {
   private experience: Experience = new Experience();
@@ -14,11 +20,20 @@ export default class Earth {
   private time: Time = this.experience.time as Time;
   private camera: Camera = this.experience.camera as Camera;
   private loaders: Loaders = this.experience.loaders as Loaders;
+  private debug: Debug = this.experience.debug as Debug;
+  private debugFolder: FolderApi | undefined = undefined;
   public earthGroup: Group = new Group();
   private models: GLTF[] | null = null;
   private textures: Texture[] | null = null;
   private zones: Group = new Group();
   private zoneMaterial: MeshBasicMaterial = new MeshBasicMaterial({ color: 0xffffff, transparent: true });
+  private movementMaterial: MeshBasicMaterial = new MeshBasicMaterial({ transparent: true });
+  private movementShader: Shader | null = null;
+  private movementShaderUniforms: { [uniform: string]: IUniform<any>; } = {
+    'uTime': { value: this.time.elapsed },
+    'uForce': { value: this.camera.rotateSpeed },
+    'uDirection': { value: this.camera.rotateDirection }
+  }
   private isDisplayed = false;
   public fire: Fire | null = null;
   public ISS: ISS | null = null;
@@ -55,7 +70,43 @@ export default class Earth {
         }
         this.textures[index].flipY = false;
         this.textures[index].encoding = sRGBEncoding;
-        model.scene.traverse((child) => { (child as Mesh).material = bakedMaterial });
+        model.scene.traverse((child) => {
+          if(child instanceof Mesh) {
+            if (this.textures && (child.name === "maison" || child.name === "ville" || child.name === "mamie")) {
+              const customMaterial = this.movementMaterial.clone();
+              customMaterial.map = this.textures[index];
+              customMaterial.onBeforeCompile = (shader) => {
+                // shader.uniforms.uTime = { value: this.time.elapsed };
+                // shader.uniforms.uForce = { value: this.camera.rotateSpeed };
+                // shader.uniforms.uDirection = { value: this.camera.rotateDirection };
+                shader.uniforms = {...this.movementShaderUniforms, ...shader.uniforms};
+          
+                shader.vertexShader = shader.vertexShader.replace(
+                  "#include <common>",
+                  commonVertex
+                );
+                shader.vertexShader = shader.vertexShader.replace(
+                  "#include <begin_vertex>",
+                  beginVertex
+                );
+                // shader.fragmentShader = shader.fragmentShader.replace(
+                //   "#include <common>",
+                //   commonFragment
+                // );
+                // shader.fragmentShader = shader.fragmentShader.replace(
+                //   "#include <output_fragment>",
+                //   outputFragment
+                // );
+                this.movementShader = shader;
+
+                this.setDebug();
+              };
+              child.material = customMaterial;
+            } else {
+              child.material = bakedMaterial;
+            }
+          }
+        });
         this.earthGroup?.add(model.scene);
       } else {
         model.scene.traverse((child) => {
@@ -151,6 +202,20 @@ export default class Earth {
 
   update() {
     this.zoneMaterial.opacity = (Math.cos(this.time.elapsed / 300) + 1) / 2;
+    if (this.movementShaderUniforms) {
+      this.movementShaderUniforms.uTime.value = this.time.elapsed;
+      this.movementShaderUniforms.uForce.value = this.camera.rotateSpeed;
+      this.movementShaderUniforms.uDirection.value = this.camera.rotateDirection;
+    }
     this.ISS?.update();
+  }
+
+  setDebug() {
+    if (this.debug.active) {
+      this.debugFolder = this.debug.ui?.addFolder({ title: "Earth" });
+      if (this.movementShader) {
+        this.debugFolder?.addInput(this.movementShader.uniforms.uForce, "value")
+      }
+    }
   }
 }

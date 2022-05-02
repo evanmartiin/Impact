@@ -3,17 +3,22 @@ import anime from "animejs";
 import { PerspectiveCamera, Scene, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Experience from "../Experience";
+import type Time from "@/webgl/controllers/Time";
 
 export default class Camera {
   private experience: Experience = new Experience();
   private sizes: Sizes = this.experience.sizes as Sizes;
   private scene: Scene = this.experience.scene as Scene;
+  private time: Time = this.experience.time as Time;
   private canvas: HTMLCanvasElement = this.experience
     .canvas as HTMLCanvasElement;
   public instance: PerspectiveCamera | null = null;
   public controls: OrbitControls | null = null;
 
   private angle: number = 0;
+  private previousPos: Vector3 = new Vector3();
+  public rotateSpeed: number = 0;
+  public rotateDirection: Vector3 = new Vector3();
 
   constructor() {
     this.setInstance();
@@ -50,6 +55,9 @@ export default class Camera {
 
   update() {
     this.controls?.update();
+    this.rotateSpeed = this.instance?.position.distanceTo(this.previousPos as Vector3) as number;
+    this.rotateDirection.copy(this.instance?.position as Vector3).sub(this.previousPos).normalize();
+    this.previousPos = new Vector3().copy(this.instance?.position as Vector3);
   }
 
   rotate(angle: number) {

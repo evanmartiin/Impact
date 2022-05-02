@@ -72,7 +72,7 @@ export default class Experience {
   }
 
   setAxis() {
-    const axesHelper = new AxesHelper(1);
+    const axesHelper = new AxesHelper(3);
 
     this.scene?.add(axesHelper);
   }
