@@ -6,7 +6,7 @@ import type Time from "@/webgl/controllers/Time";
 import vert from './shaders/vert.glsl?raw'
 import frag from './shaders/frag.glsl?raw'
 
-export default class Sky {
+export default class Stars {
   private experience: Experience = new Experience();
   private scene: Scene = this.experience.scene as Scene;
   private time: Time = this.experience.time as Time;
@@ -65,7 +65,7 @@ export default class Sky {
 
   setDebug() {
     if (this.debug.active && this.material) {
-      this.debugFolder = this.debug.ui?.addFolder({ title: "Sky" });
+      this.debugFolder = this.debug.ui?.addFolder({ title: "Stars" });
       this.debugFolder?.addInput(this.material.uniforms.uScale, "value", { min: 5, max: 30, label: "scale" });
       this.debugFolder?.addInput(this.material.uniforms.uRadius, "value", { min: 0, max: 1, label: "radius" });
       this.debugFolder?.addInput(this.material.uniforms.uRatio, "value", { min: 0, max: 5, label: "ratio" });

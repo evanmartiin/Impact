@@ -17,7 +17,7 @@ export default class ISS {
   public model: GLTF | null = null;
   private trail: Trail | null = null;
 
-  static radiusFromEarth: number = 1.4;
+  static radiusFromEarth: number = 1.6;
 
   constructor() {
     this.setMesh();

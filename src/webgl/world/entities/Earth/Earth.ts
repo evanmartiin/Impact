@@ -16,6 +16,8 @@ import fogFragment from "./shaders/fogFragment.glsl?raw";
 import type Debug from "@/webgl/controllers/Debug";
 import type { FolderApi } from "tweakpane";
 import type Mouse from "@/webgl/controllers/Mouse";
+import Stars from "../Stars/Stars";
+import Clouds from "../Clouds/Clouds";
 
 export default class Earth {
   private experience: Experience = new Experience();
@@ -33,7 +35,7 @@ export default class Earth {
   private zoneMaterial: MeshBasicMaterial = new MeshBasicMaterial({ color: 0xffffff, transparent: true });
   private wiggleShaderUniforms: { [uniform: string]: IUniform<any> } = {
     'uWiggleDirection': { value: new Vector2() },
-    'uWiggleRatio': { value: 2.5 }
+    'uWiggleRatio': { value: 4. }
   };
   private fogShaderUniforms: { [uniform: string]: IUniform<any> } = {
     '_uFogColor': { value: new Color(0xffffff) },
@@ -44,6 +46,8 @@ export default class Earth {
   private halo: Mesh | null = null;
   public fire: Fire | null = null;
   public ISS: ISS | null = null;
+  public stars: Stars | null = null;
+  public clouds: Clouds | null = null;
 
   constructor() {
     this.setMesh();
@@ -52,6 +56,8 @@ export default class Earth {
     
     this.fire = new Fire();
     this.ISS = new ISS();
+    this.stars = new Stars();
+    this.clouds = new Clouds();
   }
 
   setMesh() {
@@ -233,6 +239,8 @@ export default class Earth {
 
     this.ISS?.update();
     this.fire?.update();
+    this.stars?.update();
+    this.clouds?.update();
   }
 
   updateRelatedToCamera() {
@@ -249,7 +257,7 @@ export default class Earth {
     if (this.debug.active) {
       this.debugFolder = this.debug.ui?.addFolder({ title: "Earth" });
       this.debugFolder?.addInput(this.wiggleShaderUniforms.uWiggleRatio, "value", {
-        min: 0, max: 5, label: "wiggle"
+        min: 0, max: 7, label: "wiggle"
       });
     }
   }

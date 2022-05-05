@@ -7,14 +7,13 @@ import type { FolderApi } from "tweakpane";
 import type { district } from "./../../models/district.model";
 import Districts from "./entities/Districts/Districts";
 import Earth from "./entities/Earth/Earth";
-// import Environment from "./Environment";
 import Character from "./entities/Character/Character";
-import Sky from "./entities/Sky/Sky";
+import Environment from "./Environment";
 
 export default class World {
   private experience: Experience = new Experience();
   private loaders: Loaders = this.experience.loaders as Loaders;
-  // protected environment: Environment | null = null;
+  protected environment: Environment | null = null;
   protected scene: Scene = this.experience.scene as Scene;
   private animationController: AnimationController = this.experience
     .animationController as AnimationController;
@@ -24,13 +23,11 @@ export default class World {
   private debug: Debug = this.experience.debug as Debug;
   public currentScene: district = "earth";
   public character: Character | null = null;
-  public sky: Sky | null = null;
 
   constructor() {
     this.loaders.on("ready", () => {
-      // this.environment = new Environment();
+      this.environment = new Environment();
       this.earth = new Earth();
-      this.sky = new Sky();
       this.districts = new Districts();
       this.character = new Character();
       this.setDebug();
@@ -40,8 +37,7 @@ export default class World {
   update() {
     this.character?.update();
     this.earth?.update();
-    this.sky?.update();
-    // this.environment?.update();
+    this.environment?.update();
     this.districts?.update();
   }
  
