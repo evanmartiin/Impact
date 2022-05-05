@@ -1,8 +1,10 @@
 import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
-import { Scene, BufferGeometry, PointsMaterial, Points, BufferAttribute, AdditiveBlending } from "three";
+import { Scene, BufferGeometry, PointsMaterial, Points, BufferAttribute, AdditiveBlending, ShaderMaterial, Vector2 } from "three";
 import type { FolderApi } from "tweakpane";
 import type Time from "@/webgl/controllers/Time";
+import vert from './shaders/vert.glsl?raw'
+import frag from './shaders/frag.glsl?raw'
 
 export default class Sky {
   private experience: Experience = new Experience();
@@ -11,7 +13,7 @@ export default class Sky {
   private debug: Debug = this.experience.debug as Debug;
   private debugFolder: FolderApi | undefined = undefined;
   private geometry: BufferGeometry | null = null;
-  private material: PointsMaterial | null = null;
+  private material: ShaderMaterial | null = null;
   private mesh: Points | null = null;
 
   constructor() {
@@ -33,14 +35,27 @@ export default class Sky {
 
     this.geometry.setAttribute('position', new BufferAttribute(positions, 3));
 
-    this.material = new PointsMaterial({ size: .03, sizeAttenuation: true, blending: AdditiveBlending });
+    this.material = new ShaderMaterial({
+      uniforms: {
+        uSize: { value: this.experience.renderer?.instance?.getPixelRatio() },
+        uScale: { value: 20. },
+        uRadius: { value: 1. },
+        uRatio: { value: 5. }
+      },
+      vertexShader: vert,
+      fragmentShader: frag,
+      transparent: true
+    })
     this.mesh = new Points(this.geometry, this.material);
     this.scene.add(this.mesh);
   }
 
   setDebug() {
-    if (this.debug.active) {
+    if (this.debug.active && this.material) {
       this.debugFolder = this.debug.ui?.addFolder({ title: "Sky" });
+      this.debugFolder?.addInput(this.material.uniforms.uScale, "value", { min: 5, max: 30, label: "scale" });
+      this.debugFolder?.addInput(this.material.uniforms.uRadius, "value", { min: 0, max: 1, label: "radius" });
+      this.debugFolder?.addInput(this.material.uniforms.uRatio, "value", { min: 0, max: 5, label: "ratio" });
     }
   }
 }
