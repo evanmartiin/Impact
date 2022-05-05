@@ -26,21 +26,28 @@ export default class Sky {
     const count = 500;
 
     const positions = new Float32Array(count * 3);
+    const blinking = new Float32Array(count * 2);
 
     for(let i = 0; i < count * 3; i+=3) {
       positions[i + 0] = (Math.random() - 0.5) * 10;
       positions[i + 1] = (Math.random() - 0.5) * 10;
       positions[i + 2] = (Math.random() - 0.5) * 10;
+
+      blinking[i + 0] = Math.random();
+      blinking[i + 1] = Math.random();
     }
 
     this.geometry.setAttribute('position', new BufferAttribute(positions, 3));
+    this.geometry.setAttribute('aBlinking', new BufferAttribute(blinking, 2));
 
     this.material = new ShaderMaterial({
       uniforms: {
+        uTime: { value: this.time.elapsed },
         uSize: { value: this.experience.renderer?.instance?.getPixelRatio() },
         uScale: { value: 20. },
         uRadius: { value: 1. },
-        uRatio: { value: 5. }
+        uRatio: { value: 4. },
+        uThreshold: { value: .2 }
       },
       vertexShader: vert,
       fragmentShader: frag,
@@ -50,12 +57,19 @@ export default class Sky {
     this.scene.add(this.mesh);
   }
 
+  update() {
+    if (this.material) {
+      this.material.uniforms.uTime.value = this.time.elapsed;
+    }
+  }
+
   setDebug() {
     if (this.debug.active && this.material) {
       this.debugFolder = this.debug.ui?.addFolder({ title: "Sky" });
       this.debugFolder?.addInput(this.material.uniforms.uScale, "value", { min: 5, max: 30, label: "scale" });
       this.debugFolder?.addInput(this.material.uniforms.uRadius, "value", { min: 0, max: 1, label: "radius" });
       this.debugFolder?.addInput(this.material.uniforms.uRatio, "value", { min: 0, max: 5, label: "ratio" });
+      this.debugFolder?.addInput(this.material.uniforms.uThreshold, "value", { min: 0, max: 1, label: "threshold" });
     }
   }
 }

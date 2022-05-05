@@ -40,7 +40,14 @@ export default class Camera {
       this.controls.enableDamping = true;
       // this.controls.enableZoom = false;
       this.controls.enablePan = false;
+      this.setListener();
     }
+  }
+
+  setListener() {
+    this.controls?.addEventListener("change", () => {
+      this.experience.world?.earth?.updateRelatedToCamera();
+    })
   }
 
   resize() {

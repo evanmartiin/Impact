@@ -10,5 +10,5 @@ float _fogFresnelTerm = dot(_fogViewDirection, _vFogNormal);
 // _fogFresnelTerm = clamp(pow(1.2 - _fogFresnelTerm, 2.), 0., 1.);
 _fogFresnelTerm = clamp(1. - _fogFresnelTerm, 0., 1.);
 
-// gl_FragColor.rgb = mix(gl_FragColor.rgb, _uFogColor, _fogDepth * _fogFresnelTerm);
-gl_FragColor.rgb = _vFogNormal;
+gl_FragColor.rgb = mix(gl_FragColor.rgb, _uFogColor, _fogDepth);
+// gl_FragColor.rgb = _vFogNormal;

@@ -157,6 +157,9 @@ export default class Earth {
       transparent: true
     });
     this.halo = new Mesh(geometry, material);
+    const { x, y, z } = this.camera.instance?.position as Vector3;
+    this.halo.position.set(-x, -y, -z);
+    this.halo.lookAt(0, 0, 0);
     this.scene.add(this.halo);
   }
 
@@ -224,18 +227,22 @@ export default class Earth {
     this.zoneMaterial.opacity = (Math.cos(this.time.elapsed / 300) + 1) / 2;
 
     this.fogShaderUniforms._uFogTime.value = this.time.elapsed;
-    this.fogShaderUniforms._uFogCameraPosition.value = this.camera.instance?.position;
 
     const { x, y } = this.wiggleShaderUniforms.uWiggleDirection.value;
     this.wiggleShaderUniforms.uWiggleDirection.value = { x: x - x/20, y: y - y/20 };
+
+    this.ISS?.update();
+    this.fire?.update();
+  }
+
+  updateRelatedToCamera() {
+    this.fogShaderUniforms._uFogCameraPosition.value = this.camera.instance?.position;
 
     if (this.halo) {
       const { x, y, z } = this.camera.instance?.position as Vector3;
       this.halo.position.set(-x, -y, -z);
       this.halo.lookAt(0, 0, 0);
     }
-
-    this.ISS?.update();
   }
 
   setDebug() {

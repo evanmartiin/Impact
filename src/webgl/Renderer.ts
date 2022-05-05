@@ -46,12 +46,12 @@ export default class Renderer {
       antialias: !isRetinaScreen,
       powerPreference: "high-performance"
     });
-    this.instance.physicallyCorrectLights = true;
+    // this.instance.physicallyCorrectLights = true;
     this.instance.outputEncoding = sRGBEncoding;
     this.instance.toneMapping = CineonToneMapping;
     this.instance.toneMappingExposure = 1.75;
-    this.instance.shadowMap.enabled = true;
-    this.instance.shadowMap.type = PCFSoftShadowMap;
+    // this.instance.shadowMap.enabled = true;
+    // this.instance.shadowMap.type = PCFSoftShadowMap;
     this.instance.setClearColor("#0C1B51");
     this.instance.setSize(this.sizes.width, this.sizes.height);
     this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 2));
