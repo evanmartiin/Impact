@@ -145,6 +145,11 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/earth-map.png",
   },
+  {
+    name: "earth-halo",
+    type: "texture",
+    path: "/textures/earth-halo.png",
+  },
 ];
 
 export default Sources;

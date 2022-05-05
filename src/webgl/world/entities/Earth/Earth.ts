@@ -2,7 +2,7 @@ import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import type Camera from "@/webgl/world/Camera";
 import anime from "animejs";
-import { Group, MeshBasicMaterial, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, type IUniform, Vector2, ShaderMaterial, Color, type Shader } from "three";
+import { Group, MeshBasicMaterial, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, type IUniform, Vector2, ShaderMaterial, Color, type Shader, PlaneBufferGeometry, Vector3 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Time from "@/webgl/controllers/Time";
 import Fire from "../Fire/Fire";
@@ -41,11 +41,13 @@ export default class Earth {
     '_uFogCameraPosition': { value: this.camera.instance?.position }
   };
   private isDisplayed = false;
+  private halo: Mesh | null = null;
   public fire: Fire | null = null;
   public ISS: ISS | null = null;
 
   constructor() {
     this.setMesh();
+    this.setHalo();
     this.setDebug();
     
     this.fire = new Fire();
@@ -146,8 +148,16 @@ export default class Earth {
     shader.vertexShader = shader.vertexShader.replace("#include <fog_vertex>", fogVertex);
     shader.fragmentShader = shader.fragmentShader.replace("#include <fog_pars_fragment>", fogParsFragment);
     shader.fragmentShader = shader.fragmentShader.replace("#include <fog_fragment>", fogFragment);
-    console.log(shader.fragmentShader);
-    
+  }
+
+  setHalo() {
+    const geometry = new PlaneBufferGeometry(5.7, 5.7);
+    const material = new MeshBasicMaterial({
+      map: this.loaders.items["earth-halo"] as Texture,
+      transparent: true
+    });
+    this.halo = new Mesh(geometry, material);
+    this.scene.add(this.halo);
   }
 
   appear() {
@@ -212,10 +222,19 @@ export default class Earth {
 
   update() {
     this.zoneMaterial.opacity = (Math.cos(this.time.elapsed / 300) + 1) / 2;
+
     this.fogShaderUniforms._uFogTime.value = this.time.elapsed;
     this.fogShaderUniforms._uFogCameraPosition.value = this.camera.instance?.position;
+
     const { x, y } = this.wiggleShaderUniforms.uWiggleDirection.value;
     this.wiggleShaderUniforms.uWiggleDirection.value = { x: x - x/20, y: y - y/20 };
+
+    if (this.halo) {
+      const { x, y, z } = this.camera.instance?.position as Vector3;
+      this.halo.position.set(-x, -y, -z);
+      this.halo.lookAt(0, 0, 0);
+    }
+
     this.ISS?.update();
   }
 
