@@ -40,9 +40,11 @@ export default class Renderer {
   }
 
   setInstance() {
+    const isRetinaScreen = window.devicePixelRatio > 1;
     this.instance = new WebGLRenderer({
       canvas: this.canvas,
-      antialias: true,
+      antialias: !isRetinaScreen,
+      powerPreference: "high-performance"
     });
     this.instance.physicallyCorrectLights = true;
     this.instance.outputEncoding = sRGBEncoding;
