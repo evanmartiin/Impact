@@ -3,12 +3,18 @@ import type Mouse from "@/webgl/controllers/Mouse";
 import type Sizes from "@/webgl/controllers/Sizes";
 import {
   CineonToneMapping,
+  LinearFilter,
+  Mesh,
+  MeshBasicMaterial,
+  NearestFilter,
   Object3D,
   PCFSoftShadowMap,
+  PlaneBufferGeometry,
   Raycaster,
   Scene,
   sRGBEncoding,
   WebGLRenderer,
+  WebGLRenderTarget,
   type Intersection,
 } from "three";
 import Experience from "./Experience";
@@ -88,6 +94,18 @@ export default class Renderer {
           this.hoveredDistrict = undefined;
         }
         
+      // let rt = new WebGLRenderTarget(this.sizes.width, this.sizes.height, { minFilter: LinearFilter, magFilter: NearestFilter });
+
+      // let plane = new Mesh(
+      //   new PlaneBufferGeometry(6, 4, 10, 10),
+      //   new MeshBasicMaterial({ map: rt.texture, wireframe: true })
+      // )
+      // let rtScene = new Scene();
+      // rtScene.add(plane);
+
+      // this.instance?.setRenderTarget(rt);
+      // this.instance?.render(this.scene, this.camera.instance);
+      // this.instance?.setRenderTarget(null);
       this.instance?.render(this.scene, this.camera.instance);
     }
   }

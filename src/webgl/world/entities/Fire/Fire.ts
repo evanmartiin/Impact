@@ -61,9 +61,12 @@ export default class Fire {
       });
       toggleFire?.on("click", () => {
         if (this.isToggled) {
+          this.geometry?.dispose();
+          this.material?.dispose();
           this.scene.remove(this.mesh as Mesh);
           this.isToggled = false;
         } else {
+          this.setMesh();
           this.scene.add(this.mesh as Mesh);
           this.isToggled = true;
         }

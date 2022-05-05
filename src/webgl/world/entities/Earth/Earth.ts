@@ -2,13 +2,17 @@ import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import type Camera from "@/webgl/world/Camera";
 import anime from "animejs";
-import { Group, MeshBasicMaterial, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, type IUniform, Vector2 } from "three";
+import { Group, MeshBasicMaterial, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, type IUniform, Vector2, ShaderMaterial, Color, type Shader } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Time from "@/webgl/controllers/Time";
 import Fire from "../Fire/Fire";
 import ISS from "../ISS/ISS";
-import commonVertex from "./shaders/commonVertex.glsl?raw";
-import beginVertex from "./shaders/beginVertex.glsl?raw";
+import wiggleVertex from "./shaders/wiggleVertex.glsl?raw";
+import wiggleFragment from "./shaders/wiggleFragment.glsl?raw";
+import fogParsVertex from "./shaders/fogParsVertex.glsl?raw";
+import fogVertex from "./shaders/fogVertex.glsl?raw";
+import fogParsFragment from "./shaders/fogParsFragment.glsl?raw";
+import fogFragment from "./shaders/fogFragment.glsl?raw";
 import type Debug from "@/webgl/controllers/Debug";
 import type { FolderApi } from "tweakpane";
 import type Mouse from "@/webgl/controllers/Mouse";
@@ -27,10 +31,14 @@ export default class Earth {
   private textures: Texture[] | null = null;
   private zones: Group = new Group();
   private zoneMaterial: MeshBasicMaterial = new MeshBasicMaterial({ color: 0xffffff, transparent: true });
-  private movementMaterial: MeshBasicMaterial = new MeshBasicMaterial({ transparent: true });
-  private movementShaderUniforms: { [uniform: string]: IUniform<any> } = {
-    'uDirection': { value: new Vector2() },
-    'uBounceRatio': { value: 2.5 }
+  private wiggleShaderUniforms: { [uniform: string]: IUniform<any> } = {
+    'uWiggleDirection': { value: new Vector2() },
+    'uWiggleRatio': { value: 2.5 }
+  };
+  private fogShaderUniforms: { [uniform: string]: IUniform<any> } = {
+    '_uFogColor': { value: new Color(0xffffff) },
+    '_uFogTime': { value: this.time.elapsed },
+    '_uFogCameraPosition': { value: this.camera.instance?.position }
   };
   private isDisplayed = false;
   public fire: Fire | null = null;
@@ -63,37 +71,33 @@ export default class Earth {
 
     this.models.forEach((model, index) => {
       if (this.textures && this.textures[index]) {
-        const bakedMaterial = new MeshBasicMaterial({ map: this.textures[index] });
         this.textures[index].flipY = false;
         this.textures[index].encoding = sRGBEncoding;
         model.scene.traverse((child) => {
-          if(child instanceof Mesh) {
-            if (this.textures && (child.name === "maison" || child.name === "ville" || child.name === "mamie")) {
-              const customMaterial = this.movementMaterial.clone();
-              customMaterial.map = this.textures[index];
-              customMaterial.onBeforeCompile = (shader) => {
-                shader.uniforms = {...this.movementShaderUniforms, ...shader.uniforms};
-                shader.vertexShader = shader.vertexShader.replace(
-                  "#include <common>",
-                  commonVertex
-                );
-                shader.vertexShader = shader.vertexShader.replace(
-                  "#include <begin_vertex>",
-                  beginVertex
-                );
-              };
+          if(child instanceof Mesh && this.textures) {
+            if (child.name === "maison" || child.name === "ville" || child.name === "mamie") {
+              const wiggleMaterial = new ShaderMaterial({
+                uniforms: {
+                  ...this.wiggleShaderUniforms,
+                  uBakedTexture: { value: this.textures[index] }
+                },
+                vertexShader: wiggleVertex,
+                fragmentShader: wiggleFragment
+              })
               if (child.name === "ville") {
                 child.rotateY(Math.PI * .13);
               } else if (child.name === "maison") {
                 child.rotateY(Math.PI * .65);
               } else if (child.name === "mamie") {
-                customMaterial.side = DoubleSide;
+                wiggleMaterial.side = DoubleSide;
                 child.rotateY(Math.PI * -.1);
               }
-              child.material = customMaterial;
+              child.material = wiggleMaterial;
             } else {
+              const bakedMaterial = new MeshBasicMaterial({ map: this.textures[index] });
               child.material = bakedMaterial;
             }
+            // child.material.onBeforeCompile = this.addCustomFog;
           }
         });
         this.earthGroup?.add(model.scene);
@@ -110,7 +114,7 @@ export default class Earth {
     });
 
     this.mouse.on("mouse_grab", () => {
-      this.movementShaderUniforms.uDirection.value = this.mouse.mouseInertia.clone();
+      this.wiggleShaderUniforms.uWiggleDirection.value = this.mouse.mouseInertia.clone();
     })
 
     this.scene.add(this.earthGroup);
@@ -131,6 +135,19 @@ export default class Earth {
       );
     }
     this.isDisplayed = true;
+  }
+
+  addCustomFog = (shader: Shader) => {
+    shader.uniforms = {
+      ...shader.uniforms,
+      ...this.fogShaderUniforms
+    }
+    shader.vertexShader = shader.vertexShader.replace("#include <fog_pars_vertex>", fogParsVertex);
+    shader.vertexShader = shader.vertexShader.replace("#include <fog_vertex>", fogVertex);
+    shader.fragmentShader = shader.fragmentShader.replace("#include <fog_pars_fragment>", fogParsFragment);
+    shader.fragmentShader = shader.fragmentShader.replace("#include <fog_fragment>", fogFragment);
+    console.log(shader.fragmentShader);
+    
   }
 
   appear() {
@@ -195,14 +212,18 @@ export default class Earth {
 
   update() {
     this.zoneMaterial.opacity = (Math.cos(this.time.elapsed / 300) + 1) / 2;
+    this.fogShaderUniforms._uFogTime.value = this.time.elapsed;
+    this.fogShaderUniforms._uFogCameraPosition.value = this.camera.instance?.position;
+    const { x, y } = this.wiggleShaderUniforms.uWiggleDirection.value;
+    this.wiggleShaderUniforms.uWiggleDirection.value = { x: x - x/20, y: y - y/20 };
     this.ISS?.update();
   }
 
   setDebug() {
     if (this.debug.active) {
       this.debugFolder = this.debug.ui?.addFolder({ title: "Earth" });
-      this.debugFolder?.addInput(this.movementShaderUniforms.uBounceRatio, "value", {
-        min: 0, max: 5, label: "bounce"
+      this.debugFolder?.addInput(this.wiggleShaderUniforms.uWiggleRatio, "value", {
+        min: 0, max: 5, label: "wiggle"
       });
     }
   }

@@ -89,7 +89,6 @@ export default class Trail {
       },
       vertexShader: vert,
       fragmentShader: frag,
-      side: DoubleSide,
       transparent: true,
       depthWrite: false
     })

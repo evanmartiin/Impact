@@ -138,6 +138,13 @@ const Sources: ISource[] = [
     type: "gltfModel",
     path: "/models/zones.glb",
   },
+
+
+  {
+    name: "earth-map",
+    type: "texture",
+    path: "/textures/earth-map.png",
+  },
 ];
 
 export default Sources;

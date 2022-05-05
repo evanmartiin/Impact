@@ -12,13 +12,13 @@ export default class Environment {
   private sunLight: DirectionalLight | null = null;
   private ambientLight: AmbientLight | null = null;
   private time = 0;
-  // private fog: SceneFog | null;
+  private fog: SceneFog | null;
 
   constructor() {
-    // this.fog = new SceneFog();
+    this.fog = new SceneFog();
 
-    // this.setAmbientLight();
-    // this.setSunLight();
+    this.setAmbientLight();
+    this.setSunLight();
   }
 
   setAmbientLight() {
@@ -38,9 +38,9 @@ export default class Environment {
 
   update() {
     // this.fog?.update();
-    if (this.experience.camera?.instance) {
-      this.sunLight?.position.copy(this.experience.camera?.instance?.position);
-    }
+    // if (this.experience.camera?.instance) {
+    //   this.sunLight?.position.copy(this.experience.camera?.instance?.position);
+    // }
   }
 
   destroy() {

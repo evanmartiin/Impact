@@ -83,7 +83,7 @@ export default class Experience {
   }
 
   update() {
-    if (this.time) this.animationController?.update(this.time?.delta);
+    // if (this.time) this.animationController?.update(this.time?.delta);
     this.camera?.update();
     this.world?.update();
     this.renderer?.update();
