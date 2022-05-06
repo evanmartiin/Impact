@@ -57,7 +57,7 @@ export default class Earth {
     this.fire = new Fire();
     this.ISS = new ISS();
     this.stars = new Stars();
-    this.clouds = new Clouds();
+    this.clouds = new Clouds(4);
   }
 
   setMesh() {
