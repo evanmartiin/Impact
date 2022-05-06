@@ -55,8 +55,8 @@ export default class Clouds {
       this.clouds.traverse((cloud: Object3D) => {
         if (cloud.name === "Cloud") {
           cloud.position.setFromSphericalCoords(this.PARAMS.radius,
-            Math.PI / 2 + Math.cos(this.time.elapsed * .00002 * this.offsets[index] + this.offsets[index]) * Math.PI * .3,
-            (this.time.elapsed * .00002 * this.offsets[index] + this.offsets[index]) * Math.PI
+            Math.PI / 2 + Math.cos(this.time.elapsed * .00001 * this.offsets[index] + this.offsets[index]) * Math.PI * .3,
+            (this.time.elapsed * .00001 * this.offsets[index] + this.offsets[index]) * Math.PI
             );
           cloud.lookAt(0, 0, 0);
           index++;

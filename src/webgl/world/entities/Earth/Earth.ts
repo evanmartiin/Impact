@@ -50,7 +50,7 @@ export default class Earth {
     '_uFogCameraPosition': { value: this.camera.instance?.position }
   };
   private brazierShaderUniforms: { [uniform: string]: IUniform<any> } = {
-    'uBrazierThreshold': { value: 0 },
+    'uBrazierThreshold': { value: -1.5 },
     'uBrazierRange': { value: .2 },
     'uBrazierTexture': { value: this.loaders.items["brazier-texture"] },
     'uBrazierRandomRatio': { value: 5. }
