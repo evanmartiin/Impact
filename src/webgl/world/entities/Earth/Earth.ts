@@ -7,17 +7,24 @@ import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Time from "@/webgl/controllers/Time";
 import Fire from "../Fire/Fire";
 import ISS from "../ISS/ISS";
-import wiggleVertex from "./shaders/wiggleVertex.glsl?raw";
-import wiggleFragment from "./shaders/wiggleFragment.glsl?raw";
-import fogParsVertex from "./shaders/fogParsVertex.glsl?raw";
-import fogVertex from "./shaders/fogVertex.glsl?raw";
-import fogParsFragment from "./shaders/fogParsFragment.glsl?raw";
-import fogFragment from "./shaders/fogFragment.glsl?raw";
 import type Debug from "@/webgl/controllers/Debug";
 import type { FolderApi } from "tweakpane";
 import type Mouse from "@/webgl/controllers/Mouse";
 import Stars from "../Stars/Stars";
 import Clouds from "../Clouds/Clouds";
+
+import wiggleVertex from "./shaders/wiggle/wiggleVertex.glsl?raw";
+import wiggleFragment from "./shaders/wiggle/wiggleFragment.glsl?raw";
+
+import fogParsVertex from "./shaders/customFog/fogParsVertex.glsl?raw";
+import fogVertex from "./shaders/customFog/fogVertex.glsl?raw";
+import fogParsFragment from "./shaders/customFog/fogParsFragment.glsl?raw";
+import fogFragment from "./shaders/customFog/fogFragment.glsl?raw";
+
+import brazierParsVertex from "./shaders/brazier/brazierParsVertex.glsl?raw";
+import brazierVertex from "./shaders/brazier/brazierVertex.glsl?raw";
+import brazierParsFragment from "./shaders/brazier/brazierParsFragment.glsl?raw";
+import brazierFragment from "./shaders/brazier/brazierFragment.glsl?raw";
 
 export default class Earth {
   private experience: Experience = new Experience();
@@ -42,6 +49,12 @@ export default class Earth {
     '_uFogTime': { value: this.time.elapsed },
     '_uFogCameraPosition': { value: this.camera.instance?.position }
   };
+  private brazierShaderUniforms: { [uniform: string]: IUniform<any> } = {
+    'uBrazierThreshold': { value: 0 },
+    'uBrazierRange': { value: .2 },
+    'uBrazierTexture': { value: this.loaders.items["brazier-texture"] },
+    'uBrazierRandomRatio': { value: 5. }
+  };
   private isDisplayed = false;
   private halo: Mesh | null = null;
   public fire: Fire | null = null;
@@ -57,7 +70,7 @@ export default class Earth {
     this.fire = new Fire();
     this.ISS = new ISS();
     this.stars = new Stars();
-    this.clouds = new Clouds(4);
+    this.clouds = new Clouds(3);
   }
 
   setMesh() {
@@ -102,10 +115,11 @@ export default class Earth {
               }
               child.material = wiggleMaterial;
             } else {
-              const bakedMaterial = new MeshBasicMaterial({ map: this.textures[index] });
+              const bakedMaterial = new MeshBasicMaterial({ map: this.textures[index], transparent: true });
               child.material = bakedMaterial;
             }
             // child.material.onBeforeCompile = this.addCustomFog;
+            child.material.onBeforeCompile = this.addBrazierShader;
           }
         });
         this.earthGroup?.add(model.scene);
@@ -154,6 +168,17 @@ export default class Earth {
     shader.vertexShader = shader.vertexShader.replace("#include <fog_vertex>", fogVertex);
     shader.fragmentShader = shader.fragmentShader.replace("#include <fog_pars_fragment>", fogParsFragment);
     shader.fragmentShader = shader.fragmentShader.replace("#include <fog_fragment>", fogFragment);
+  }
+
+  addBrazierShader = (shader: Shader) => {
+    shader.uniforms = {
+      ...shader.uniforms,
+      ...this.brazierShaderUniforms
+    }
+    shader.vertexShader = shader.vertexShader.replace("#include <common>", "#include <common>" + brazierParsVertex);
+    shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>" + brazierVertex);
+    shader.fragmentShader = shader.fragmentShader.replace("#include <common>", "#include <common>" + brazierParsFragment);
+    shader.fragmentShader = shader.fragmentShader.replace("#include <output_fragment>", "#include <output_fragment>" + brazierFragment);
   }
 
   setHalo() {
@@ -256,9 +281,10 @@ export default class Earth {
   setDebug() {
     if (this.debug.active) {
       this.debugFolder = this.debug.ui?.addFolder({ title: "Earth" });
-      this.debugFolder?.addInput(this.wiggleShaderUniforms.uWiggleRatio, "value", {
-        min: 0, max: 7, label: "wiggle"
-      });
+      this.debugFolder?.addInput(this.wiggleShaderUniforms.uWiggleRatio, "value", { min: 0, max: 7, label: "wiggle" });
+      this.debugFolder?.addInput(this.brazierShaderUniforms.uBrazierThreshold, "value", { min: -1.5, max: 2.5, label: "brazier Y" });
+      this.debugFolder?.addInput(this.brazierShaderUniforms.uBrazierRange, "value", { min: 0, max: 2, label: "brazier range" });
+      this.debugFolder?.addInput(this.brazierShaderUniforms.uBrazierRandomRatio, "value", { min: 0, max: 20, label: "brazier random" });
     }
   }
 }

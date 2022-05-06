@@ -150,6 +150,11 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/earth-halo.png",
   },
+  {
+    name: "brazier-texture",
+    type: "texture",
+    path: "/textures/fire.jpeg",
+  },
 ];
 
 export default Sources;
