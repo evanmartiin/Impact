@@ -16,6 +16,7 @@ export default class Mouse extends EventEmitter {
   public speedX = 0;
   public speedY = 0;
   public mouseVector = new Vector2();
+  public mouseInertia = new Vector2();
   private mouseClicking: Boolean = false;
 
   constructor() {
@@ -43,6 +44,10 @@ export default class Mouse extends EventEmitter {
   update(e: globalThis.MouseEvent) {
     this.top = e.clientY;
     this.left = e.clientX;
+    const newMouseVector = new Vector2((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+    this.mouseInertia.x = this.mouseVector.x - newMouseVector.x;
+    this.mouseInertia.y = this.mouseVector.y - newMouseVector.y;
+    
     this.mouseVector.x = (e.clientX / window.innerWidth) * 2 - 1;
     this.mouseVector.y = -(e.clientY / window.innerHeight) * 2 + 1;
     if (e.clientX < window.innerWidth / 2) {

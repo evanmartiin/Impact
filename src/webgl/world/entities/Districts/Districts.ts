@@ -28,21 +28,21 @@ export default class Districts extends EventEmitter {
       name: "mamie",
       pos: {
         lat: -10 - this.shift.lat,
-        lon: -10 - this.shift.lon,
+        lon: 170 - this.shift.lon,
       },
     },
     {
       name: "ville",
       pos: {
-        lat: 35 - this.shift.lat,
-        lon: 120 - this.shift.lon,
+        lat: 30 - this.shift.lat,
+        lon: -65 - this.shift.lon,
       },
     },
     {
       name: "maison",
       pos: {
         lat: 40 - this.shift.lat,
-        lon: -150 - this.shift.lon,
+        lon: 30 - this.shift.lon,
       },
     },
   ];

@@ -12,15 +12,13 @@ export default class Environment {
   private sunLight: DirectionalLight | null = null;
   private ambientLight: AmbientLight | null = null;
   private time = 0;
-  // private fog: SceneFog | null;
+  private fog: SceneFog | null;
 
   constructor() {
-    // this.fog = new SceneFog();
+    this.fog = new SceneFog();
 
     this.setAmbientLight();
     this.setSunLight();
-
-    this.setDebug();
   }
 
   setAmbientLight() {
@@ -38,34 +36,11 @@ export default class Environment {
     this.scene.add(this.sunLight);
   }
 
-  sunRotate() {
-    this.time += 0.02;
-    this.sunLight?.position.set(
-      Math.cos(this.time) * 40,
-      40,
-      Math.sin(this.time) * 40
-    );
-  }
-
-  setDebug() {
-    if (this.debug.active) {
-      if (this.sunLight) {
-        this.debugFolder = this.debug.ui?.addFolder({ title: "Sun" });
-
-        this.debugFolder?.addInput(this.sunLight, "intensity", {
-          min: 0,
-          max: 10,
-          step: 0.01,
-        });
-      }
-    }
-  }
-
   update() {
     // this.fog?.update();
-    if (this.experience.camera?.instance) {
-      this.sunLight?.position.copy(this.experience.camera?.instance?.position);
-    }
+    // if (this.experience.camera?.instance) {
+    //   this.sunLight?.position.copy(this.experience.camera?.instance?.position);
+    // }
   }
 
   destroy() {

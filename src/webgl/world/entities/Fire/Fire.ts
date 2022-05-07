@@ -3,8 +3,8 @@ import Experience from "@/webgl/Experience";
 import { Scene, Mesh, CylinderBufferGeometry, ShaderMaterial, DoubleSide, TextureLoader, Color, AdditiveBlending } from "three";
 import type { FolderApi } from "tweakpane";
 import type Time from "@/webgl/controllers/Time";
-import vert from './vert.glsl?raw'
-import frag from './frag.glsl?raw'
+import vert from './shaders/vert.glsl?raw'
+import frag from './shaders/frag.glsl?raw'
 
 export default class Fire {
   private experience: Experience = new Experience();
@@ -27,7 +27,6 @@ export default class Fire {
     this.geometry.computeTangents();
     this.material = new ShaderMaterial({ 
       transparent: true,
-      // wireframe: true,
       blending: AdditiveBlending,
       uniforms: {
         uTime: { value: this.time?.elapsed },
@@ -62,9 +61,12 @@ export default class Fire {
       });
       toggleFire?.on("click", () => {
         if (this.isToggled) {
+          this.geometry?.dispose();
+          this.material?.dispose();
           this.scene.remove(this.mesh as Mesh);
           this.isToggled = false;
         } else {
+          this.setMesh();
           this.scene.add(this.mesh as Mesh);
           this.isToggled = true;
         }
