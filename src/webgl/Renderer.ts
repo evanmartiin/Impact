@@ -1,4 +1,3 @@
-import intersectionController from "@/webgl/controllers/IntersectionController";
 import type Mouse from "@/webgl/controllers/Mouse";
 import type Sizes from "@/webgl/controllers/Sizes";
 import {
@@ -24,8 +23,7 @@ export default class Renderer {
   private camera: Camera = this.experience.camera as Camera;
   public instance: WebGLRenderer | null = null;
   public raycaster: Raycaster = new Raycaster();
-  private intersects: Intersection[] = [];
-  private intersectionController = new intersectionController();
+  public intersects: Intersection[] = [];
   private districtNames: string[] = ["maison", "ville", "mamie"];
   public hoveredDistrict: Object3D | undefined;
 
@@ -47,7 +45,6 @@ export default class Renderer {
     this.instance.setClearColor("#0C1B51");
     this.instance.setSize(this.sizes.width, this.sizes.height);
     this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 2));
-    this.mouse.on("click", () => this.IntersActions());
   }
 
   resize() {
@@ -55,40 +52,64 @@ export default class Renderer {
     this.instance?.setPixelRatio(Math.min(this.sizes.pixelRatio, 2));
   }
 
-  IntersActions() {
-    if (this.intersects.length > 0) {
-      this.intersectionController.dispatchInterAction(
-        this.intersects[0].object.name,
-        this.intersects[0].object
-      );
+  update() {
+    if (this.camera.instance && this.instance) {
+      this.instance.render(this.scene, this.camera.instance);
     }
   }
 
-  update() {
+  raycast() {
+    this.intersects = [];
     if (this.camera.instance && this.experience.world?.earth?.earthGroup) {
       this.raycaster.setFromCamera(
         this.mouse.mouseVector,
         this.camera.instance
       );
-      this.intersects = [];
-      this.raycaster
-        .intersectObjects(
-          this.experience.world.earth.earthGroup.children[0].children
-        )
-        .map((object) => {
-          this.intersects.push(object);
-        });
-        
+      switch (this.experience.world.currentScene) {
+        case "earth":
+          this.raycaster
+            .intersectObjects(
+              this.experience.world.earth.earthGroup.children[0].children
+            )
+            .map((object) => {
+              this.intersects.push(object);
+            });
+
           let selectedObjects = [];
-          if (this.intersects.length > 0 && this.districtNames.includes(this.intersects[0].object.name)) {
+          if (
+            this.intersects.length > 0 &&
+            this.districtNames.includes(this.intersects[0].object.name)
+          ) {
             this.hoveredDistrict = this.intersects[0].object;
             selectedObjects.push(this.hoveredDistrict);
           } else {
-            selectedObjects = this.experience.world.earth.earthGroup.children[0].children.filter((model) => this.districtNames.includes(model.name));
+            selectedObjects =
+              this.experience.world.earth.earthGroup.children[0].children.filter(
+                (model) => this.districtNames.includes(model.name)
+              );
             this.hoveredDistrict = undefined;
           }
-        
-      this.instance?.render(this.scene, this.camera.instance);
+          break;
+        case "maison":
+          let toRaycast: Object3D[] = [];
+          if (this.experience.world.districts?.homeDistrict?.instance) {
+
+            this.experience.world.districts.homeDistrict?.instance?.children.map(
+              (object) => toRaycast.push(object)
+            );
+
+            this.experience.world.districts.homeDistrict.game?.targets?.instance.children.map(
+              (object) => toRaycast.push(object)
+            );
+
+            this.raycaster.intersectObjects(toRaycast).map((object) => {
+              this.intersects.push(object);
+            });
+          }
+        default:
+          break;
+      }
     }
+    return this.intersects;
   }
 }

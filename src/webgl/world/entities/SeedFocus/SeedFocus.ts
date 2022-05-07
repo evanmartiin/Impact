@@ -11,8 +11,8 @@ import {
 } from "three";
 import type { FolderApi } from "tweakpane";
 
-import fragment from "./shaders/frag.glsl?raw";
-import vertex from "./shaders/vert.glsl?raw";
+import fragment from "./shaders/fragment.glsl?raw";
+import vertex from "./shaders/vertex.glsl?raw";
 
 export default class SeedFocus {
   private experience: Experience = new Experience();

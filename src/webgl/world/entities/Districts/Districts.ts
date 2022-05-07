@@ -9,7 +9,7 @@ import type { district } from "./../../../../models/district.model";
 import type { GPSPos } from "./../../../../models/webgl/GPSPos.model";
 import CityDistrict from "./cityDistrict/CityDistrict";
 import HomeDistrict from "./homeDistrict/HomeDistrict";
-import Scoreboard from "./Scoreboard";
+import Scoreboard from "./homeDistrict/SeedGame/Scoreboard";
 
 export default class Districts extends EventEmitter {
   private experience: Experience = new Experience();
@@ -54,11 +54,11 @@ export default class Districts extends EventEmitter {
 
     this.setModels();
 
-    this.mouse.on("mouse_grab", () => {
+    this.mouse.on("mousegrab", () => {
       this.trigger("no_district_selected");
     });
 
-    this.mouse.on("click_end", () => {
+    this.mouse.on("mouseup", () => {
       this.hoveredDistrict = this.experience.renderer?.hoveredDistrict;
       if (this.hoveredDistrict) {
         this.trigger("district_selected", [this.hoveredDistrict]);

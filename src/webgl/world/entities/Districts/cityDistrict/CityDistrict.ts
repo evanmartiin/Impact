@@ -9,7 +9,7 @@ import Waste from "./Waste";
 import Trash from "./Trash";
 import type Debug from "@/webgl/controllers/Debug";
 import type { FolderApi } from "tweakpane";
-import type Scoreboard from "../Scoreboard";
+import type Scoreboard from "../homeDistrict/SeedGame/Scoreboard";
 
 export default class CityDistrict {
   private experience: Experience = new Experience();
