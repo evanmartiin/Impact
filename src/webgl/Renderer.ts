@@ -3,7 +3,6 @@ import type Sizes from "@/webgl/controllers/Sizes";
 import {
   CineonToneMapping,
   Object3D,
-  PCFSoftShadowMap,
   Raycaster,
   Scene,
   sRGBEncoding,
@@ -32,16 +31,18 @@ export default class Renderer {
   }
 
   setInstance() {
+    const isRetinaScreen = window.devicePixelRatio > 1;
     this.instance = new WebGLRenderer({
       canvas: this.canvas,
-      antialias: true,
+      antialias: !isRetinaScreen,
+      powerPreference: "high-performance",
     });
-    this.instance.physicallyCorrectLights = true;
+    // this.instance.physicallyCorrectLights = true;
     this.instance.outputEncoding = sRGBEncoding;
     this.instance.toneMapping = CineonToneMapping;
     this.instance.toneMappingExposure = 1.75;
-    this.instance.shadowMap.enabled = true;
-    this.instance.shadowMap.type = PCFSoftShadowMap;
+    // this.instance.shadowMap.enabled = true;
+    // this.instance.shadowMap.type = PCFSoftShadowMap;
     this.instance.setClearColor("#0C1B51");
     this.instance.setSize(this.sizes.width, this.sizes.height);
     this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 2));
@@ -68,9 +69,7 @@ export default class Renderer {
       switch (this.experience.world.currentScene) {
         case "earth":
           this.raycaster
-            .intersectObjects(
-              this.experience.world.earth.earthGroup.children[0].children
-            )
+            .intersectObjects(this.experience.world.earth.earthGroup.children)
             .map((object) => {
               this.intersects.push(object);
             });
@@ -93,7 +92,6 @@ export default class Renderer {
         case "maison":
           let toRaycast: Object3D[] = [];
           if (this.experience.world.districts?.homeDistrict?.instance) {
-
             this.experience.world.districts.homeDistrict?.instance?.children.map(
               (object) => toRaycast.push(object)
             );
@@ -109,6 +107,20 @@ export default class Renderer {
         default:
           break;
       }
+
+      // let rt = new WebGLRenderTarget(this.sizes.width, this.sizes.height, { minFilter: LinearFilter, magFilter: NearestFilter });
+
+      // let plane = new Mesh(
+      //   new PlaneBufferGeometry(6, 4, 10, 10),
+      //   new MeshBasicMaterial({ map: rt.texture, wireframe: true })
+      // )
+      // let rtScene = new Scene();
+      // rtScene.add(plane);
+
+      // this.instance?.setRenderTarget(rt);
+      // this.instance?.render(this.scene, this.camera.instance);
+      // this.instance?.setRenderTarget(null);
+      this.instance?.render(this.scene, this.camera.instance);
     }
     return this.intersects;
   }

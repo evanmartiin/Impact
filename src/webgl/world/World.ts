@@ -6,8 +6,8 @@ import type { FolderApi } from "tweakpane";
 import type { district } from "./../../models/district.model";
 import Districts from "./entities/Districts/Districts";
 import Earth from "./entities/Earth/Earth";
-import Environment from "./Environment";
 import Character from "./entities/Character/Character";
+import Environment from "./Environment";
 
 export default class World {
   private experience: Experience = new Experience();
@@ -34,7 +34,6 @@ export default class World {
   update() {
     this.districts?.update();
     this.earth?.update();
-    this.earth?.fire?.update();
     this.environment?.update();
     this.districts?.update();
   }
@@ -84,6 +83,6 @@ export default class World {
   }
 
   destroy() {
-    this.environment?.destroy();
+    // this.environment?.destroy();
   }
 }

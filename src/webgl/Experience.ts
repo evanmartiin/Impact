@@ -69,7 +69,7 @@ export default class Experience {
   }
 
   setAxis() {
-    const axesHelper = new AxesHelper(5);
+    const axesHelper = new AxesHelper(3);
 
     this.scene?.add(axesHelper);
   }
@@ -80,6 +80,7 @@ export default class Experience {
   }
 
   update() {
+    // if (this.time) this.animationController?.update(this.time?.delta);
     this.camera?.update();
     this.world?.update();
     this.renderer?.update();

@@ -50,15 +50,15 @@ export default class Waste {
   }
 
   update() {
-      if (this.mesh?.position.y) {
-        if (this.mesh.position.y < Waste.DESPAWN_HEIGHT) {
-            this.destroy();
-        } else if (this.mesh.position.y < .6 && this.mesh.position.x === this.cityDistrict.trash?.mesh?.position.x) {
-            this.scoreboard.increaseScore();
-            this.destroy();
-        } else {
-            this.mesh.position.y -= Waste.FALL_SPEED;
-        }
+    if (this.mesh?.position.y) {
+      if (this.mesh.position.y < Waste.DESPAWN_HEIGHT) {
+          this.destroy();
+      } else if (this.mesh.position.y < .6 && this.mesh.position.x === this.cityDistrict.trash?.mesh?.position.x) {
+          this.scoreboard.increaseScore();
+          this.destroy();
+      } else {
+          this.mesh.position.y -= Waste.FALL_SPEED;
+      }
     }
   }
 
