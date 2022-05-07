@@ -8,7 +8,6 @@ import type Time from "@/webgl/controllers/Time";
 export default class Camera {
   private experience: Experience = new Experience();
   private sizes: Sizes = this.experience.sizes as Sizes;
-  private scene: Scene = this.experience.scene as Scene;
   private time: Time = this.experience.time as Time;
   private canvas: HTMLCanvasElement = this.experience
     .canvas as HTMLCanvasElement;
@@ -31,7 +30,7 @@ export default class Camera {
     );
     this.instance.position.set(0, 4, 6);
 
-    this.scene.add(this.instance);
+    this.experience.activeScene?.add(this.instance);
   }
 
   setControls() {

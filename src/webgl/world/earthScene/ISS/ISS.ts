@@ -9,17 +9,19 @@ import type { FolderApi } from "tweakpane";
 
 export default class ISS {
   private experience: Experience = new Experience();
-  private scene: Scene = this.experience.scene as Scene;
+  private scene: Scene | null = null;
   private time: Time = this.experience.time as Time;
   private loaders: Loaders = this.experience.loaders as Loaders;
   private debug: Debug = this.experience.debug as Debug;
-  public debugFolder: FolderApi | undefined = undefined;
+  public debugTab: FolderApi | undefined = undefined;
   public model: GLTF | null = null;
   private trail: Trail | null = null;
 
   static radiusFromEarth: number = 1.6;
 
-  constructor() {
+  constructor(scene: Scene) {
+    this.scene = scene;
+
     this.setMesh();
     this.setTrail();
     this.setDebug();
@@ -38,12 +40,12 @@ export default class ISS {
     this.model.scene.scale.set(.01, .01, .01);
     this.model.scene.position.set(ISS.radiusFromEarth, 0, 0);
     this.model.scene.lookAt(0, 0, 0);
-    this.scene.add(this.model.scene);
+    this.scene?.add(this.model.scene);
   }
 
   setTrail() {
     const ISSPosition = new Vector3().copy(this.model?.scene.position as Vector3);
-    this.trail = new Trail(ISSPosition, ISS.radiusFromEarth);
+    this.trail = new Trail(ISSPosition, ISS.radiusFromEarth, this.scene as Scene);
   }
 
   update() {
@@ -61,11 +63,11 @@ export default class ISS {
 
   setDebug() {
     if (this.debug.active) {
-      this.debugFolder = this.debug.ui?.addFolder({ title: "ISS" });
+      this.debugTab = this.debug.ui?.pages[1].addFolder({ title: "ISS" });
       const PARAMS = {
         radius: ISS.radiusFromEarth
       };
-      const radiusInput = this.debugFolder?.addInput(PARAMS, "radius", {
+      const radiusInput = this.debugTab?.addInput(PARAMS, "radius", {
         min: 1,
         max: 2
       });

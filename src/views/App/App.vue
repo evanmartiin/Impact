@@ -15,26 +15,27 @@ onMounted(() => {
   const experience = new Experience(document.getElementById("webgl") as HTMLCanvasElement);
   const store = webglStore();
   store.$state = { experience };
+  
   store.experience.loaders.on('ready', () => {
-    store.experience.world.districts.on('district_selected', (district) => {
+    store.experience.world.earth.on('district_selected', (district) => {
       selectedDistrict.value = district.name;
     })
-    store.experience.world.districts.on('no_district_selected', () => {
+    store.experience.world.earth.on('no_district_selected', () => {
       selectedDistrict.value = '';
     })
 
-    store.experience.world.districts.scoreboard.on("timer_started", () => {
-      showScoreboard.value = true;
+    // store.experience.world.districts.scoreboard.on("timer_started", () => {
+    //   showScoreboard.value = true;
 
-      store.experience.world.districts.scoreboard.on("timer_ended", () => {
-        showScoreboard.value = false;
-        store.experience.world.districts.scoreboard.off("timer_ended");
-      })
-    })
+    //   store.experience.world.districts.scoreboard.on("timer_ended", () => {
+    //     showScoreboard.value = false;
+    //     store.experience.world.districts.scoreboard.off("timer_ended");
+    //   })
+    // })
     
-    store.experience.world.districts.scoreboard.on("score_changed", (newScore: number) => {
-      score.value = newScore;
-    })
+    // store.experience.world.districts.scoreboard.on("score_changed", (newScore: number) => {
+    //   score.value = newScore;
+    // })
   })
 });
 </script>

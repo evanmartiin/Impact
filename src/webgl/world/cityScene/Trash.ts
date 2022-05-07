@@ -3,15 +3,16 @@ import { BoxBufferGeometry, Mesh, MeshBasicMaterial, Object3D, Scene } from "thr
 
 export default class Trash {
   private experience: Experience = new Experience();
-  private scene: Scene = this.experience.scene as Scene;
-
+  private scene: Scene | null = null;
   private geometry: BoxBufferGeometry = new BoxBufferGeometry(.3, .3, .3);
   private material: MeshBasicMaterial = new MeshBasicMaterial({ color: 0x00ff00 });
   public mesh: Mesh | null;
 
   private row: "LEFT" | "CENTER" | "RIGHT" = "CENTER";
 
-  constructor() {
+  constructor(scene: Scene) {
+    this.scene = scene;
+
     this.mesh = new Mesh(this.geometry, this.material);
     this.mesh.position.set(-.1, .6, 3.5);
     this.scene.add(this.mesh);
@@ -54,6 +55,6 @@ export default class Trash {
   destroy() {
     this.geometry.dispose();
     this.material.dispose();
-    this.scene.remove(this.mesh as Object3D);
+    this.scene?.remove(this.mesh as Object3D);
   }
 }

@@ -8,16 +8,18 @@ import frag from './shaders/frag.glsl?raw'
 
 export default class Fire {
   private experience: Experience = new Experience();
-  private scene: Scene = this.experience.scene as Scene;
+  private scene: Scene | null = null;
   private time: Time = this.experience.time as Time;
   private debug: Debug = this.experience.debug as Debug;
-  private debugFolder: FolderApi | undefined = undefined;
+  private debugTab: FolderApi | undefined = undefined;
   private geometry: CylinderBufferGeometry | null = null;
   private material: ShaderMaterial | null = null;
   private mesh: Mesh | null = null;
   private isToggled: boolean = false;
 
-  constructor() {
+  constructor(scene: Scene) {
+    this.scene = scene;
+
     this.setMesh();
     this.setDebug();
   }
@@ -55,19 +57,19 @@ export default class Fire {
 
   setDebug() {
     if (this.debug.active) {
-      this.debugFolder = this.debug.ui?.addFolder({ title: "Fire" });
-      const toggleFire = this.debugFolder?.addButton({
+      this.debugTab = this.debug.ui?.pages[1].addFolder({ title: "Fire" });
+      const toggleFire = this.debugTab?.addButton({
         title: "Toggle Fire",
       });
       toggleFire?.on("click", () => {
         if (this.isToggled) {
           this.geometry?.dispose();
           this.material?.dispose();
-          this.scene.remove(this.mesh as Mesh);
+          this.scene?.remove(this.mesh as Mesh);
           this.isToggled = false;
         } else {
           this.setMesh();
-          this.scene.add(this.mesh as Mesh);
+          this.scene?.add(this.mesh as Mesh);
           this.isToggled = true;
         }
       });

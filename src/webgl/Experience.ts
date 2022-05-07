@@ -1,5 +1,4 @@
 import Debug from "@/webgl/controllers/Debug";
-import AnimationController from "@/webgl/controllers/AnimationController";
 import Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Sources from "@/webgl/controllers/Loaders/sources";
 import Mouse from "@/webgl/controllers/Mouse";
@@ -25,11 +24,10 @@ export default class Experience {
   public sizes: Sizes | null = null;
   public mouse: Mouse | null = null;
   public time: Time | null = null;
-  public scene: Scene | null = null;
+  public activeScene: Scene | null = null;
   public loaders: Loaders | null = null;
   public camera: Camera | null = null;
   public renderer: Renderer | null = null;
-  public animationController: AnimationController | null = null;
 
   private sources: ISource[] | null = null;
   public world: World | null = null;
@@ -51,11 +49,9 @@ export default class Experience {
     this.mouse = new Mouse();
     this.time = new Time();
     this.debug = new Debug();
-    this.scene = new Scene();
     this.camera = new Camera();
-    this.animationController = new AnimationController();
     this.world = new World();
-    this.renderer = new Renderer(this.scene);
+    this.renderer = new Renderer();
 
     // Resize event
     this.sizes.on("resize", () => {
@@ -74,7 +70,7 @@ export default class Experience {
   setAxis() {
     const axesHelper = new AxesHelper(3);
 
-    this.scene?.add(axesHelper);
+    this.activeScene?.add(axesHelper);
   }
 
   resize() {
@@ -95,7 +91,7 @@ export default class Experience {
     this.time?.off("tick");
     this.mouse?.destroy();
     // Traverse the whole scene
-    this.scene?.traverse((child) => {
+    this.activeScene?.traverse((child) => {
       // Test if it's a mesh
       if (child instanceof Mesh) {
         child.geometry.dispose();
@@ -111,7 +107,7 @@ export default class Experience {
         }
       }
     });
-    this.world?.destroy();
+    // this.world?.destroy();
     this.camera?.controls?.dispose();
     this.renderer?.instance?.dispose();
 
