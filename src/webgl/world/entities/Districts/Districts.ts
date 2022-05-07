@@ -4,7 +4,7 @@ import EventEmitter from "@/webgl/controllers/EventEmitter";
 import type Mouse from "@/webgl/controllers/Mouse";
 import Experience from "@/webgl/Experience";
 import anime from "animejs";
-import { Group, Vector3, type Scene } from "three";
+import { Group, Scene, Vector3 } from "three";
 import type { district } from "./../../../../models/district.model";
 import type { GPSPos } from "./../../../../models/webgl/GPSPos.model";
 import CityDistrict from "./cityDistrict/CityDistrict";
@@ -13,7 +13,8 @@ import Scoreboard from "./Scoreboard";
 
 export default class Districts extends EventEmitter {
   private experience: Experience = new Experience();
-  private scene: Scene = this.experience.scene as Scene;
+  // private scene: Scene = this.experience.scene as Scene;
+  public scene: Scene = new Scene();
   private mouse: Mouse = this.experience.mouse as Mouse;
   private hoveredDistrict = this.experience.renderer?.hoveredDistrict;
   private instance: Group = new Group();

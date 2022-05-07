@@ -2,6 +2,7 @@ import intersectionController from "@/webgl/controllers/IntersectionController";
 import type Mouse from "@/webgl/controllers/Mouse";
 import type Sizes from "@/webgl/controllers/Sizes";
 import {
+  BoxBufferGeometry,
   CineonToneMapping,
   LinearFilter,
   Mesh,
@@ -13,6 +14,7 @@ import {
   Raycaster,
   Scene,
   sRGBEncoding,
+  Vector3,
   WebGLRenderer,
   WebGLRenderTarget,
   type Intersection,
@@ -34,8 +36,14 @@ export default class Renderer {
   private intersectionController = new intersectionController();
   private districtNames: string[] = ["maison", "ville", "mamie"];
   public hoveredDistrict: Object3D | undefined;
+  public currentScene: Scene | null = null;
+  public renderTargetScene: Scene | null = null;
+  public renderTarget: WebGLRenderTarget | null = null;
+  private isRenderTargetOn: boolean = false;
 
-  constructor() {
+  constructor(scene: Scene) {
+    this.currentScene = scene;
+
     this.setInstance();
   }
 
@@ -95,20 +103,27 @@ export default class Renderer {
           selectedObjects = this.experience.world.earth.earthGroup.children[0].children.filter((model) => this.districtNames.includes(model.name));
           this.hoveredDistrict = undefined;
         }
-        
-      // let rt = new WebGLRenderTarget(this.sizes.width, this.sizes.height, { minFilter: LinearFilter, magFilter: NearestFilter });
-
-      // let plane = new Mesh(
-      //   new PlaneBufferGeometry(6, 4, 10, 10),
-      //   new MeshBasicMaterial({ map: rt.texture, wireframe: true })
-      // )
-      // let rtScene = new Scene();
-      // rtScene.add(plane);
-
-      // this.instance?.setRenderTarget(rt);
-      // this.instance?.render(this.scene, this.camera.instance);
-      // this.instance?.setRenderTarget(null);
-      this.instance?.render(this.scene, this.camera.instance);
+        if (this.isRenderTargetOn) {
+          this.instance?.setRenderTarget(this.renderTarget);
+          this.instance?.render(this.renderTargetScene as Scene, this.camera.instance);
+          this.instance?.setRenderTarget(null);
+        }
+      this.instance?.render(this.currentScene as Scene, this.camera.instance);
     }
+  }
+
+  changeScene(nextScene: Scene) {
+    this.renderTargetScene = this.currentScene;
+    this.renderTarget = new WebGLRenderTarget(this.sizes.width*2, this.sizes.height*2, { minFilter: LinearFilter, magFilter: NearestFilter });
+    this.isRenderTargetOn = true;
+
+    if (this.renderTarget) {
+      this.renderTarget.texture.encoding = sRGBEncoding;
+    }
+    const plane = new Mesh(new PlaneBufferGeometry(this.sizes.width/200, this.sizes.height/200), new MeshBasicMaterial({ map: this.renderTarget?.texture }));
+    plane.lookAt(this.camera.instance?.position as Vector3);
+    nextScene.add(plane);
+
+    this.currentScene = nextScene;
   }
 }

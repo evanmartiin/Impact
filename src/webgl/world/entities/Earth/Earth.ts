@@ -285,6 +285,10 @@ export default class Earth {
       this.debugFolder?.addInput(this.brazierShaderUniforms.uBrazierThreshold, "value", { min: -1.5, max: 2.5, label: "brazier Y" });
       this.debugFolder?.addInput(this.brazierShaderUniforms.uBrazierRange, "value", { min: 0, max: 2, label: "brazier range" });
       this.debugFolder?.addInput(this.brazierShaderUniforms.uBrazierRandomRatio, "value", { min: 0, max: 20, label: "brazier random" });
+      const changeSceneBtn = this.debugFolder?.addButton({ title: "Change scene" });
+      changeSceneBtn?.on("click", () => {
+        this.experience.renderer?.changeScene(this.experience.world?.districts?.scene as Scene);
+      })
     }
   }
 }
