@@ -1,6 +1,6 @@
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
-import { DirectionalLight, Scene } from "three";
+import { DirectionalLight, Scene, Vector3 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import Character from "@/webgl/world/homeScene/Character/Character";
 import type Time from "@/webgl/controllers/Time";
@@ -18,6 +18,7 @@ export default class CityDistrict {
   private debugPage: TabPageApi | undefined = undefined;
 
   public scene: Scene = new Scene();
+  public cameraPos: Vector3 = new Vector3(50, 50, 50);
   public scoreboard: Scoreboard = new Scoreboard();
   public trash: Trash | null = null;
 

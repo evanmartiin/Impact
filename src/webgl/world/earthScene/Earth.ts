@@ -49,6 +49,7 @@ import calcPosFromGPS from "@/utils/calcPosFromGPS";
 export default class Earth extends EventEmitter {
   private experience: Experience = new Experience();
   public scene: Scene | null = null;
+  public cameraPos: Vector3 = new Vector3(0, 4, 6);
   private time: Time = this.experience.time as Time;
   private camera: Camera = this.experience.camera as Camera;
   private renderer: Renderer = this.experience.renderer as Renderer;

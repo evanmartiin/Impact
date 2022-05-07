@@ -1,7 +1,7 @@
 import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
-import type { Scene } from "three";
+import type { Scene, Vector3 } from "three";
 import type { FolderApi } from "tweakpane";
 import type { district } from "./../../models/district.model";
 import Earth from "./earthScene/Earth";
@@ -47,16 +47,18 @@ export default class World {
     if (this.homeDistrict && this.earth) {
       switchHome?.on("click", () => {
         this.currentScene = "maison";
-        this.experience.activeScene = this.homeDistrict?.scene as Scene;
+        this.experience.camera?.instance?.position.copy(this.homeDistrict?.cameraPos as Vector3);
+        this.experience.renderer?.changeScene(this.homeDistrict?.scene as Scene);
       });
       switchCity?.on("click", () => {
         this.currentScene = "ville";
-        this.experience.activeScene = this.cityDistrict?.scene as Scene;
+        this.experience.camera?.instance?.position.copy(this.cityDistrict?.cameraPos as Vector3);
+        this.experience.renderer?.changeScene(this.cityDistrict?.scene as Scene);
       });
       switchEarth?.on("click", () => {
         this.currentScene = "earth";
-        // this.districts?.disableMovements();
-        this.experience.activeScene = this.earth?.scene as Scene;
+        this.experience.camera?.instance?.position.copy(this.earth?.cameraPos as Vector3);
+        this.experience.renderer?.changeScene(this.earth?.scene as Scene);
       });
     }
   }

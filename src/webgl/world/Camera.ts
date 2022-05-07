@@ -1,16 +1,13 @@
 import type Sizes from "@/webgl/controllers/Sizes";
 import anime from "animejs";
-import { PerspectiveCamera, Scene, Vector2, Vector3 } from "three";
+import { PerspectiveCamera, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Experience from "../Experience";
-import type Time from "@/webgl/controllers/Time";
 
 export default class Camera {
   private experience: Experience = new Experience();
   private sizes: Sizes = this.experience.sizes as Sizes;
-  private time: Time = this.experience.time as Time;
-  private canvas: HTMLCanvasElement = this.experience
-    .canvas as HTMLCanvasElement;
+  private canvas: HTMLCanvasElement = this.experience.canvas as HTMLCanvasElement;
   public instance: PerspectiveCamera | null = null;
   public controls: OrbitControls | null = null;
 

@@ -21,8 +21,7 @@ import type Camera from "./world/Camera";
 
 export default class Renderer {
   private experience: Experience = new Experience();
-  private canvas: HTMLCanvasElement = this.experience
-    .canvas as HTMLCanvasElement;
+  private canvas: HTMLCanvasElement = this.experience.canvas as HTMLCanvasElement;
   private sizes: Sizes = this.experience.sizes as Sizes;
   private mouse: Mouse = this.experience.mouse as Mouse;
   private camera: Camera = this.experience.camera as Camera;
@@ -136,8 +135,21 @@ export default class Renderer {
       this.renderTarget.texture.encoding = sRGBEncoding;
     }
     const plane = new Mesh(new PlaneBufferGeometry(this.sizes.width/200, this.sizes.height/200), new MeshBasicMaterial({ map: this.renderTarget?.texture }));
-    plane.lookAt(this.camera.instance?.position as Vector3);
-    nextScene.add(plane);
+
+    if (this.camera.instance?.position) {
+      const camPos = new Vector3(
+        this.camera.instance.position.x - 1,
+        this.camera.instance.position.y - 1,
+        this.camera.instance.position.z - 1
+      );
+      plane.lookAt(camPos);
+      plane.position.copy(camPos);
+      nextScene.add(plane);
+    }
+
+    setTimeout(() => {
+      nextScene.remove(plane);
+    }, 1000)
 
     this.experience.activeScene = nextScene;
   }

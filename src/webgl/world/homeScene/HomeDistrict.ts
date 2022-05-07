@@ -1,7 +1,7 @@
 import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
-import { DirectionalLight, Group, PerspectiveCamera, Scene } from "three";
+import { DirectionalLight, Group, PerspectiveCamera, Scene, Vector3 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
 import SeedGameBoard from "./SeedGame/SeedGameBoard";
@@ -17,6 +17,7 @@ export default class HomeDistrict {
   private stopButton: ButtonApi | null = null;
   public game: SeedGameBoard | null = null;
   public scene: Scene = new Scene();
+  public cameraPos: Vector3 = new Vector3(50, 50, 50);
 
   constructor() {
     this.game = new SeedGameBoard(this.scene);
