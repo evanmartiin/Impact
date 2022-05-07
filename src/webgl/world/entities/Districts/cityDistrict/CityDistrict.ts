@@ -9,7 +9,7 @@ import Waste from "./Waste";
 import Trash from "./Trash";
 import type Debug from "@/webgl/controllers/Debug";
 import type { FolderApi } from "tweakpane";
-import type Scoreboard from "../Scoreboard";
+import type Scoreboard from "../homeDistrict/SeedGame/Scoreboard";
 
 export default class CityDistrict {
   private experience: Experience = new Experience();
@@ -18,7 +18,6 @@ export default class CityDistrict {
   private time: Time = this.experience.time as Time;
   private loaders: Loaders = this.experience.loaders as Loaders;
   public instance: Group = new Group();
-  private character: Character = new Character();
   private isInit = false;
   private isDisplayed = false;
   public trash: Trash | null = null;
@@ -98,7 +97,6 @@ export default class CityDistrict {
         easing: "easeInOutQuart",
         duration: 1000,
       });
-      this.character.appear();
     }
   }
 
@@ -114,7 +112,6 @@ export default class CityDistrict {
           this.instance.visible = false;
         },
       });
-      this.character.disappear();
     }
   }
   

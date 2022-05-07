@@ -12,10 +12,10 @@ export default class Environment {
   private sunLight: DirectionalLight | null = null;
   private ambientLight: AmbientLight | null = null;
   private time = 0;
-  private fog: SceneFog | null;
+  // private fog: SceneFog | null;
 
   constructor() {
-    this.fog = new SceneFog();
+    // this.fog = new SceneFog();
 
     this.setAmbientLight();
     this.setSunLight();

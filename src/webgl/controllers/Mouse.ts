@@ -29,14 +29,15 @@ export default class Mouse extends EventEmitter {
     document.addEventListener("mouseleave", () => this.setIsInScreen(false));
     document.addEventListener("mousedown", () => {
       this.mouseClicking = true;
+      this.trigger("mousedown");
     });
     document.addEventListener("mouseup", () => {
-      this.trigger("click_end");
       this.mouseClicking = false;
+      this.trigger("mouseup");
     });
     document.addEventListener("mousemove", () => {
       if (this.mouseClicking) {
-        this.trigger("mouse_grab");
+        this.trigger("mousegrab");
       }
     });
   }

@@ -1,5 +1,4 @@
 import Debug from "@/webgl/controllers/Debug";
-import AnimationController from "@/webgl/controllers/AnimationController";
 import Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Sources from "@/webgl/controllers/Loaders/sources";
 import Mouse from "@/webgl/controllers/Mouse";
@@ -29,7 +28,6 @@ export default class Experience {
   public loaders: Loaders | null = null;
   public camera: Camera | null = null;
   public renderer: Renderer | null = null;
-  public animationController: AnimationController | null = null;
 
   private sources: ISource[] | null = null;
   public world: World | null = null;
@@ -53,7 +51,6 @@ export default class Experience {
     this.debug = new Debug();
     this.scene = new Scene();
     this.camera = new Camera();
-    this.animationController = new AnimationController();
     this.world = new World();
     this.renderer = new Renderer();
 

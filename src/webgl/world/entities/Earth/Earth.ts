@@ -1,8 +1,24 @@
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import type Camera from "@/webgl/world/Camera";
+import type Renderer from "@/webgl/Renderer";
 import anime from "animejs";
-import { Group, MeshBasicMaterial, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, type IUniform, Vector2, ShaderMaterial, Color, type Shader, PlaneBufferGeometry, Vector3 } from "three";
+import {
+  Group,
+  MeshBasicMaterial,
+  Scene,
+  Mesh,
+  Texture,
+  sRGBEncoding,
+  DoubleSide,
+  type IUniform,
+  Vector2,
+  ShaderMaterial,
+  Color,
+  type Shader,
+  PlaneBufferGeometry,
+  Vector3,
+} from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Time from "@/webgl/controllers/Time";
 import Fire from "../Fire/Fire";
@@ -31,6 +47,7 @@ export default class Earth {
   private scene: Scene = this.experience.scene as Scene;
   private time: Time = this.experience.time as Time;
   private camera: Camera = this.experience.camera as Camera;
+  private renderer: Renderer = this.experience.renderer as Renderer;
   private loaders: Loaders = this.experience.loaders as Loaders;
   private mouse: Mouse = this.experience.mouse as Mouse;
   private debug: Debug = this.experience.debug as Debug;
@@ -39,21 +56,24 @@ export default class Earth {
   private models: GLTF[] | null = null;
   private textures: Texture[] | null = null;
   private zones: Group = new Group();
-  private zoneMaterial: MeshBasicMaterial = new MeshBasicMaterial({ color: 0xffffff, transparent: true });
+  private zoneMaterial: MeshBasicMaterial = new MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+  });
   private wiggleShaderUniforms: { [uniform: string]: IUniform<any> } = {
-    'uWiggleDirection': { value: new Vector2() },
-    'uWiggleRatio': { value: 4. }
+    uWiggleDirection: { value: new Vector2() },
+    uWiggleRatio: { value: 4 },
   };
   private fogShaderUniforms: { [uniform: string]: IUniform<any> } = {
-    '_uFogColor': { value: new Color(0xffffff) },
-    '_uFogTime': { value: this.time.elapsed },
-    '_uFogCameraPosition': { value: this.camera.instance?.position }
+    _uFogColor: { value: new Color(0xffffff) },
+    _uFogTime: { value: this.time.elapsed },
+    _uFogCameraPosition: { value: this.camera.instance?.position },
   };
   private brazierShaderUniforms: { [uniform: string]: IUniform<any> } = {
-    'uBrazierThreshold': { value: -1.5 },
-    'uBrazierRange': { value: .2 },
-    'uBrazierTexture': { value: this.loaders.items["brazier-texture"] },
-    'uBrazierRandomRatio': { value: 5. }
+    uBrazierThreshold: { value: -1.5 },
+    uBrazierRange: { value: 0.2 },
+    uBrazierTexture: { value: this.loaders.items["brazier-texture"] },
+    uBrazierRandomRatio: { value: 5 },
   };
   private isDisplayed = false;
   private halo: Mesh | null = null;
@@ -66,7 +86,7 @@ export default class Earth {
     this.setMesh();
     this.setHalo();
     this.setDebug();
-    
+
     this.fire = new Fire();
     this.ISS = new ISS();
     this.stars = new Stars();
@@ -80,42 +100,49 @@ export default class Earth {
       this.loaders.items["house-mini-model"] as GLTF,
       this.loaders.items["city-mini-model"] as GLTF,
       this.loaders.items["granny-mini-model"] as GLTF,
-      this.loaders.items["zones-model"] as GLTF
-    ]
+      this.loaders.items["zones-model"] as GLTF,
+    ];
     this.textures = [
       this.loaders.items["oceans-texture"] as Texture,
       this.loaders.items["continents-texture"] as Texture,
       this.loaders.items["house-mini-texture"] as Texture,
       this.loaders.items["city-mini-texture"] as Texture,
-      this.loaders.items["granny-mini-texture"] as Texture
-    ]
+      this.loaders.items["granny-mini-texture"] as Texture,
+    ];
 
     this.models.forEach((model, index) => {
       if (this.textures && this.textures[index]) {
         this.textures[index].flipY = false;
         this.textures[index].encoding = sRGBEncoding;
         model.scene.traverse((child) => {
-          if(child instanceof Mesh && this.textures) {
-            if (child.name === "maison" || child.name === "ville" || child.name === "mamie") {
+          if (child instanceof Mesh && this.textures) {
+            if (
+              child.name === "maison" ||
+              child.name === "ville" ||
+              child.name === "mamie"
+            ) {
               const wiggleMaterial = new ShaderMaterial({
                 uniforms: {
                   ...this.wiggleShaderUniforms,
-                  uBakedTexture: { value: this.textures[index] }
+                  uBakedTexture: { value: this.textures[index] },
                 },
                 vertexShader: wiggleVertex,
-                fragmentShader: wiggleFragment
-              })
+                fragmentShader: wiggleFragment,
+              });
               if (child.name === "ville") {
-                child.rotateY(Math.PI * .13);
+                child.rotateY(Math.PI * 0.13);
               } else if (child.name === "maison") {
-                child.rotateY(Math.PI * .65);
+                child.rotateY(Math.PI * 0.65);
               } else if (child.name === "mamie") {
                 wiggleMaterial.side = DoubleSide;
-                child.rotateY(Math.PI * -.1);
+                child.rotateY(Math.PI * -0.1);
               }
               child.material = wiggleMaterial;
             } else {
-              const bakedMaterial = new MeshBasicMaterial({ map: this.textures[index], transparent: true });
+              const bakedMaterial = new MeshBasicMaterial({
+                map: this.textures[index],
+                transparent: true,
+              });
               child.material = bakedMaterial;
             }
             // child.material.onBeforeCompile = this.addCustomFog;
@@ -130,15 +157,15 @@ export default class Earth {
             zone.material = this.zoneMaterial;
             this.zones.add(zone);
           }
-        })
+        });
         this.earthGroup.add(this.zones);
       }
     });
 
     this.mouse.on("mouse_grab", () => {
-      this.wiggleShaderUniforms.uWiggleDirection.value = this.mouse.mouseInertia.clone();
-    })
-
+      this.wiggleShaderUniforms.uWiggleDirection.value =
+        this.mouse.mouseInertia.clone();
+    });
     this.scene.add(this.earthGroup);
     this.earthGroup.position.set(10, 0, 0);
 
@@ -157,35 +184,60 @@ export default class Earth {
       );
     }
     this.isDisplayed = true;
+    this.setEvents();
   }
 
   addCustomFog = (shader: Shader) => {
     shader.uniforms = {
       ...shader.uniforms,
-      ...this.fogShaderUniforms
-    }
-    shader.vertexShader = shader.vertexShader.replace("#include <fog_pars_vertex>", fogParsVertex);
-    shader.vertexShader = shader.vertexShader.replace("#include <fog_vertex>", fogVertex);
-    shader.fragmentShader = shader.fragmentShader.replace("#include <fog_pars_fragment>", fogParsFragment);
-    shader.fragmentShader = shader.fragmentShader.replace("#include <fog_fragment>", fogFragment);
-  }
+      ...this.fogShaderUniforms,
+    };
+    shader.vertexShader = shader.vertexShader.replace(
+      "#include <fog_pars_vertex>",
+      fogParsVertex
+    );
+    shader.vertexShader = shader.vertexShader.replace(
+      "#include <fog_vertex>",
+      fogVertex
+    );
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <fog_pars_fragment>",
+      fogParsFragment
+    );
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <fog_fragment>",
+      fogFragment
+    );
+  };
 
   addBrazierShader = (shader: Shader) => {
     shader.uniforms = {
       ...shader.uniforms,
-      ...this.brazierShaderUniforms
-    }
-    shader.vertexShader = shader.vertexShader.replace("#include <common>", "#include <common>" + brazierParsVertex);
-    shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>" + brazierVertex);
-    shader.fragmentShader = shader.fragmentShader.replace("#include <common>", "#include <common>" + brazierParsFragment);
-    shader.fragmentShader = shader.fragmentShader.replace("#include <output_fragment>", "#include <output_fragment>" + brazierFragment);
-  }
+      ...this.brazierShaderUniforms,
+    };
+    shader.vertexShader = shader.vertexShader.replace(
+      "#include <common>",
+      "#include <common>" + brazierParsVertex
+    );
+    shader.vertexShader = shader.vertexShader.replace(
+      "#include <begin_vertex>",
+      "#include <begin_vertex>" + brazierVertex
+    );
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <common>",
+      "#include <common>" + brazierParsFragment
+    );
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <output_fragment>",
+      "#include <output_fragment>" + brazierFragment
+    );
+  };
 
   setHalo() {
     const geometry = new PlaneBufferGeometry(5.7, 5.7);
     const material = new MeshBasicMaterial({
       map: this.loaders.items["earth-halo"] as Texture,
-      transparent: true
+      transparent: true,
     });
     this.halo = new Mesh(geometry, material);
     const { x, y, z } = this.camera.instance?.position as Vector3;
@@ -222,7 +274,19 @@ export default class Earth {
         );
       }
       this.isDisplayed = true;
+      this.setEvents();
     }
+  }
+
+  setEvents() {
+    this.mouse.on("mousedown", () => this.getIntersect());
+  }
+  unSetEvents() {
+    this.mouse.off("mousedown");
+  }
+
+  getIntersect() {
+    const intersects = this.renderer.raycast();
   }
 
   disappear() {
@@ -251,6 +315,7 @@ export default class Earth {
         0
       );
       this.isDisplayed = false;
+      this.unSetEvents();
     }
   }
 
@@ -260,7 +325,10 @@ export default class Earth {
     this.fogShaderUniforms._uFogTime.value = this.time.elapsed;
 
     const { x, y } = this.wiggleShaderUniforms.uWiggleDirection.value;
-    this.wiggleShaderUniforms.uWiggleDirection.value = { x: x - x/20, y: y - y/20 };
+    this.wiggleShaderUniforms.uWiggleDirection.value = {
+      x: x - x / 20,
+      y: y - y / 20,
+    };
 
     this.ISS?.update();
     this.fire?.update();
@@ -269,7 +337,8 @@ export default class Earth {
   }
 
   updateRelatedToCamera() {
-    this.fogShaderUniforms._uFogCameraPosition.value = this.camera.instance?.position;
+    this.fogShaderUniforms._uFogCameraPosition.value =
+      this.camera.instance?.position;
 
     if (this.halo) {
       const { x, y, z } = this.camera.instance?.position as Vector3;
@@ -281,10 +350,26 @@ export default class Earth {
   setDebug() {
     if (this.debug.active) {
       this.debugFolder = this.debug.ui?.addFolder({ title: "Earth" });
-      this.debugFolder?.addInput(this.wiggleShaderUniforms.uWiggleRatio, "value", { min: 0, max: 7, label: "wiggle" });
-      this.debugFolder?.addInput(this.brazierShaderUniforms.uBrazierThreshold, "value", { min: -1.5, max: 2.5, label: "brazier Y" });
-      this.debugFolder?.addInput(this.brazierShaderUniforms.uBrazierRange, "value", { min: 0, max: 2, label: "brazier range" });
-      this.debugFolder?.addInput(this.brazierShaderUniforms.uBrazierRandomRatio, "value", { min: 0, max: 20, label: "brazier random" });
+      this.debugFolder?.addInput(
+        this.wiggleShaderUniforms.uWiggleRatio,
+        "value",
+        { min: 0, max: 7, label: "wiggle" }
+      );
+      this.debugFolder?.addInput(
+        this.brazierShaderUniforms.uBrazierThreshold,
+        "value",
+        { min: -1.5, max: 2.5, label: "brazier Y" }
+      );
+      this.debugFolder?.addInput(
+        this.brazierShaderUniforms.uBrazierRange,
+        "value",
+        { min: 0, max: 2, label: "brazier range" }
+      );
+      this.debugFolder?.addInput(
+        this.brazierShaderUniforms.uBrazierRandomRatio,
+        "value",
+        { min: 0, max: 20, label: "brazier random" }
+      );
     }
   }
 }
