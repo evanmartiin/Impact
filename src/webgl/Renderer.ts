@@ -7,6 +7,7 @@ import {
   MeshBasicMaterial,
   NearestFilter,
   Object3D,
+  PerspectiveCamera,
   PlaneBufferGeometry,
   Raycaster,
   Scene,
@@ -24,13 +25,13 @@ export default class Renderer {
   private canvas: HTMLCanvasElement = this.experience.canvas as HTMLCanvasElement;
   private sizes: Sizes = this.experience.sizes as Sizes;
   private mouse: Mouse = this.experience.mouse as Mouse;
-  private camera: Camera = this.experience.camera as Camera;
   public instance: WebGLRenderer | null = null;
   public raycaster: Raycaster = new Raycaster();
   public intersects: Intersection[] = [];
   private districtNames: string[] = ["maison", "ville", "mamie"];
   public hoveredDistrict: Object3D | undefined;
   public renderTargetScene: Scene | null = null;
+  public renderTargetCamera: Camera | null = null;
   public renderTarget: WebGLRenderTarget | null = null;
   private isRenderTargetOn: boolean = false;
 
@@ -62,24 +63,24 @@ export default class Renderer {
   }
 
   update() {
-    if (this.camera.instance && this.instance) {
+    if (this.experience.activeCamera?.instance && this.instance) {
       if (this.isRenderTargetOn) {
         this.instance.setRenderTarget(this.renderTarget);
-        this.instance.render(this.renderTargetScene as Scene, this.camera.instance);
+        this.instance.render(this.renderTargetScene as Scene, this.renderTargetCamera?.instance as PerspectiveCamera);
         this.instance.setRenderTarget(null);
       }
       if (this.experience.activeScene) {
-        this.instance.render(this.experience.activeScene as Scene, this.camera.instance);
+        this.instance.render(this.experience.activeScene as Scene, this.experience.activeCamera?.instance);
       }
     }
   }
 
   raycast() {
     this.intersects = [];
-    if (this.camera.instance && this.experience.world?.earth?.earthGroup) {
+    if (this.experience.activeCamera?.instance && this.experience.world?.earth?.earthGroup) {
       this.raycaster.setFromCamera(
         this.mouse.mouseVector,
-        this.camera.instance
+        this.experience.activeCamera?.instance
       );
       switch (this.experience.world.currentScene) {
         case "earth":
@@ -126,31 +127,32 @@ export default class Renderer {
     }
   }
 
-  changeScene(nextScene: Scene) {
+  changeScene(nextScene: Scene, nextCamera: Camera) {
     this.renderTargetScene = this.experience.activeScene;
+    this.renderTargetCamera = this.experience.activeCamera;
     this.renderTarget = new WebGLRenderTarget(this.sizes.width*2, this.sizes.height*2, { minFilter: LinearFilter, magFilter: NearestFilter });
     this.isRenderTargetOn = true;
 
     if (this.renderTarget) {
       this.renderTarget.texture.encoding = sRGBEncoding;
     }
-    const plane = new Mesh(new PlaneBufferGeometry(this.sizes.width/200, this.sizes.height/200), new MeshBasicMaterial({ map: this.renderTarget?.texture }));
 
-    if (this.camera.instance?.position) {
-      const camPos = new Vector3(
-        this.camera.instance.position.x - 1,
-        this.camera.instance.position.y - 1,
-        this.camera.instance.position.z - 1
-      );
-      plane.lookAt(camPos);
-      plane.position.copy(camPos);
+    const plane = new Mesh(new PlaneBufferGeometry(this.sizes.width/200, this.sizes.height/200), new MeshBasicMaterial({ map: this.renderTarget?.texture }));
+    if (nextCamera.instance?.position) {
+      plane.lookAt(nextCamera.instance.position);
+      plane.position.copy(nextCamera.instance.position);
+      const { x, y, z } = nextCamera.instance.position;
+      const planePos = new Vector3(x, y, z).normalize().multiply(new Vector3(7.4, 7.4, 7.4));
+      plane.position.sub(planePos);
       nextScene.add(plane);
     }
 
     setTimeout(() => {
       nextScene.remove(plane);
-    }, 1000)
+      this.isRenderTargetOn = false;
+    }, 1000);
 
     this.experience.activeScene = nextScene;
+    this.experience.activeCamera = nextCamera;
   }
 }

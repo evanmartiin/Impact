@@ -7,8 +7,8 @@ import Time from "@/webgl/controllers/Time";
 import type { ISource } from "@/models/webgl/source.model";
 import { AxesHelper, Mesh, Scene } from "three";
 import Renderer from "./Renderer";
-import Camera from "./world/Camera";
 import World from "./world/World";
+import type Camera from "./world/Camera";
 
 declare global {
   interface Window {
@@ -25,8 +25,8 @@ export default class Experience {
   public mouse: Mouse | null = null;
   public time: Time | null = null;
   public activeScene: Scene | null = null;
+  public activeCamera: Camera | null = null;
   public loaders: Loaders | null = null;
-  public camera: Camera | null = null;
   public renderer: Renderer | null = null;
 
   private sources: ISource[] | null = null;
@@ -49,7 +49,6 @@ export default class Experience {
     this.mouse = new Mouse();
     this.time = new Time();
     this.debug = new Debug();
-    this.camera = new Camera();
     this.world = new World();
     this.renderer = new Renderer();
 
@@ -74,13 +73,13 @@ export default class Experience {
   }
 
   resize() {
-    this.camera?.resize();
+    this.activeCamera?.resize();
     this.renderer?.resize();
   }
 
   update() {
     // if (this.time) this.animationController?.update(this.time?.delta);
-    this.camera?.update();
+    this.activeCamera?.update();
     this.world?.update();
     this.renderer?.update();
     this.debug?.update();
@@ -108,7 +107,7 @@ export default class Experience {
       }
     });
     // this.world?.destroy();
-    this.camera?.controls?.dispose();
+    this.activeCamera?.controls?.dispose();
     this.renderer?.instance?.dispose();
 
     if (this.debug?.active) this.debug.ui?.dispose();

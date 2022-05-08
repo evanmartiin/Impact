@@ -4,12 +4,12 @@ import Experience from "@/webgl/Experience";
 import { DirectionalLight, Group, PerspectiveCamera, Scene, Vector3 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
+import Camera from "../Camera";
 import SeedGameBoard from "./SeedGame/SeedGameBoard";
 
 export default class HomeDistrict {
   private experience: Experience = new Experience();
   private loaders: Loaders = this.experience.loaders as Loaders;
-  private camera: PerspectiveCamera = this.experience.camera?.instance as PerspectiveCamera;
   private debugTab: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
   public instance: Group = new Group();
@@ -18,6 +18,7 @@ export default class HomeDistrict {
   public game: SeedGameBoard | null = null;
   public scene: Scene = new Scene();
   public cameraPos: Vector3 = new Vector3(50, 50, 50);
+  public camera: Camera = new Camera(this.cameraPos);
 
   constructor() {
     this.game = new SeedGameBoard(this.scene);
@@ -55,17 +56,17 @@ export default class HomeDistrict {
   setDebug() {
     this.debugTab = this.debug.ui?.pages[2].addFolder({ title: "Home" });
     if (this.scene?.position) {
-      this.debugTab?.addInput(this.camera?.position, "x", {
+      this.debugTab?.addInput(this.camera?.instance?.position as Vector3, "x", {
         min: -10,
         max: 10,
         step: 0.1,
       });
-      this.debugTab?.addInput(this.camera?.position, "y", {
+      this.debugTab?.addInput(this.camera?.instance?.position as Vector3, "y", {
         min: -10,
         max: 10,
         step: 0.01,
       });
-      this.debugTab?.addInput(this.camera?.position, "z", {
+      this.debugTab?.addInput(this.camera?.instance?.position as Vector3, "z", {
         min: -10,
         max: 10,
         step: 0.01,

@@ -10,7 +10,7 @@ import {
 
 export default class Helper {
   private experience: Experience = new Experience();
-  private camera: PerspectiveCamera = this.experience.camera?.instance as PerspectiveCamera;
+  private camera: PerspectiveCamera = this.experience.world?.homeDistrict?.camera.instance as PerspectiveCamera;
   private scene: Scene | null = null;
   private geometry: PlaneGeometry | null = null;
   private material: MeshStandardMaterial | null = null;

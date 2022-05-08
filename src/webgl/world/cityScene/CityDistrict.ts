@@ -9,6 +9,7 @@ import Trash from "./Trash";
 import type Debug from "@/webgl/controllers/Debug";
 import type { TabPageApi } from "tweakpane";
 import Scoreboard from "./Scoreboard";
+import Camera from "../Camera";
 
 export default class CityDistrict {
   private experience: Experience = new Experience();
@@ -19,6 +20,7 @@ export default class CityDistrict {
 
   public scene: Scene = new Scene();
   public cameraPos: Vector3 = new Vector3(50, 50, 50);
+  public camera: Camera = new Camera(this.cameraPos);
   public scoreboard: Scoreboard = new Scoreboard();
   public trash: Trash | null = null;
 

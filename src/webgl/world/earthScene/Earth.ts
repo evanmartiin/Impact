@@ -1,6 +1,6 @@
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
-import type Camera from "@/webgl/world/Camera";
+import Camera from "@/webgl/world/Camera";
 import type Renderer from "@/webgl/Renderer";
 import {
   Group,
@@ -51,7 +51,7 @@ export default class Earth extends EventEmitter {
   public scene: Scene | null = null;
   public cameraPos: Vector3 = new Vector3(0, 4, 6);
   private time: Time = this.experience.time as Time;
-  private camera: Camera = this.experience.camera as Camera;
+  public camera: Camera = new Camera(this.cameraPos);
   private renderer: Renderer = this.experience.renderer as Renderer;
   private loaders: Loaders = this.experience.loaders as Loaders;
   private mouse: Mouse = this.experience.mouse as Mouse;
@@ -321,12 +321,12 @@ export default class Earth extends EventEmitter {
   }
 
   rotateTo(newGPSPos: GPSPos) {
-    const radius = this.experience.camera?.instance?.position.distanceTo(
+    const radius = this.camera?.instance?.position.distanceTo(
       new Vector3()
     );
     const currentGPSPos = calcGPSFromPos(
-      this.experience.camera?.instance?.position as Vector3,
-      this.experience.camera?.instance?.position.distanceTo(
+      this.camera?.instance?.position as Vector3,
+      this.camera?.instance?.position.distanceTo(
         new Vector3()
       ) as number
     );
@@ -340,8 +340,8 @@ export default class Earth extends EventEmitter {
 
     newGPSPos.lon = currentGPSPos.lon + min * sign;
 
-    if (this.experience.camera?.controls) {
-      this.experience.camera.controls.enableRotate = false;
+    if (this.camera?.controls) {
+      this.camera.controls.enableRotate = false;
     }
 
     const tl = anime.timeline({});
@@ -354,11 +354,11 @@ export default class Earth extends EventEmitter {
         duration: 1000,
         update: () => {
           const newPos = calcPosFromGPS(currentGPSPos, radius as number);
-          this.experience.camera?.instance?.position.copy(newPos);
+          this.camera?.instance?.position.copy(newPos);
         },
         complete: () => {
-          if (this.experience.camera?.controls) {
-            this.experience.camera.controls.enableRotate = true;
+          if (this.camera?.controls) {
+            this.camera.controls.enableRotate = true;
           }
         },
       },

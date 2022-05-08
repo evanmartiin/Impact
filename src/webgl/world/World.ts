@@ -9,6 +9,7 @@ import Character from "./homeScene/Character/Character";
 import type Renderer from "../Renderer";
 import HomeDistrict from "./homeScene/HomeDistrict";
 import CityDistrict from "./cityScene/CityDistrict";
+import type Camera from "./Camera";
 
 export default class World {
   private experience: Experience = new Experience();
@@ -28,6 +29,7 @@ export default class World {
       this.cityDistrict = new CityDistrict();
 
       this.experience.activeScene = this.earth.scene;
+      this.experience.activeCamera = this.earth.camera;
 
       this.setDebug();
     });
@@ -47,18 +49,15 @@ export default class World {
     if (this.homeDistrict && this.earth) {
       switchHome?.on("click", () => {
         this.currentScene = "maison";
-        this.experience.camera?.instance?.position.copy(this.homeDistrict?.cameraPos as Vector3);
-        this.experience.renderer?.changeScene(this.homeDistrict?.scene as Scene);
+        this.experience.renderer?.changeScene(this.homeDistrict?.scene as Scene, this.homeDistrict?.camera as Camera);
       });
       switchCity?.on("click", () => {
         this.currentScene = "ville";
-        this.experience.camera?.instance?.position.copy(this.cityDistrict?.cameraPos as Vector3);
-        this.experience.renderer?.changeScene(this.cityDistrict?.scene as Scene);
+        this.experience.renderer?.changeScene(this.cityDistrict?.scene as Scene, this.cityDistrict?.camera as Camera);
       });
       switchEarth?.on("click", () => {
         this.currentScene = "earth";
-        this.experience.camera?.instance?.position.copy(this.earth?.cameraPos as Vector3);
-        this.experience.renderer?.changeScene(this.earth?.scene as Scene);
+        this.experience.renderer?.changeScene(this.earth?.scene as Scene, this.earth?.camera as Camera);
       });
     }
   }

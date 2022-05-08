@@ -12,7 +12,7 @@ export default class SeedGameHub {
   private mouse: Mouse = this.experience.mouse as Mouse;
   private scene: Scene | null = null;
   private renderer: Renderer = this.experience.renderer as Renderer;
-  private camera: PerspectiveCamera = this.experience.camera?.instance as PerspectiveCamera;
+  private camera: PerspectiveCamera = this.experience.world?.homeDistrict?.camera.instance as PerspectiveCamera;
   private debugTab: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
   public instance: Group = new Group();

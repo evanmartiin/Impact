@@ -13,19 +13,19 @@ export default class Camera {
 
   private angle: number = 0;
 
-  constructor() {
-    this.setInstance();
+  constructor(position: Vector3) {
+    this.setInstance(position);
     this.setControls();
   }
 
-  setInstance() {
+  setInstance(position: Vector3) {
     this.instance = new PerspectiveCamera(
       35,
       this.sizes.width / this.sizes.height,
       0.1,
       1000
     );
-    this.instance.position.set(0, 4, 6);
+    this.instance.position.copy(position);
 
     this.experience.activeScene?.add(this.instance);
   }
