@@ -7,8 +7,8 @@ import type { district } from "./../../models/district.model";
 import Earth from "./earthScene/Earth";
 import Character from "./homeScene/Character/Character";
 import type Renderer from "../Renderer";
-import HomeDistrict from "./homeScene/HomeDistrict";
-import CityDistrict from "./cityScene/CityDistrict";
+import HomeScene from "./homeScene/HomeScene";
+import CityScene from "./cityScene/CityScene";
 import type Camera from "./Camera";
 
 export default class World {
@@ -16,8 +16,8 @@ export default class World {
   private loaders: Loaders = this.experience.loaders as Loaders;
   private renderer: Renderer = this.experience.renderer as Renderer;
   public earth: Earth | null = null;
-  public homeDistrict: HomeDistrict | null = null;
-  public cityDistrict: CityDistrict | null = null;
+  public homeScene: HomeScene | null = null;
+  public cityScene: CityScene | null = null;
   private debugTab: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
   public currentScene: district = "earth";
@@ -25,11 +25,11 @@ export default class World {
   constructor() {
     this.loaders.on("ready", () => {
       this.earth = new Earth();
-      this.homeDistrict = new HomeDistrict();
-      this.cityDistrict = new CityDistrict();
+      this.homeScene = new HomeScene();
+      this.cityScene = new CityScene();
 
-      this.experience.activeScene = this.earth.scene;
-      this.experience.activeCamera = this.earth.camera;
+      this.experience.activeScene = this.homeScene.scene;
+      this.experience.activeCamera = this.homeScene.camera;
 
       this.setDebug();
     });
@@ -37,23 +37,23 @@ export default class World {
 
   update() {
     this.earth?.update();
-    this.homeDistrict?.update();
+    this.homeScene?.update();
   }
 
   setDebug() {
     this.debugTab = this.debug.ui?.pages[0].addFolder({ title: "Change scene" });
-    const switchHome = this.debugTab?.addButton({ title: "Maison" });
-    const switchCity = this.debugTab?.addButton({ title: "Ville" });
+    const switchHome = this.debugTab?.addButton({ title: "House" });
+    const switchCity = this.debugTab?.addButton({ title: "City" });
     const switchEarth = this.debugTab?.addButton({ title: "Earth" });
 
-    if (this.homeDistrict && this.earth) {
+    if (this.homeScene && this.earth) {
       switchHome?.on("click", () => {
-        this.currentScene = "maison";
-        this.experience.renderer?.changeScene(this.homeDistrict?.scene as Scene, this.homeDistrict?.camera as Camera);
+        this.currentScene = "house";
+        this.experience.renderer?.changeScene(this.homeScene?.scene as Scene, this.homeScene?.camera as Camera);
       });
       switchCity?.on("click", () => {
-        this.currentScene = "ville";
-        this.experience.renderer?.changeScene(this.cityDistrict?.scene as Scene, this.cityDistrict?.camera as Camera);
+        this.currentScene = "city";
+        this.experience.renderer?.changeScene(this.cityScene?.scene as Scene, this.cityScene?.camera as Camera);
       });
       switchEarth?.on("click", () => {
         this.currentScene = "earth";

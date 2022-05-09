@@ -1,13 +1,19 @@
 import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
-import { DirectionalLight, Group, PerspectiveCamera, Scene, Vector3 } from "three";
+import {
+  DirectionalLight,
+  Group,
+  PerspectiveCamera,
+  Scene,
+  Vector3,
+} from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
 import Camera from "../Camera";
 import SeedGameBoard from "./SeedGame/SeedGameBoard";
 
-export default class HomeDistrict {
+export default class HomeScene {
   private experience: Experience = new Experience();
   private loaders: Loaders = this.experience.loaders as Loaders;
   private debugTab: FolderApi | undefined = undefined;
@@ -21,10 +27,11 @@ export default class HomeDistrict {
   public camera: Camera = new Camera(this.cameraPos);
 
   constructor() {
-    this.game = new SeedGameBoard(this.scene);
+    if (this.camera.instance)
+      this.game = new SeedGameBoard(this.scene, this.camera.instance);
 
-    const districtModel = this.loaders.items["housev1"] as GLTF;
-    this.scene.add(districtModel.scene);
+    const mainModel = this.loaders.items["housev1"] as GLTF;
+    this.scene.add(mainModel.scene);
 
     const sunLight = new DirectionalLight("#ffffff", 4);
     sunLight.castShadow = true;
@@ -53,6 +60,7 @@ export default class HomeDistrict {
       if (this.game) this.game.leaveView();
     }
   }
+
   setDebug() {
     this.debugTab = this.debug.ui?.pages[2].addFolder({ title: "Home" });
     if (this.scene?.position) {
@@ -72,6 +80,7 @@ export default class HomeDistrict {
         step: 0.01,
       });
     }
+
     this.startButton = this.debugTab?.addButton({
       title: "Enter Game",
     }) as ButtonApi;

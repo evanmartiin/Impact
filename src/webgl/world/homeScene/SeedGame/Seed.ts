@@ -11,7 +11,7 @@ import {
 
 export default class Seed {
   private experience: Experience = new Experience();
-  private camera: PerspectiveCamera = this.experience.world?.homeDistrict?.camera.instance as PerspectiveCamera;
+  private camera: PerspectiveCamera = this.experience.world?.homeScene?.camera.instance as PerspectiveCamera;
   private scene: Scene | null = null;
   private geometry: SphereGeometry | null = null;
   private material: MeshStandardMaterial | null = null;

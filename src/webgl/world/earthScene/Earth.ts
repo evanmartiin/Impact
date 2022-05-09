@@ -86,25 +86,25 @@ export default class Earth extends EventEmitter {
   public stars: Stars | null = null;
   public clouds: Clouds | null = null;
 
-  private hoveredDistrict = this.experience.renderer?.hoveredDistrict;
+  private hoveredDistrict = this.experience.renderer?.hoveredScene;
   private shift = { lat: 30, lon: -20 };
   private districtPositions = [
     {
-      name: "mamie",
+      name: "grandma",
       pos: {
         lat: -10 - this.shift.lat,
         lon: 170 - this.shift.lon,
       },
     },
     {
-      name: "ville",
+      name: "city",
       pos: {
         lat: 30 - this.shift.lat,
         lon: -65 - this.shift.lon,
       },
     },
     {
-      name: "maison",
+      name: "house",
       pos: {
         lat: 40 - this.shift.lat,
         lon: 30 - this.shift.lon,
@@ -152,9 +152,9 @@ export default class Earth extends EventEmitter {
         model.scene.traverse((child) => {
           if (child instanceof Mesh && this.textures) {
             if (
-              child.name === "maison" ||
-              child.name === "ville" ||
-              child.name === "mamie"
+              child.name === "house" ||
+              child.name === "city" ||
+              child.name === "grandma"
             ) {
               const wiggleMaterial = new ShaderMaterial({
                 uniforms: {
@@ -164,11 +164,11 @@ export default class Earth extends EventEmitter {
                 vertexShader: wiggleVertex,
                 fragmentShader: wiggleFragment,
               });
-              if (child.name === "ville") {
+              if (child.name === "city") {
                 child.rotateY(Math.PI * 0.13);
-              } else if (child.name === "maison") {
+              } else if (child.name === "house") {
                 child.rotateY(Math.PI * 0.65);
-              } else if (child.name === "mamie") {
+              } else if (child.name === "grandma") {
                 wiggleMaterial.side = DoubleSide;
                 child.rotateY(Math.PI * -0.1);
               }
@@ -267,7 +267,7 @@ export default class Earth extends EventEmitter {
     this.mouse.on("mousedown", () => this.getIntersect());
 
     this.mouse.on("mouseup", () => {
-      this.hoveredDistrict = this.experience.renderer?.hoveredDistrict;
+      this.hoveredDistrict = this.experience.renderer?.hoveredScene;
       if (this.hoveredDistrict) {
         this.trigger("district_selected", [this.hoveredDistrict]);
         const districtPos = this.districtPositions.filter(

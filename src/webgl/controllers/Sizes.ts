@@ -20,9 +20,9 @@ export default class Sizes extends EventEmitter {
   }
 
   setViewSizeAtDepth() {
-    if (this.experience.camera?.instance as PerspectiveCamera)
+    if (this.experience.activeCamera?.instance as PerspectiveCamera)
       this.viewSizeAtDepth = getViewSizeAtDepth(
-        this.experience.camera?.instance as PerspectiveCamera
+        this.experience.activeCamera?.instance as PerspectiveCamera
       );
   }
 

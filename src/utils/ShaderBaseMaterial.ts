@@ -1,9 +1,8 @@
 import { ShaderMaterial } from "three";
 
 export default class ShaderBaseMaterial extends ShaderMaterial {
-    constructor(parameters) {
-        super();
-        console.log(parameters);
-        
-    }
+  constructor(parameters: any) {
+    super();
+    console.log(parameters);
+  }
 }

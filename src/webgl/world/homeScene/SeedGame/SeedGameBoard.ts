@@ -12,7 +12,7 @@ export default class SeedGameHub {
   private mouse: Mouse = this.experience.mouse as Mouse;
   private scene: Scene | null = null;
   private renderer: Renderer = this.experience.renderer as Renderer;
-  private camera: PerspectiveCamera = this.experience.world?.homeDistrict?.camera.instance as PerspectiveCamera;
+  private camera: PerspectiveCamera | null = null;
   private debugTab: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
   public instance: Group = new Group();
@@ -49,8 +49,9 @@ export default class SeedGameHub {
 
   public camdebuging = false;
 
-  constructor(scene: Scene) {
+  constructor(scene: Scene, camera: PerspectiveCamera) {
     this.scene = scene;
+    this.camera = camera;
   }
 
   init() {
@@ -78,6 +79,7 @@ export default class SeedGameHub {
 
   fixCamera() {
     if (this.camera) {
+      console.log(this.camera);
       this.camera.position.set(0, this.cameraHeight, 0);
     }
     this.setCameraLookAt();

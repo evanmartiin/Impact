@@ -11,7 +11,7 @@ import type { TabPageApi } from "tweakpane";
 import Scoreboard from "./Scoreboard";
 import Camera from "../Camera";
 
-export default class CityDistrict {
+export default class CityScene {
   private experience: Experience = new Experience();
   private time: Time = this.experience.time as Time;
   private loaders: Loaders = this.experience.loaders as Loaders;
@@ -49,52 +49,54 @@ export default class CityDistrict {
   }
 
   startGame() {
-    if (!CityDistrict.isPlaying) {
+    if (!CityScene.isPlaying) {
       this.trash = new Trash(this.scene);
       this.scene.add(Waste.wasteMeshes);
-  
-      this.scoreboard.startTimer(CityDistrict.MAX_TIME);
+
+      this.scoreboard.startTimer(CityScene.MAX_TIME);
       this.scoreboard.on("timer_ended", () => {
         this.stopGame();
       });
-  
-      CityDistrict.isPlaying = true;
+
+      CityScene.isPlaying = true;
     }
   }
 
   stopGame() {
-    if (CityDistrict.isPlaying) {
-      console.log('Ended, score:', this.scoreboard?.score);
+    if (CityScene.isPlaying) {
+      console.log("Ended, score:", this.scoreboard?.score);
       this.scoreboard?.off("timer_ended");
-  
+
       this.trash?.destroy();
       this.trash = null;
       Waste.destroy();
       this.scene.remove(Waste.wasteMeshes);
-  
-      CityDistrict.isPlaying = false;
+
+      CityScene.isPlaying = false;
     }
   }
 
   update() {
-    if (CityDistrict.isPlaying) {
+    if (CityScene.isPlaying) {
       this.scoreboard?.update();
       if (this.time.elapsed - Waste.lastSpawn > Waste.SPAWN_COOLDOWN) {
         Waste.lastSpawn = this.time.elapsed;
         new Waste();
-      };
-  
+      }
+
       Waste.wasteInstances.forEach((wasteInstance) => {
         wasteInstance.update();
-      })
+      });
     }
   }
-  
+
   setDebug() {
     if (this.debug?.active) {
       this.debugPage = this.debug.ui?.pages[3];
       const startGameBtn = this.debugPage?.addButton({ title: "Start Game" });
-      startGameBtn?.on("click", () => { this.startGame() });
+      startGameBtn?.on("click", () => {
+        this.startGame();
+      });
     }
   }
 }
