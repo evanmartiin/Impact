@@ -40,6 +40,7 @@ import brazierParsVertex from "./shaders/brazier/brazierParsVertex.glsl?raw";
 import brazierVertex from "./shaders/brazier/brazierVertex.glsl?raw";
 import brazierParsFragment from "./shaders/brazier/brazierParsFragment.glsl?raw";
 import brazierFragment from "./shaders/brazier/brazierFragment.glsl?raw";
+
 import EventEmitter from "@/webgl/controllers/EventEmitter";
 import type { GPSPos } from "@/models/webgl/GPSPos.model";
 import calcGPSFromPos from "@/utils/calcGPSFromPos";
@@ -48,10 +49,10 @@ import calcPosFromGPS from "@/utils/calcPosFromGPS";
 
 export default class Earth extends EventEmitter {
   private experience: Experience = new Experience();
-  public scene: Scene | null = null;
+  public scene: Scene = new Scene();
   public cameraPos: Vector3 = new Vector3(0, 4, 6);
   private time: Time = this.experience.time as Time;
-  public camera: Camera = new Camera(this.cameraPos);
+  public camera: Camera = new Camera(this.cameraPos, this.scene);
   private renderer: Renderer = this.experience.renderer as Renderer;
   private loaders: Loaders = this.experience.loaders as Loaders;
   private mouse: Mouse = this.experience.mouse as Mouse;
@@ -114,7 +115,6 @@ export default class Earth extends EventEmitter {
 
   constructor() {
     super();
-    this.scene = new Scene();
 
     this.setMesh();
     this.setHalo();
@@ -340,8 +340,8 @@ export default class Earth extends EventEmitter {
 
     newGPSPos.lon = currentGPSPos.lon + min * sign;
 
-    if (this.camera?.controls) {
-      this.camera.controls.enableRotate = false;
+    if (this.experience?.world?.controls) {
+      this.experience.world.controls.enableRotate = false;
     }
 
     const tl = anime.timeline({});
@@ -357,8 +357,8 @@ export default class Earth extends EventEmitter {
           this.camera?.instance?.position.copy(newPos);
         },
         complete: () => {
-          if (this.camera?.controls) {
-            this.camera.controls.enableRotate = true;
+          if (this.experience?.world?.controls) {
+            this.experience.world.controls.enableRotate = true;
           }
         },
       },
