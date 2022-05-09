@@ -5,7 +5,6 @@ import type { FolderApi } from "tweakpane";
 import type Time from "@/webgl/controllers/Time";
 import vert from './shaders/vert.glsl?raw'
 import frag from './shaders/frag.glsl?raw'
-import ShaderBaseMaterial from "@/utils/ShaderBaseMaterial";
 
 export default class Stars {
   private experience: Experience = new Experience();
