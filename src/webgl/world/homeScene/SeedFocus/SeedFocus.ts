@@ -3,7 +3,6 @@ import type Debug from "@/webgl/controllers/Debug";
 import {
   type Scene,
   PlaneGeometry,
-  MeshBasicMaterial,
   DoubleSide,
   Mesh,
   Group,
@@ -16,8 +15,8 @@ import vertex from "./shaders/vertex.glsl?raw";
 
 export default class SeedFocus {
   private experience: Experience = new Experience();
-  private scene: Scene = this.experience.scene as Scene;
-  private debugFolder: FolderApi | undefined = undefined;
+  private scene: Scene | null = null;
+  private debugTab: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
   private isDisplayed = false;
   private isInit = false;
@@ -26,7 +25,9 @@ export default class SeedFocus {
   private distanceCurveMat: ShaderMaterial | null = null;
   private distanceCurveGeo: PlaneGeometry | null = null;
 
-  constructor() {}
+  constructor(scene: Scene) {
+    this.scene = scene;
+  }
 
   setDistanceCurve() {
     this.distanceCurveGeo = new PlaneGeometry(1, 1);
@@ -54,7 +55,7 @@ export default class SeedFocus {
 
   init() {
     this.setDistanceCurve();
-    this.scene.add(this.instance);
+    this.scene?.add(this.instance);
     this.setDebug();
   }
 
@@ -77,52 +78,52 @@ export default class SeedFocus {
   update() {}
 
   setDebug() {
-    this.debugFolder = this.debug.ui?.addFolder({ title: "SeedFocus" });
+    this.debugTab = this.debug.ui?.pages[2].addFolder({ title: "SeedFocus" });
     if (this.instance) {
-      this.debugFolder?.addInput(this.instance?.position, "x", {
+      this.debugTab?.addInput(this.instance?.position, "x", {
         min: -5,
         max: 5,
         step: 0.1,
       });
-      this.debugFolder?.addInput(this.instance?.position, "y", {
+      this.debugTab?.addInput(this.instance?.position, "y", {
         min: -5,
         max: 5,
         step: 0.01,
       });
-      this.debugFolder?.addInput(this.instance?.position, "z", {
+      this.debugTab?.addInput(this.instance?.position, "z", {
         min: -5,
         max: 5,
         step: 0.01,
       });
     }
     if (this.distanceCurve) {
-      this.debugFolder?.addInput(this.distanceCurve?.rotation, "x", {
+      this.debugTab?.addInput(this.distanceCurve?.rotation, "x", {
         min: -5,
         max: 5,
         step: 0.01,
       });
-      this.debugFolder?.addInput(this.distanceCurve?.rotation, "y", {
+      this.debugTab?.addInput(this.distanceCurve?.rotation, "y", {
         min: -5,
         max: 5,
         step: 0.01,
       });
-      this.debugFolder?.addInput(this.distanceCurve?.rotation, "z", {
+      this.debugTab?.addInput(this.distanceCurve?.rotation, "z", {
         min: -5,
         max: 5,
         step: 0.01,
       });
 
-      this.debugFolder?.addInput(this.distanceCurve?.scale, "x", {
+      this.debugTab?.addInput(this.distanceCurve?.scale, "x", {
         min: -5,
         max: 5,
         step: 0.01,
       });
-      this.debugFolder?.addInput(this.distanceCurve?.scale, "y", {
+      this.debugTab?.addInput(this.distanceCurve?.scale, "y", {
         min: -5,
         max: 5,
         step: 0.01,
       });
-      this.debugFolder?.addInput(this.distanceCurve?.scale, "z", {
+      this.debugTab?.addInput(this.distanceCurve?.scale, "z", {
         min: -5,
         max: 5,
         step: 0.01,

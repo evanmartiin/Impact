@@ -1,37 +1,33 @@
 import type Sizes from "@/webgl/controllers/Sizes";
 import anime from "animejs";
-import { PerspectiveCamera, Scene, Vector2, Vector3 } from "three";
+import { PerspectiveCamera, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Experience from "../Experience";
-import type Time from "@/webgl/controllers/Time";
 
 export default class Camera {
   private experience: Experience = new Experience();
   private sizes: Sizes = this.experience.sizes as Sizes;
-  private scene: Scene = this.experience.scene as Scene;
-  private time: Time = this.experience.time as Time;
-  private canvas: HTMLCanvasElement = this.experience
-    .canvas as HTMLCanvasElement;
+  private canvas: HTMLCanvasElement = this.experience.canvas as HTMLCanvasElement;
   public instance: PerspectiveCamera | null = null;
   public controls: OrbitControls | null = null;
 
   private angle: number = 0;
 
-  constructor() {
-    this.setInstance();
+  constructor(position: Vector3) {
+    this.setInstance(position);
     this.setControls();
   }
 
-  setInstance() {
+  setInstance(position: Vector3) {
     this.instance = new PerspectiveCamera(
       35,
       this.sizes.width / this.sizes.height,
       0.1,
       1000
     );
-    this.instance.position.set(0, 4, 6);
+    this.instance.position.copy(position);
 
-    this.scene.add(this.instance);
+    this.experience.activeScene?.add(this.instance);
   }
 
   setControls() {

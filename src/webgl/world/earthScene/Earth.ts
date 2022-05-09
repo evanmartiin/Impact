@@ -1,8 +1,7 @@
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
-import type Camera from "@/webgl/world/Camera";
+import Camera from "@/webgl/world/Camera";
 import type Renderer from "@/webgl/Renderer";
-import anime from "animejs";
 import {
   Group,
   MeshBasicMaterial,
@@ -21,13 +20,13 @@ import {
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Time from "@/webgl/controllers/Time";
-import Fire from "../Fire/Fire";
-import ISS from "../ISS/ISS";
+import Fire from "./Fire/Fire";
+import ISS from "./ISS/ISS";
 import type Debug from "@/webgl/controllers/Debug";
 import type { FolderApi } from "tweakpane";
 import type Mouse from "@/webgl/controllers/Mouse";
-import Stars from "../Stars/Stars";
-import Clouds from "../Clouds/Clouds";
+import Stars from "./Stars/Stars";
+import Clouds from "./Clouds/Clouds";
 
 import wiggleVertex from "./shaders/wiggle/wiggleVertex.glsl?raw";
 import wiggleFragment from "./shaders/wiggle/wiggleFragment.glsl?raw";
@@ -41,17 +40,23 @@ import brazierParsVertex from "./shaders/brazier/brazierParsVertex.glsl?raw";
 import brazierVertex from "./shaders/brazier/brazierVertex.glsl?raw";
 import brazierParsFragment from "./shaders/brazier/brazierParsFragment.glsl?raw";
 import brazierFragment from "./shaders/brazier/brazierFragment.glsl?raw";
+import EventEmitter from "@/webgl/controllers/EventEmitter";
+import type { GPSPos } from "@/models/webgl/GPSPos.model";
+import calcGPSFromPos from "@/utils/calcGPSFromPos";
+import anime from "animejs";
+import calcPosFromGPS from "@/utils/calcPosFromGPS";
 
-export default class Earth {
+export default class Earth extends EventEmitter {
   private experience: Experience = new Experience();
-  private scene: Scene = this.experience.scene as Scene;
+  public scene: Scene | null = null;
+  public cameraPos: Vector3 = new Vector3(0, 4, 6);
   private time: Time = this.experience.time as Time;
-  private camera: Camera = this.experience.camera as Camera;
+  public camera: Camera = new Camera(this.cameraPos);
   private renderer: Renderer = this.experience.renderer as Renderer;
   private loaders: Loaders = this.experience.loaders as Loaders;
   private mouse: Mouse = this.experience.mouse as Mouse;
   private debug: Debug = this.experience.debug as Debug;
-  private debugFolder: FolderApi | undefined = undefined;
+  private debugTab: FolderApi | undefined = undefined;
   public earthGroup: Group = new Group();
   private models: GLTF[] | null = null;
   private textures: Texture[] | null = null;
@@ -75,22 +80,52 @@ export default class Earth {
     uBrazierTexture: { value: this.loaders.items["brazier-texture"] },
     uBrazierRandomRatio: { value: 5 },
   };
-  private isDisplayed = false;
   private halo: Mesh | null = null;
   public fire: Fire | null = null;
   public ISS: ISS | null = null;
   public stars: Stars | null = null;
   public clouds: Clouds | null = null;
 
+  private hoveredDistrict = this.experience.renderer?.hoveredDistrict;
+  private shift = { lat: 30, lon: -20 };
+  private districtPositions = [
+    {
+      name: "mamie",
+      pos: {
+        lat: -10 - this.shift.lat,
+        lon: 170 - this.shift.lon,
+      },
+    },
+    {
+      name: "ville",
+      pos: {
+        lat: 30 - this.shift.lat,
+        lon: -65 - this.shift.lon,
+      },
+    },
+    {
+      name: "maison",
+      pos: {
+        lat: 40 - this.shift.lat,
+        lon: 30 - this.shift.lon,
+      },
+    },
+  ];
+
   constructor() {
+    super();
+    this.scene = new Scene();
+
     this.setMesh();
     this.setHalo();
-    this.setDebug();
+    this.setEvents();
+    
+    this.fire = new Fire(this.scene);
+    this.ISS = new ISS(this.scene);
+    this.stars = new Stars(this.scene);
+    this.clouds = new Clouds(3, this.scene);
 
-    this.fire = new Fire();
-    this.ISS = new ISS();
-    this.stars = new Stars();
-    this.clouds = new Clouds(3);
+    this.setDebug();
   }
 
   setMesh() {
@@ -166,25 +201,7 @@ export default class Earth {
       this.wiggleShaderUniforms.uWiggleDirection.value =
         this.mouse.mouseInertia.clone();
     });
-    this.scene.add(this.earthGroup);
-    this.earthGroup.position.set(10, 0, 0);
-
-    if (this.camera.instance) {
-      const tl = anime.timeline({});
-      tl.add(
-        {
-          targets: this.earthGroup?.position,
-          x: [0, 0],
-          y: [-10, 0],
-          z: [0, 0],
-          easing: "easeInOutQuart",
-          duration: 1000,
-        },
-        0
-      );
-    }
-    this.isDisplayed = true;
-    this.setEvents();
+    this.scene?.add(this.earthGroup);
   }
 
   addCustomFog = (shader: Shader) => {
@@ -243,80 +260,36 @@ export default class Earth {
     const { x, y, z } = this.camera.instance?.position as Vector3;
     this.halo.position.set(-x, -y, -z);
     this.halo.lookAt(0, 0, 0);
-    this.scene.add(this.halo);
-  }
-
-  appear() {
-    if (!this.isDisplayed) {
-      if (this.earthGroup && this.camera.instance && this.camera.controls) {
-        const tl = anime.timeline({});
-        tl.add(
-          {
-            targets: this.earthGroup?.position,
-            x: [0, 0],
-            y: [-10, 0],
-            z: [0, 0],
-            easing: "easeInOutQuart",
-            duration: 700,
-          },
-          300
-        );
-        tl.add(
-          {
-            targets: this.earthGroup?.scale,
-            x: [this.earthGroup?.scale.x, 1],
-            y: [this.earthGroup?.scale.y, 1],
-            z: [this.earthGroup?.scale.z, 1],
-            easing: "easeInOutQuart",
-            duration: 700,
-          },
-          300
-        );
-      }
-      this.isDisplayed = true;
-      this.setEvents();
-    }
+    this.scene?.add(this.halo);
   }
 
   setEvents() {
     this.mouse.on("mousedown", () => this.getIntersect());
+
+    this.mouse.on("mouseup", () => {
+      this.hoveredDistrict = this.experience.renderer?.hoveredDistrict;
+      if (this.hoveredDistrict) {
+        this.trigger("district_selected", [this.hoveredDistrict]);
+        const districtPos = this.districtPositions.filter(
+          (district) => district.name === this.hoveredDistrict?.name
+        )[0].pos;
+        this.rotateTo(districtPos);
+      }
+    });
+
+    this.mouse.on("mousegrab", () => {
+      this.trigger("no_district_selected");
+    });
   }
+
   unSetEvents() {
     this.mouse.off("mousedown");
+    this.mouse.off("mouseup");
+    this.mouse.off("mousegrab");
   }
 
   getIntersect() {
     const intersects = this.renderer.raycast();
-  }
-
-  disappear() {
-    if (this.isDisplayed) {
-      const tl = anime.timeline({});
-      tl.add(
-        {
-          targets: this.earthGroup?.position,
-          x: [this.earthGroup?.position.x, 0],
-          y: [this.earthGroup?.position.y, -10],
-          z: [this.earthGroup?.position.z, 0],
-          easing: "easeInOutQuart",
-          duration: 1000,
-        },
-        0
-      );
-      tl.add(
-        {
-          targets: this.earthGroup?.scale,
-          x: [this.earthGroup?.scale.x, 0.1],
-          y: [this.earthGroup?.scale.y, 0.1],
-          z: [this.earthGroup?.scale.z, 0.1],
-          easing: "easeInOutQuart",
-          duration: 700,
-        },
-        0
-      );
-      this.isDisplayed = false;
-      this.unSetEvents();
-    }
   }
 
   update() {
@@ -347,29 +320,67 @@ export default class Earth {
     }
   }
 
+  rotateTo(newGPSPos: GPSPos) {
+    const radius = this.camera?.instance?.position.distanceTo(
+      new Vector3()
+    );
+    const currentGPSPos = calcGPSFromPos(
+      this.camera?.instance?.position as Vector3,
+      this.camera?.instance?.position.distanceTo(
+        new Vector3()
+      ) as number
+    );
+
+    const dist1 = Math.round(Math.abs(currentGPSPos.lon - newGPSPos.lon));
+    const dist2 = Math.round(360 - dist1);
+    const min = Math.min(dist1, dist2);
+    const sign = -Math.sign(
+      ((newGPSPos.lon + 180 + (360 - (currentGPSPos.lon + 180))) % 360) - 180
+    );
+
+    newGPSPos.lon = currentGPSPos.lon + min * sign;
+
+    if (this.camera?.controls) {
+      this.camera.controls.enableRotate = false;
+    }
+
+    const tl = anime.timeline({});
+    tl.add(
+      {
+        targets: currentGPSPos,
+        lat: newGPSPos.lat,
+        lon: newGPSPos.lon,
+        easing: "easeInOutQuart",
+        duration: 1000,
+        update: () => {
+          const newPos = calcPosFromGPS(currentGPSPos, radius as number);
+          this.camera?.instance?.position.copy(newPos);
+        },
+        complete: () => {
+          if (this.camera?.controls) {
+            this.camera.controls.enableRotate = true;
+          }
+        },
+      },
+      0
+    );
+  }
+
   setDebug() {
     if (this.debug.active) {
-      this.debugFolder = this.debug.ui?.addFolder({ title: "Earth" });
-      this.debugFolder?.addInput(
-        this.wiggleShaderUniforms.uWiggleRatio,
-        "value",
-        { min: 0, max: 7, label: "wiggle" }
-      );
-      this.debugFolder?.addInput(
-        this.brazierShaderUniforms.uBrazierThreshold,
-        "value",
-        { min: -1.5, max: 2.5, label: "brazier Y" }
-      );
-      this.debugFolder?.addInput(
-        this.brazierShaderUniforms.uBrazierRange,
-        "value",
-        { min: 0, max: 2, label: "brazier range" }
-      );
-      this.debugFolder?.addInput(
-        this.brazierShaderUniforms.uBrazierRandomRatio,
-        "value",
-        { min: 0, max: 20, label: "brazier random" }
-      );
+      this.debugTab = this.debug.ui?.pages[1].addFolder({ title: "Earth" });
+      this.debugTab?.addInput(this.wiggleShaderUniforms.uWiggleRatio, "value", { min: 0, max: 7, label: "wiggle" });
+      this.debugTab?.addInput(this.brazierShaderUniforms.uBrazierThreshold, "value", { min: -1.5, max: 2.5, label: "brazier Y" });
+      this.debugTab?.addInput(this.brazierShaderUniforms.uBrazierRange, "value", { min: 0, max: 2, label: "brazier range" });
+      this.debugTab?.addInput(this.brazierShaderUniforms.uBrazierRandomRatio, "value", { min: 0, max: 20, label: "brazier random" });
+      // const changeSceneBtn = this.debugTab?.addButton({ title: "Change scene" });
+      // changeSceneBtn?.on("click", () => {
+      //   this.experience.renderer?.changeScene(this.experience.world?.districts?.scene as Scene);
+      // })
     }
+  }
+
+  destroy() {
+    this.unSetEvents();
   }
 }

@@ -1,6 +1,6 @@
 import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
-import { Scene, BufferGeometry, PointsMaterial, Points, BufferAttribute, AdditiveBlending, ShaderMaterial, Vector2 } from "three";
+import { Scene, BufferGeometry, Points, BufferAttribute, ShaderMaterial } from "three";
 import type { FolderApi } from "tweakpane";
 import type Time from "@/webgl/controllers/Time";
 import vert from './shaders/vert.glsl?raw'
@@ -9,15 +9,17 @@ import ShaderBaseMaterial from "@/utils/ShaderBaseMaterial";
 
 export default class Stars {
   private experience: Experience = new Experience();
-  private scene: Scene = this.experience.scene as Scene;
+  private scene: Scene | null = null;
   private time: Time = this.experience.time as Time;
   private debug: Debug = this.experience.debug as Debug;
-  private debugFolder: FolderApi | undefined = undefined;
+  private debugTab: FolderApi | undefined = undefined;
   private geometry: BufferGeometry | null = null;
   private material: ShaderMaterial | null = null;
   private mesh: Points | null = null;
 
-  constructor() {
+  constructor(scene: Scene) {
+    this.scene = scene;
+
     this.setMesh();
     this.setDebug();
   }
@@ -55,7 +57,7 @@ export default class Stars {
       transparent: true
     })
     this.mesh = new Points(this.geometry, this.material);
-    this.scene.add(this.mesh);
+    this.scene?.add(this.mesh);
   }
 
   update() {
@@ -66,11 +68,11 @@ export default class Stars {
 
   setDebug() {
     if (this.debug.active && this.material) {
-      this.debugFolder = this.debug.ui?.addFolder({ title: "Stars" });
-      this.debugFolder?.addInput(this.material.uniforms.uScale, "value", { min: 5, max: 30, label: "scale" });
-      this.debugFolder?.addInput(this.material.uniforms.uRadius, "value", { min: 0, max: 1, label: "radius" });
-      this.debugFolder?.addInput(this.material.uniforms.uRatio, "value", { min: 0, max: 5, label: "ratio" });
-      this.debugFolder?.addInput(this.material.uniforms.uThreshold, "value", { min: 0, max: 1, label: "threshold" });
+      this.debugTab = this.debug.ui?.pages[1].addFolder({ title: "Stars" });
+      this.debugTab?.addInput(this.material.uniforms.uScale, "value", { min: 5, max: 30, label: "scale" });
+      this.debugTab?.addInput(this.material.uniforms.uRadius, "value", { min: 0, max: 1, label: "radius" });
+      this.debugTab?.addInput(this.material.uniforms.uRatio, "value", { min: 0, max: 5, label: "ratio" });
+      this.debugTab?.addInput(this.material.uniforms.uThreshold, "value", { min: 0, max: 1, label: "threshold" });
     }
   }
 }

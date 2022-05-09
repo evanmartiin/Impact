@@ -10,9 +10,8 @@ import {
 
 export default class Helper {
   private experience: Experience = new Experience();
-  private camera: PerspectiveCamera = this.experience.camera
-    ?.instance as PerspectiveCamera;
-  private scene: Scene = this.experience.scene as Scene;
+  private camera: PerspectiveCamera = this.experience.world?.homeDistrict?.camera.instance as PerspectiveCamera;
+  private scene: Scene | null = null;
   private geometry: PlaneGeometry | null = null;
   private material: MeshStandardMaterial | null = null;
   private instance: Mesh | null = null;
@@ -21,14 +20,16 @@ export default class Helper {
 
   private targetPoint: Vector3 | null = null;
 
-  constructor() {}
+  constructor(scene: Scene) {
+    this.scene = scene;
+  }
 
   init() {
     if (!this.isInit) {
       this.geometry = new PlaneGeometry(0.05, 16);
       this.material = new MeshStandardMaterial({ color: 0xff0000 });
       this.instance = new Mesh(this.geometry, this.material);
-      this.scene.add(this.instance);
+      this.scene?.add(this.instance);
       this.isInit = true;
       this.isDisplayed = true;
     }

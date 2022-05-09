@@ -10,11 +10,10 @@ import type Renderer from "@/webgl/Renderer";
 export default class SeedGameHub {
   private experience: Experience = new Experience();
   private mouse: Mouse = this.experience.mouse as Mouse;
-  private scene: Scene = this.experience.scene as Scene;
+  private scene: Scene | null = null;
   private renderer: Renderer = this.experience.renderer as Renderer;
-  private camera: PerspectiveCamera = this.experience.camera
-    ?.instance as PerspectiveCamera;
-  private debugFolder: FolderApi | undefined = undefined;
+  private camera: PerspectiveCamera = this.experience.world?.homeDistrict?.camera.instance as PerspectiveCamera;
+  private debugTab: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
   public instance: Group = new Group();
   private prevCamPos = new Vector3(0, 0, 0);
@@ -50,15 +49,17 @@ export default class SeedGameHub {
 
   public camdebuging = false;
 
-  constructor() {}
+  constructor(scene: Scene) {
+    this.scene = scene;
+  }
 
   init() {
     this.isInit = true;
     this.setTargets();
-    this.seed = new Seed();
+    this.seed = new Seed(this.scene as Scene);
     this.targetPoint = new Vector3();
     this.cameraLookAtPoint = new Vector3();
-    this.scene.add(this.instance);
+    this.scene?.add(this.instance);
     this.set();
     this.setDebug();
   }
@@ -137,10 +138,10 @@ export default class SeedGameHub {
 
   getIntersects() {
     // const intersects = this.renderer.raycast();
-    console.log(intersects);
-    if (intersects[0]) {
-      this.targetPoint?.copy(intersects[0].object.position);
-    }
+    // console.log(intersects);
+    // if (intersects[0]) {
+    //   this.targetPoint?.copy(intersects[0].object.position);
+    // }
   }
 
   getShotAngle() {
@@ -203,23 +204,23 @@ export default class SeedGameHub {
   }
 
   setDebug() {
-    this.debugFolder = this.debug.ui?.addFolder({ title: "Game board" });
+    this.debugTab = this.debug.ui?.pages[2].addFolder({ title: "Game board" });
 
-    const startButton = this.debugFolder?.addButton({
+    const startButton = this.debugTab?.addButton({
       title: "Start Game",
     }) as ButtonApi;
     startButton.on("click", () => {
       this.start();
     });
 
-    const stopButton = this.debugFolder?.addButton({
+    const stopButton = this.debugTab?.addButton({
       title: "Stop Game",
     }) as ButtonApi;
     stopButton.on("click", () => {
       this.stop();
       this.camdebuging = false;
     });
-    const debugCam = this.debugFolder?.addButton({
+    const debugCam = this.debugTab?.addButton({
       title: "Toggle Cam mode",
     }) as ButtonApi;
     debugCam.on("click", () => {
@@ -228,6 +229,6 @@ export default class SeedGameHub {
   }
 
   unsetDebug() {
-    if (this.debugFolder) this.debug.ui?.remove(this.debugFolder);
+    if (this.debugTab) this.debug.ui?.pages[2].remove(this.debugTab);
   }
 }

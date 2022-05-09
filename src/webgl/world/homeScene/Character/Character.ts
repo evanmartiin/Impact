@@ -6,7 +6,7 @@ import { Group, type Scene } from "three";
 import { AnimationMixer, type AnimationAction } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi } from "tweakpane";
-import SeedFocus from "@/webgl/world/entities/SeedFocus/SeedFocus";
+import SeedFocus from "@/webgl/world/homeScene/SeedFocus/SeedFocus";
 
 interface IAnimation {
   mixer: AnimationMixer | null;
@@ -18,7 +18,7 @@ type TSpeed = "fast" | "slow";
 export default class Character {
   private experience: Experience = new Experience();
   private loaders: Loaders = this.experience.loaders as Loaders;
-  protected scene: Scene = this.experience.scene as Scene;
+  protected scene: Scene | null = null;
   protected time: Time = this.experience.time as Time;
   public instance: Group | null = null;
   public items: Group = new Group();
@@ -35,7 +35,9 @@ export default class Character {
   private speed: TSpeed = "fast";
   private seedFocus: SeedFocus | null = null;
 
-  constructor() {}
+  constructor(scene: Scene) {
+    this.scene = scene;
+  }
 
   init() {
     this.model = this.loaders.items["homeGameCharacter"] as GLTF;
@@ -44,11 +46,11 @@ export default class Character {
       this.instance?.scale.set(0.25, 0.25, 0.25);
       this.instance?.position.set(-0.4, 0.3, 2.2);
       this.instance.rotation.y = 0.54;
-      this.seedFocus = new SeedFocus();
+      this.seedFocus = new SeedFocus(this.scene as Scene);
       this.seedFocus.appear();
       this.items.add(this.seedFocus.instance);
       this.instance.add(this.items);
-      this.scene.add(this.instance);
+      this.scene?.add(this.instance);
       this.setDebug();
       this.setAnimation();
     }
@@ -57,7 +59,7 @@ export default class Character {
   }
 
   setDebug() {
-    this.debugFolder = this.debug.ui?.addFolder({ title: "Character" });
+    this.debugFolder = this.debug.ui?.pages[1].addFolder({ title: "Character" });
     if (this.instance?.position) {
       this.debugFolder?.addInput(this.instance?.position, "x", {
         min: -10,

@@ -11,9 +11,8 @@ import {
 
 export default class Seed {
   private experience: Experience = new Experience();
-  private camera: PerspectiveCamera = this.experience.camera
-    ?.instance as PerspectiveCamera;
-  private scene: Scene = this.experience.scene as Scene;
+  private camera: PerspectiveCamera = this.experience.world?.homeDistrict?.camera.instance as PerspectiveCamera;
+  private scene: Scene | null = null;
   private geometry: SphereGeometry | null = null;
   private material: MeshStandardMaterial | null = null;
   private mesh: Mesh | null = null;
@@ -21,14 +20,16 @@ export default class Seed {
   private targetPoint: Vector3 | null = null;
   private shotAngle = 0;
 
-  constructor() {}
+  constructor(scene: Scene) {
+    this.scene = scene;
+  }
 
   init() {
     if (!this.isInit) {
       this.geometry = new SphereGeometry(0.05, 16, 16);
       this.material = new MeshStandardMaterial({ color: 0xff0000 });
       this.mesh = new Mesh(this.geometry, this.material);
-      this.scene.add(this.mesh);
+      this.scene?.add(this.mesh);
       this.resetPos();
       this.animeShot();
       this.isInit = true;

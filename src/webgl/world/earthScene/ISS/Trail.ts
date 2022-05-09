@@ -8,10 +8,10 @@ import type { FolderApi } from "tweakpane";
 
 export default class Trail {
   private experience: Experience = new Experience();
-  private scene: Scene = this.experience.scene as Scene;
+  private scene: Scene | null = null;
   private time: Time = this.experience.time as Time;
   private debug: Debug = this.experience.debug as Debug;
-  private debugFolder: FolderApi | undefined = undefined;
+  private debugTab: FolderApi | undefined = undefined;
 
   private geometry: InstancedBufferGeometry | null = null;
   private material: ShaderMaterial | null = null;
@@ -35,7 +35,9 @@ export default class Trail {
   private paramsArray: Float32Array | null = null;
   private paramsAttribute: InstancedBufferAttribute | null = null;
 
-  constructor(ISSPosition: Vector3, radiusFromEarth: number) {
+  constructor(ISSPosition: Vector3, radiusFromEarth: number, scene: Scene) {
+    this.scene = scene;
+
     this.PARAMS.ISSPosition = ISSPosition;
     this.PARAMS.radiusFromEarth = radiusFromEarth;
 
@@ -113,40 +115,40 @@ export default class Trail {
   regenerate() {
     this.geometry?.dispose();
     this.material?.dispose();
-    this.scene.remove(this.mesh as Points);
+    this.scene?.remove(this.mesh as Points);
 
     this.setGeometry();
     this.setMaterial(this.PARAMS.ISSPosition, this.PARAMS.radiusFromEarth);
     this.setMesh();
 
-    if (this.mesh) this.scene.add(this.mesh);
+    if (this.mesh) this.scene?.add(this.mesh);
   }
 
   setDebug() {
     if (this.debug.active) {
-      this.debugFolder = this.debug.ui?.addFolder({ title: "ISS Trail" });
+      this.debugTab = this.debug.ui?.pages[1].addFolder({ title: "ISS Trail" });
       
-      const instancesCountInput = this.debugFolder?.addInput(this.PARAMS, "instancesCount", { min: 10, max: 200, step: 1, label: 'count' });
+      const instancesCountInput = this.debugTab?.addInput(this.PARAMS, "instancesCount", { min: 10, max: 200, step: 1, label: 'count' });
       instancesCountInput?.on("change", () => { this.regenerate() });
 
-      const spreadRatioInput = this.debugFolder?.addInput(this.PARAMS, "spreadRatio", { min: 0, max: .2, label: 'spread' });
+      const spreadRatioInput = this.debugTab?.addInput(this.PARAMS, "spreadRatio", { min: 0, max: .2, label: 'spread' });
       spreadRatioInput?.on("change", () => { this.regenerate() });
 
-      this.debugFolder?.addInput(this.material?.uniforms.uOffset as IUniform, "value", { min: 0, max: .2, label: 'offset' });
+      this.debugTab?.addInput(this.material?.uniforms.uOffset as IUniform, "value", { min: 0, max: .2, label: 'offset' });
 
-      const scaleMinInput = this.debugFolder?.addInput(this.PARAMS, "scaleMin", { min: 0, max: 50 });
+      const scaleMinInput = this.debugTab?.addInput(this.PARAMS, "scaleMin", { min: 0, max: 50 });
       scaleMinInput?.on("change", () => { this.regenerate() });
 
-      const scaleMaxInput = this.debugFolder?.addInput(this.PARAMS, "scaleMax", { min: 0, max: 50 });
+      const scaleMaxInput = this.debugTab?.addInput(this.PARAMS, "scaleMax", { min: 0, max: 50 });
       scaleMaxInput?.on("change", () => { this.regenerate() });
 
-      const speedInput = this.debugFolder?.addInput(this.PARAMS, "speed", { min: 0, max: 2 });
+      const speedInput = this.debugTab?.addInput(this.PARAMS, "speed", { min: 0, max: 2 });
       speedInput?.on("change", () => { this.regenerate() });
 
-      const blendingInput = this.debugFolder?.addInput(this.PARAMS, "blending" );
+      const blendingInput = this.debugTab?.addInput(this.PARAMS, "blending" );
       blendingInput?.on("change", () => { this.regenerate() });
 
-      this.debugFolder?.addInput(this.material?.uniforms.uOpacityRatio as IUniform, "value", { min: 0, max: 1, label: 'opacity' });
+      this.debugTab?.addInput(this.material?.uniforms.uOpacityRatio as IUniform, "value", { min: 0, max: 1, label: 'opacity' });
     }
   }
 }

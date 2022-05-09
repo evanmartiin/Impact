@@ -7,8 +7,8 @@ import Time from "@/webgl/controllers/Time";
 import type { ISource } from "@/models/webgl/source.model";
 import { AxesHelper, Mesh, Scene } from "three";
 import Renderer from "./Renderer";
-import Camera from "./world/Camera";
 import World from "./world/World";
+import type Camera from "./world/Camera";
 
 declare global {
   interface Window {
@@ -24,9 +24,9 @@ export default class Experience {
   public sizes: Sizes | null = null;
   public mouse: Mouse | null = null;
   public time: Time | null = null;
-  public scene: Scene | null = null;
+  public activeScene: Scene | null = null;
+  public activeCamera: Camera | null = null;
   public loaders: Loaders | null = null;
-  public camera: Camera | null = null;
   public renderer: Renderer | null = null;
 
   private sources: ISource[] | null = null;
@@ -49,8 +49,6 @@ export default class Experience {
     this.mouse = new Mouse();
     this.time = new Time();
     this.debug = new Debug();
-    this.scene = new Scene();
-    this.camera = new Camera();
     this.world = new World();
     this.renderer = new Renderer();
 
@@ -71,17 +69,17 @@ export default class Experience {
   setAxis() {
     const axesHelper = new AxesHelper(3);
 
-    this.scene?.add(axesHelper);
+    this.activeScene?.add(axesHelper);
   }
 
   resize() {
-    this.camera?.resize();
+    this.activeCamera?.resize();
     this.renderer?.resize();
   }
 
   update() {
     // if (this.time) this.animationController?.update(this.time?.delta);
-    this.camera?.update();
+    this.activeCamera?.update();
     this.world?.update();
     this.renderer?.update();
     this.debug?.update();
@@ -92,7 +90,7 @@ export default class Experience {
     this.time?.off("tick");
     this.mouse?.destroy();
     // Traverse the whole scene
-    this.scene?.traverse((child) => {
+    this.activeScene?.traverse((child) => {
       // Test if it's a mesh
       if (child instanceof Mesh) {
         child.geometry.dispose();
@@ -108,8 +106,8 @@ export default class Experience {
         }
       }
     });
-    this.world?.destroy();
-    this.camera?.controls?.dispose();
+    // this.world?.destroy();
+    this.activeCamera?.controls?.dispose();
     this.renderer?.instance?.dispose();
 
     if (this.debug?.active) this.debug.ui?.dispose();

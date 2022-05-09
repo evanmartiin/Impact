@@ -6,17 +6,19 @@ import type Time from "@/webgl/controllers/Time";
 
 export default class Clouds {
   private experience: Experience = new Experience();
-  private scene: Scene = this.experience.scene as Scene;
+  private scene: Scene | null = null;
   private time: Time = this.experience.time as Time;
   private debug: Debug = this.experience.debug as Debug;
-  private debugFolder: FolderApi | undefined = undefined;
+  private debugTab: FolderApi | undefined = undefined;
   private clouds: Group = new Group();
   private offsets: number[] = [];
   private PARAMS = {
     "radius": 1.2
   }
 
-  constructor(count: number) {
+  constructor(count: number, scene: Scene) {
+    this.scene = scene;
+
     this.scene.add(this.clouds);
     this.setClouds(count);
     this.setDebug();
@@ -67,8 +69,8 @@ export default class Clouds {
 
   setDebug() {
     if (this.debug.active) {
-      this.debugFolder = this.debug.ui?.addFolder({ title: "Clouds" });
-      this.debugFolder?.addInput(this.PARAMS, "radius", { min: 1, max: 2 });
+      this.debugTab = this.debug.ui?.pages[1].addFolder({ title: "Clouds" });
+      this.debugTab?.addInput(this.PARAMS, "radius", { min: 1, max: 2 });
     }
   }
 }
