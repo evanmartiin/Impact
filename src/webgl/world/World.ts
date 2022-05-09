@@ -11,6 +11,7 @@ import HomeDistrict from "./homeScene/HomeDistrict";
 import CityDistrict from "./cityScene/CityDistrict";
 import type Camera from "./Camera";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import GrandmaDistrict from "./grandmaScene/grandmaDistrict";
 
 export default class World {
   private experience: Experience = new Experience();
@@ -20,6 +21,7 @@ export default class World {
   public earth: Earth | null = null;
   public homeDistrict: HomeDistrict | null = null;
   public cityDistrict: CityDistrict | null = null;
+  public grandmaDistrict: GrandmaDistrict | null = null;
   private debugTab: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
   public currentScene: district = "earth";
@@ -30,6 +32,7 @@ export default class World {
       this.earth = new Earth();
       this.homeDistrict = new HomeDistrict();
       this.cityDistrict = new CityDistrict();
+      this.grandmaDistrict = new GrandmaDistrict();
 
       this.experience.activeScene = this.earth.scene;
       this.experience.activeCamera = this.earth.camera;
@@ -77,6 +80,7 @@ export default class World {
     const switchHome = this.debugTab?.addButton({ title: "Maison" });
     const switchCity = this.debugTab?.addButton({ title: "Ville" });
     const switchEarth = this.debugTab?.addButton({ title: "Earth" });
+    const switchGrandma = this.debugTab?.addButton({ title: "Grandma" });
 
     if (this.homeDistrict && this.earth) {
       switchHome?.on("click", () => {
@@ -90,6 +94,10 @@ export default class World {
       switchEarth?.on("click", () => {
         this.currentScene = "earth";
         this.experience.renderer?.changeScene(this.earth?.scene as Scene, this.earth?.camera as Camera);
+      });
+      switchGrandma?.on("click", () => {
+        this.currentScene = "mamie";
+        this.experience.renderer?.changeScene(this.grandmaDistrict?.scene as Scene, this.grandmaDistrict?.camera as Camera);
       });
     }
   }

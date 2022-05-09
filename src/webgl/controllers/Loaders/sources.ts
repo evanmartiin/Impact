@@ -143,6 +143,11 @@ const Sources: ISource[] = [
     type: "gltfModel",
     path: "/models/zones.glb",
   },
+  {
+    name: "grandma-model",
+    type: "gltfModel",
+    path: "/models/grandma.glb",
+  },
 
 
   {
