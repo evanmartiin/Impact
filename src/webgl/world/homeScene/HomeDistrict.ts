@@ -1,7 +1,7 @@
 import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
-import { DirectionalLight, Group, PerspectiveCamera, Scene, Vector3 } from "three";
+import { DirectionalLight, Group, Scene, Vector3 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
 import Camera from "../Camera";
@@ -18,7 +18,7 @@ export default class HomeDistrict {
   public game: SeedGameBoard | null = null;
   public scene: Scene = new Scene();
   public cameraPos: Vector3 = new Vector3(50, 50, 50);
-  public camera: Camera = new Camera(this.cameraPos);
+  public camera: Camera = new Camera(this.cameraPos, this.scene);
 
   constructor() {
     this.game = new SeedGameBoard(this.scene);

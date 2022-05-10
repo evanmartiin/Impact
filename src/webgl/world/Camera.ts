@@ -1,24 +1,21 @@
 import type Sizes from "@/webgl/controllers/Sizes";
 import anime from "animejs";
-import { PerspectiveCamera, Vector3 } from "three";
+import { PerspectiveCamera, Scene, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Experience from "../Experience";
 
 export default class Camera {
   private experience: Experience = new Experience();
   private sizes: Sizes = this.experience.sizes as Sizes;
-  private canvas: HTMLCanvasElement = this.experience.canvas as HTMLCanvasElement;
   public instance: PerspectiveCamera | null = null;
-  public controls: OrbitControls | null = null;
 
   private angle: number = 0;
 
-  constructor(position: Vector3) {
-    this.setInstance(position);
-    this.setControls();
+  constructor(position: Vector3, scene: Scene) {
+    this.setInstance(position, scene);
   }
 
-  setInstance(position: Vector3) {
+  setInstance(position: Vector3, scene: Scene) {
     this.instance = new PerspectiveCamera(
       35,
       this.sizes.width / this.sizes.height,
@@ -27,23 +24,7 @@ export default class Camera {
     );
     this.instance.position.copy(position);
 
-    this.experience.activeScene?.add(this.instance);
-  }
-
-  setControls() {
-    if (this.instance && this.canvas) {
-      this.controls = new OrbitControls(this.instance, this.canvas);
-      this.controls.enableDamping = true;
-      // this.controls.enableZoom = false;
-      this.controls.enablePan = false;
-      this.setListener();
-    }
-  }
-
-  setListener() {
-    this.controls?.addEventListener("change", () => {
-      this.experience.world?.earth?.updateRelatedToCamera();
-    })
+    scene.add(this.instance);
   }
 
   resize() {
@@ -51,10 +32,6 @@ export default class Camera {
       this.instance.aspect = this.sizes.width / this.sizes.height;
     }
     this.instance?.updateProjectionMatrix();
-  }
-
-  update() {
-    this.controls?.update();
   }
 
   rotate(angle: number) {
