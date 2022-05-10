@@ -1,5 +1,7 @@
-uniform sampler2D uTexture;
+uniform sampler2D uSceneTexture;
+uniform sampler2D uPaperTexture;
 uniform float uTime;
+uniform float uEase;
 
 varying vec2 vUv;
 varying vec3 vPosition;
@@ -31,19 +33,22 @@ float noise(vec3 p){
 }
 
 void main() {
-    vec4 fireColor = vec4(1, 0.3, 0.09, 1);
-    vec4 asheColor = vec4(1, 0.88, 0.76, 1);
+    vec4 fireColor = vec4(1, 0.2, 0, 1);
+    vec4 asheColor = vec4(0.06, 0.04, 0, 1);
+    vec4 sceneColor = texture2D(uSceneTexture, vUv);
+    vec4 paperColor = texture2D(uPaperTexture, vUv);
+    sceneColor.rgb += (paperColor.r - .5) * .5 * uEase * 3.;
+    float time = uTime * .002 * uEase;
 
-    float distance = distance(vPosition, vec3(0.));
-    float noise = noise(vec3(vUv * 20., distance));
-    float asheFireStep = smoothstep(distance - .1 + noise, distance + .1 + noise, uTime * .004 + .05);
+    float distance = distance(vPosition, vec3(0.)) + .5;
+    float noise = noise(vec3(vUv * 10., distance));
+    float asheFireStep = smoothstep(distance - .1 + noise, distance + .1 + noise, time + .1);
     vec4 tempColor = mix(asheColor, fireColor, asheFireStep);
 
-    vec4 color = texture2D(uTexture, vUv);
-    float fireTextureStep = smoothstep(distance - .1 + noise, distance + .1 + noise, uTime * .004 + .2);
-    gl_FragColor = mix(color, tempColor, fireTextureStep);
+    float fireTextureStep = smoothstep(distance - .7 + noise, distance + .7 + noise, time + .5);
+    gl_FragColor = mix(sceneColor, tempColor, fireTextureStep);
 
-    float cutStep = step(distance + noise, uTime * .004);
+    float cutStep = step(distance + noise, time);
     gl_FragColor.a = 1. - cutStep;
     // gl_FragColor = vec4(color.rgb, noise(vUv * 100.));
 }

@@ -165,6 +165,11 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/fire.jpeg",
   },
+  {
+    name: "paper-texture",
+    type: "texture",
+    path: "/textures/paper.jpeg",
+  },
 ];
 
 export default Sources;

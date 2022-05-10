@@ -4,7 +4,6 @@ import {
   CineonToneMapping,
   LinearFilter,
   Mesh,
-  MeshBasicMaterial,
   NearestFilter,
   Object3D,
   PerspectiveCamera,
@@ -17,8 +16,6 @@ import {
   WebGLRenderer,
   WebGLRenderTarget,
   type Intersection,
-  type IUniform,
-  type Shader,
 } from "three";
 import Experience from "./Experience";
 import type Camera from "./world/Camera";
@@ -26,6 +23,7 @@ import type Camera from "./world/Camera";
 import vert from "./rtShaders/rtVertex.glsl?raw";
 import frag from "./rtShaders/rtFragment.glsl?raw";
 import type Time from "./controllers/Time";
+import anime from "animejs";
 
 export default class Renderer {
   private experience: Experience = new Experience();
@@ -43,7 +41,8 @@ export default class Renderer {
   public renderTarget: WebGLRenderTarget | null = null;
   private rtMaterial: ShaderMaterial | null = null;
   private rtMaterialStartTime: number = 0;
-  private isRenderTargetOn: boolean = false;
+  public isRenderTargetOn: boolean = false;
+  private isCameraPosLocked: boolean = false;
 
   constructor() {
     this.setInstance();
@@ -82,6 +81,9 @@ export default class Renderer {
       }
       if (this.experience.activeScene) {
         this.instance.render(this.experience.activeScene as Scene, this.experience.activeCamera?.instance);
+      }
+      if (this.isCameraPosLocked) {
+        this.experience.world?.controls?.reset();
       }
     }
   }
@@ -151,8 +153,10 @@ export default class Renderer {
     this.rtMaterialStartTime = this.time.elapsed;
     this.rtMaterial = new ShaderMaterial({
       uniforms: {
-        uTexture: { value: this.renderTarget.texture },
-        uTime: { value: 0 }
+        uSceneTexture: { value: this.renderTarget.texture },
+        uPaperTexture: { value: this.experience.loaders?.items["paper-texture"] },
+        uTime: { value: 0 },
+        uEase: { value: 0 }
       },
       vertexShader: vert,
       fragmentShader: frag,
@@ -169,11 +173,6 @@ export default class Renderer {
       nextScene.add(rtPlane);
     }
 
-    setTimeout(() => {
-      nextScene.remove(rtPlane);
-      this.isRenderTargetOn = false;
-    }, 1500);
-
     // this.experience.activeCamera?.controls?.reset();
     // nextCamera.controls?.reset();
 
@@ -181,6 +180,32 @@ export default class Renderer {
     this.experience.activeCamera = nextCamera;
     if (this.experience.world?.controls) {
       this.experience.world.controls.object = nextCamera.instance as PerspectiveCamera;
+      this.experience.world.controls.dampingFactor = 0;
     }
+    this.isCameraPosLocked = true;
+    this.experience.world?.controls?.saveState();
+
+    const tl = anime.timeline({});
+    tl.add(
+      {
+        targets: this.rtMaterial.uniforms.uEase,
+        value: 1,
+        duration: 2500,
+        easing: 'easeInOutQuad'
+      },
+      0
+    );
+
+    setTimeout(() => {
+      nextScene.remove(rtPlane);
+      this.isRenderTargetOn = false;
+    }, 2500);
+    
+    setTimeout(() => {
+      if (this.experience.world?.controls) {
+        this.experience.world.controls.dampingFactor = 0.05;
+      }
+      this.isCameraPosLocked = false;
+    }, 2500);
   }
 }
