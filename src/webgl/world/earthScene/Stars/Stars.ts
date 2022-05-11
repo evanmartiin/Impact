@@ -28,19 +28,20 @@ export default class Stars {
     const count = 500;
 
     const positions = new Float32Array(count * 3);
-    const blinking = new Float32Array(count * 2);
+    const params = new Float32Array(count * 3);
 
     for(let i = 0; i < count * 3; i+=3) {
       positions[i + 0] = (Math.random() - 0.5) * 10;
       positions[i + 1] = (Math.random() - 0.5) * 10;
       positions[i + 2] = (Math.random() - 0.5) * 10;
 
-      blinking[i + 0] = Math.random();
-      blinking[i + 1] = Math.random();
+      params[i + 0] = Math.random();
+      params[i + 1] = Math.random();
+      params[i + 2] = Math.random();
     }
 
     this.geometry.setAttribute('position', new BufferAttribute(positions, 3));
-    this.geometry.setAttribute('aBlinking', new BufferAttribute(blinking, 2));
+    this.geometry.setAttribute('aParams', new BufferAttribute(params, 3));
 
     this.material = new ShaderMaterial({
       uniforms: {

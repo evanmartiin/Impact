@@ -1,10 +1,10 @@
-attribute vec2 aBlinking;
+attribute vec3 aParams;
 
 uniform float uSize;
 uniform float uScale;
 
 varying vec4 vPosition;
-varying vec2 vBlinking;
+varying vec3 vParams;
 
 void main() {
     vec4 modelPosition = modelMatrix * vec4(position, 1.);
@@ -17,5 +17,5 @@ void main() {
     gl_PointSize *= (1. / - viewPosition.z);
     
     vPosition = projectedPosition;
-    vBlinking = aBlinking;
+    vParams = aParams;
 }
