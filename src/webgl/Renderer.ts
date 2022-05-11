@@ -23,6 +23,7 @@ import anime from "animejs";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
+import Ashes from "./world/entities/Ashes/Ashes";
 
 export default class Renderer {
   private experience: Experience = new Experience();
@@ -196,6 +197,11 @@ export default class Renderer {
     }
     this.isCameraPosLocked = true;
     this.experience.world?.controls?.saveState();
+
+    // if (this.experience.world) {
+    //   this.experience.world.ashes = null;
+    //   this.experience.world.ashes = new Ashes(nextScene, nextCamera);
+    // }
 
     const tl = anime.timeline({});
     tl.add(

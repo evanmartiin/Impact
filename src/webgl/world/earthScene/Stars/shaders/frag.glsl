@@ -4,11 +4,15 @@ uniform float uTime;
 uniform float uThreshold;
 
 varying vec4 vPosition;
-varying vec2 vBlinking;
+varying vec3 vParams;
 
 void main() {
-    float isBlinking = vBlinking.x;
-    float blinkOffset = vBlinking.y;
+    float isBlinking = vParams.x;
+    float blinkOffset = vParams.y;
+    float colorOffset = vParams.z;
+
+    vec3 hotColor = vec3(1, 0.67, 0.67);
+    vec3 coldColor = vec3(0.67, 0.67, 1);
 
   	vec2 vCoords = vPosition.xy;
     vCoords /= vPosition.w;
@@ -21,5 +25,7 @@ void main() {
     float blinking = step(uThreshold, isBlinking);
     blinking *= cos(uTime * .003 + blinkOffset * 10000.) * .5;
 
-    gl_FragColor = vec4(vec3(1.), opacity + blinking);
+    vec3 color = mix(hotColor, coldColor, colorOffset);
+
+    gl_FragColor = vec4(color, opacity + blinking);
 }

@@ -46,6 +46,7 @@ import type { GPSPos } from "@/models/webgl/GPSPos.model";
 import calcGPSFromPos from "@/utils/calcGPSFromPos";
 import anime from "animejs";
 import calcPosFromGPS from "@/utils/calcPosFromGPS";
+import Ashes from "../entities/Ashes/Ashes";
 
 export default class Earth extends EventEmitter {
   private experience: Experience = new Experience();

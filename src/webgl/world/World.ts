@@ -12,6 +12,7 @@ import CityDistrict from "./cityScene/CityDistrict";
 import type Camera from "./Camera";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import GrandmaDistrict from "./grandmaScene/grandmaDistrict";
+// import type Ashes from "./entities/Ashes/Ashes";
 
 export default class World {
   private experience: Experience = new Experience();
@@ -26,6 +27,7 @@ export default class World {
   private debug: Debug = this.experience.debug as Debug;
   public currentScene: district = "earth";
   public controls: OrbitControls | null = null;
+  // public ashes: Ashes | null = null;
 
   constructor() {
     this.loaders.on("ready", () => {
@@ -47,6 +49,7 @@ export default class World {
     this.earth?.update();
     this.homeDistrict?.update();
     this.controls?.update();
+    // this.ashes?.update();
   }
 
   setControls() {
