@@ -168,7 +168,7 @@ const Sources: ISource[] = [
   {
     name: "paper-texture",
     type: "texture",
-    path: "/textures/paper.jpeg",
+    path: "/textures/paper.jpg",
   },
 ];
 

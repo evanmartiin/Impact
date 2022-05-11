@@ -208,7 +208,7 @@ export default class Renderer {
       {
         targets: this.shaderPass.uniforms.uEase,
         value: 1,
-        duration: 2500,
+        duration: 3500,
         easing: 'easeInOutQuad'
       },
       0
@@ -220,6 +220,6 @@ export default class Renderer {
       }
       this.isCameraPosLocked = false;
       this.isTransitionOn = false;
-    }, 2500);
+    }, 3500);
   }
 }
