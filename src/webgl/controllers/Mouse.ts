@@ -18,6 +18,7 @@ export default class Mouse extends EventEmitter {
   public mouseVector = new Vector2();
   public mouseInertia = new Vector2();
   private mouseClicking: Boolean = false;
+  public mouseMoveEvent: null | MouseEvent = null;
 
   constructor() {
     super();
@@ -35,20 +36,22 @@ export default class Mouse extends EventEmitter {
       this.mouseClicking = false;
       this.trigger("mouseup");
     });
-    document.addEventListener("mousemove", () => {
-      if (this.mouseClicking) {
-        this.trigger("mousegrab");
-      }
-    });
   }
 
   update(e: globalThis.MouseEvent) {
+    this.mouseMoveEvent = e;
+    if (this.mouseClicking) {
+      this.trigger("mousegrab");
+    }
     this.top = e.clientY;
     this.left = e.clientX;
-    const newMouseVector = new Vector2((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+    const newMouseVector = new Vector2(
+      (e.clientX / window.innerWidth) * 2 - 1,
+      -(e.clientY / window.innerHeight) * 2 + 1
+    );
     this.mouseInertia.x = this.mouseVector.x - newMouseVector.x;
     this.mouseInertia.y = this.mouseVector.y - newMouseVector.y;
-    
+
     this.mouseVector.x = (e.clientX / window.innerWidth) * 2 - 1;
     this.mouseVector.y = -(e.clientY / window.innerHeight) * 2 + 1;
     if (e.clientX < window.innerWidth / 2) {

@@ -7,9 +7,11 @@ import Experience from "../Experience";
 export default class Camera {
   private experience: Experience = new Experience();
   private sizes: Sizes = this.experience.sizes as Sizes;
-  private canvas: HTMLCanvasElement = this.experience.canvas as HTMLCanvasElement;
+  private canvas: HTMLCanvasElement = this.experience
+    .canvas as HTMLCanvasElement;
   public instance: PerspectiveCamera | null = null;
   public controls: OrbitControls | null = null;
+  public static isCtrlActive = false;
 
   private angle: number = 0;
 
@@ -34,8 +36,9 @@ export default class Camera {
     if (this.instance && this.canvas) {
       this.controls = new OrbitControls(this.instance, this.canvas);
       this.controls.enableDamping = true;
-      // this.controls.enableZoom = false;
+      this.controls.enableZoom = true;
       this.controls.enablePan = false;
+      Camera.isCtrlActive = true;
       this.setListener();
     }
   }
@@ -43,7 +46,7 @@ export default class Camera {
   setListener() {
     this.controls?.addEventListener("change", () => {
       this.experience.world?.earth?.updateRelatedToCamera();
-    })
+    });
   }
 
   resize() {
@@ -54,16 +57,16 @@ export default class Camera {
   }
 
   update() {
-    this.controls?.update();
+    if (Camera.isCtrlActive) this.controls?.update();
   }
 
   rotate(angle: number) {
     this.angle += angle;
     if (this.instance) {
       const newPos = new Vector3();
-      newPos.x += Math.sin(this.angle)*6;
-      newPos.y += .3;
-      newPos.z += Math.cos(this.angle)*6;
+      newPos.x += Math.sin(this.angle) * 6;
+      newPos.y += 0.3;
+      newPos.z += Math.cos(this.angle) * 6;
       const tl = anime.timeline({});
       tl.add(
         {
@@ -71,7 +74,7 @@ export default class Camera {
           x: newPos.x,
           y: newPos.y,
           z: newPos.z,
-          duration: 100
+          duration: 100,
         },
         0
       );

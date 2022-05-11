@@ -11,7 +11,7 @@ import {
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
 import Camera from "../Camera";
-import SeedGameBoard from "./SeedGame/SeedGameBoard";
+import SeedGame from "./SeedGame/SeedGame";
 
 export default class HomeScene {
   private experience: Experience = new Experience();
@@ -21,14 +21,14 @@ export default class HomeScene {
   public instance: Group = new Group();
   private startButton: ButtonApi | null = null;
   private stopButton: ButtonApi | null = null;
-  public game: SeedGameBoard | null = null;
+  public game: SeedGame | null = null;
   public scene: Scene = new Scene();
   public cameraPos: Vector3 = new Vector3(50, 50, 50);
   public camera: Camera = new Camera(this.cameraPos);
 
   constructor() {
     if (this.camera.instance)
-      this.game = new SeedGameBoard(this.scene, this.camera.instance);
+      this.game = new SeedGame(this.scene, this.camera);
 
     const mainModel = this.loaders.items["housev1"] as GLTF;
     this.scene.add(mainModel.scene);

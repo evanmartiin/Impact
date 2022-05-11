@@ -22,7 +22,7 @@ import type Camera from "./world/Camera";
 
 export default class Renderer {
   private experience: Experience = new Experience();
-  private canvas: HTMLCanvasElement = this.experience
+  public canvas: HTMLCanvasElement = this.experience
     .canvas as HTMLCanvasElement;
   private sizes: Sizes = this.experience.sizes as Sizes;
   private mouse: Mouse = this.experience.mouse as Mouse;

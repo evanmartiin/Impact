@@ -16,23 +16,23 @@ export default class Targets {
     this.set();
   }
 
-  setModel() {
-    this.geometry = new SphereGeometry(0.2, 16, 16);
+  setMesh() {
+    this.geometry = new SphereGeometry(0.4, 16, 16);
     this.material = new MeshStandardMaterial({ color: 0xff0000 });
 
     for (let i = 0; i < 7; i++) {
       const mesh = new Mesh(this.geometry, this.material);
       mesh.name = "target";
       mesh.position.set(
-        getRandomFloatBetween(-2, 2, 2),
+        getRandomFloatBetween(-7, 7, 7),
         0,
-        getRandomFloatBetween(-2, 2, 2)
+        getRandomFloatBetween(-7, 7, 7)
       );
       this.spheres.push(mesh);
       this.instance.add(mesh);
     }
-    this.instance.position.z = 6;
-    this.instance.position.y = 0.15;
+    this.instance.position.z = 30;
+    this.instance.position.y = 5;
   }
 
   set() {
