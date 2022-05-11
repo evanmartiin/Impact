@@ -1,7 +1,6 @@
 import Camera from "@/webgl/world/Camera";
 import { isLocked, setLockMouseMode } from "@/utils/lockMouseMode";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
-import { TrackballControls } from "three/examples/jsm/controls/TrackballControls.js";
 import type Mouse from "@/webgl/controllers/Mouse";
 import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
@@ -59,16 +58,13 @@ export default class SeedGame {
   private currentX = window.innerWidth / 2;
   private currentY = window.innerHeight / 2;
 
-  private gameControls: TrackballControls | null = null;
+  private gameControls: PointerLockControls | null = null;
 
   constructor(scene: Scene, camera: Camera) {
-    this.gameControls = new TrackballControls(
+    this.gameControls = new PointerLockControls(
       camera.instance as PerspectiveCamera,
-      this.renderer.canvas,
-      this.scene
+      this.renderer.canvas
     );
-    // this.gameControls.maxPolarAngle = Math.PI / 2 ;
-    // this.gameControls.minPolarAngle = Math.PI / 2;
     this.scene = scene;
     this.camera = camera;
   }
@@ -105,7 +101,7 @@ export default class SeedGame {
       this.camera.instance?.position.set(0, this.cameraHeight, 5);
     }
     // if (this.camera) this.camera.instance?.lookAt(this.defaultCenterPos);
-    // this.setCameraLookAt();
+    this.setCameraLookAt();
   }
 
   setCameraLookAt() {
@@ -134,8 +130,8 @@ export default class SeedGame {
       const yc = this.lookAtPosExpectedY * 20;
       const zc = -this.distanceLookAt;
 
-      // this.cameraLookAtPoint?.set(xc, yc, zc);
-      // this.camera.instance?.lookAt(xc, yc, zc);
+      this.cameraLookAtPoint?.set(xc, yc, zc);
+      this.camera.instance?.lookAt(xc, yc, zc);
 
       // this.cameraLookAtPoint?.set(xc, yc, zc);
       // this.camera.instance?.lookAt(xc, yc, zc);
@@ -221,7 +217,7 @@ export default class SeedGame {
   keyAction(e: any) {
     const key = e.key;
     switch (key) {
-      case "r":
+      case "g":
         break;
     }
   }
@@ -235,18 +231,15 @@ export default class SeedGame {
         );
         this.lookAtPos.copy(this.defaultCenterPos);
         if (this.camera.controls) this.camera.controls.enabled = false;
-        Camera.isCtrlActive = false;
-        if (this.gameControls) this.gameControls.enabled = true;
-        // this.gameControls?.lock();
-        // this.gameControls?.connect();
         this.camera.instance?.lookAt(this.defaultCenterPos);
       }
-      window.addEventListener("keydown", this.keyAction.bind(this));
+      
+      window.addEventListener("keydown", this.keyAction);
       this.set();
-      // setLockMouseMode(this.experience.canvas as HTMLCanvasElement);
-      // if (!isLocked(this.experience.canvas as HTMLCanvasElement)) {
-      //   this.experience.canvas?.requestPointerLock();
-      // }
+      setLockMouseMode(this.experience.canvas as HTMLCanvasElement);
+      if (!isLocked(this.experience.canvas as HTMLCanvasElement)) {
+        this.experience.canvas?.requestPointerLock();
+      }
     }
   }
 
@@ -259,9 +252,8 @@ export default class SeedGame {
       this.camera.instance?.position.copy(this.prevCamPos);
     }
     Camera.isCtrlActive = false;
-    if (this.gameControls) this.gameControls.enabled = true;
-    // this.gameControls?.unlock();
-    // this.gameControls?.disconnect();
+    this.gameControls?.unlock();
+    this.gameControls?.disconnect();
     this.unsetDebug();
     this.disappear();
 
