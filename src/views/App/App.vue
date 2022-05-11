@@ -16,13 +16,15 @@ onMounted(() => {
   const store = webglStore();
   store.$state = { experience };
   
+  if(store.experience.loaders)
   store.experience.loaders.on('ready', () => {
-    store.experience.world.earth.on('district_selected', (district) => {
+    if(store.experience.world?.earth){
+    store.experience.world.earth.on('district_selected', (district: any) => {
       selectedDistrict.value = district.name;
     })
     store.experience.world.earth.on('no_district_selected', () => {
       selectedDistrict.value = '';
-    })
+    })}
 
     // store.experience.world.districts.scoreboard.on("timer_started", () => {
     //   showScoreboard.value = true;
