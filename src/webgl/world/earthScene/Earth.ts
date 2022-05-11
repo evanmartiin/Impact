@@ -180,8 +180,11 @@ export default class Earth extends EventEmitter {
               });
               child.material = bakedMaterial;
             }
-            // child.material.onBeforeCompile = this.addCustomFog;
-            child.material.onBeforeCompile = this.addBrazierShader;
+            child.material.onBeforeCompile = (shader: Shader) => {
+              // this.addCustomFog(shader);
+              this.addBrazierShader(shader);
+            }
+            // child.material.onBeforeCompile = this.addBrazierShader;
           }
         });
         this.earthGroup?.add(model.scene);
@@ -225,6 +228,8 @@ export default class Earth extends EventEmitter {
       "#include <fog_fragment>",
       fogFragment
     );
+    console.log(shader.vertexShader);
+    
   };
 
   addBrazierShader = (shader: Shader) => {

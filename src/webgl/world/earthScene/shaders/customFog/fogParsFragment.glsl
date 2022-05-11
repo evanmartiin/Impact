@@ -4,20 +4,20 @@ uniform vec3 _uFogCameraPosition;
 varying vec3 _vFogWorldPosition;
 varying vec3 _vFogNormal;
 
-vec3 mod289(vec3 x) {
+vec3 fog_mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
-vec4 mod289(vec4 x) {
+vec4 fog_mod289(vec4 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
-vec4 permute(vec4 x) {
-    return mod289(((x*34.0)+1.0)*x);
+vec4 fog_permute(vec4 x) {
+    return fog_mod289(((x*34.0)+1.0)*x);
 }
-vec4 taylorInvSqrt(vec4 r)
+vec4 fog_taylorInvSqrt(vec4 r)
 {
   return 1.79284291400159 - 0.85373472095314 * r;
 }
-float snoise(vec3 v)
+float fog_snoise(vec3 v)
 {
   const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
   const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
@@ -37,8 +37,8 @@ float snoise(vec3 v)
   vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y
   vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y
 // Permutations
-  i = mod289(i);
-  vec4 p = permute( permute( permute(
+  i = fog_mod289(i);
+  vec4 p = fog_permute( fog_permute( fog_permute(
              i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
            + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
            + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
@@ -66,7 +66,7 @@ float snoise(vec3 v)
   vec3 p2 = vec3(a1.xy,h.z);
   vec3 p3 = vec3(a1.zw,h.w);
 //Normalise gradients
-  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+  vec4 norm = fog_taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
   p0 *= norm.x;
   p1 *= norm.y;
   p2 *= norm.z;
@@ -82,7 +82,7 @@ float FBM(vec3 p) {
   float amplitude = 0.5;
   float frequency = 0.0;
   for (int i = 0; i < 6; ++i) {
-    value += amplitude * snoise(p);
+    value += amplitude * fog_snoise(p);
     p *= 2.0;
     amplitude *= 0.5;
   }

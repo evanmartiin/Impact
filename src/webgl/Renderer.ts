@@ -3,16 +3,12 @@ import type Sizes from "@/webgl/controllers/Sizes";
 import {
   CineonToneMapping,
   LinearFilter,
-  Mesh,
   NearestFilter,
   Object3D,
   PerspectiveCamera,
-  PlaneBufferGeometry,
   Raycaster,
   Scene,
-  ShaderMaterial,
   sRGBEncoding,
-  Vector3,
   WebGLRenderer,
   WebGLRenderTarget,
   type Intersection,
@@ -24,6 +20,9 @@ import vert from "./rtShaders/rtVertex.glsl?raw";
 import frag from "./rtShaders/rtFragment.glsl?raw";
 import type Time from "./controllers/Time";
 import anime from "animejs";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 
 export default class Renderer {
   private experience: Experience = new Experience();
@@ -36,13 +35,18 @@ export default class Renderer {
   public intersects: Intersection[] = [];
   private districtNames: string[] = ["maison", "ville", "mamie"];
   public hoveredDistrict: Object3D | undefined;
-  public renderTargetScene: Scene | null = null;
-  public renderTargetCamera: Camera | null = null;
-  public renderTarget: WebGLRenderTarget | null = null;
-  private rtMaterial: ShaderMaterial | null = null;
-  private rtMaterialStartTime: number = 0;
-  public isRenderTargetOn: boolean = false;
+  public renderTargetPrevScene: Scene | null = null;
+  public renderTargetPrevCamera: Camera | null = null;
+  public renderTargetPrev: WebGLRenderTarget | null = null;
+  public renderTargetNextScene: Scene | null = null;
+  public renderTargetNextCamera: Camera | null = null;
+  public renderTargetNext: WebGLRenderTarget | null = null;
+  private transitionStartTime: number = 0;
+  public isTransitionOn: boolean = false;
   private isCameraPosLocked: boolean = false;
+  private composer: EffectComposer | null = null;
+  private shaderPass: ShaderPass | null = null;
+  private then: number = 0;
 
   constructor() {
     this.setInstance();
@@ -55,12 +59,9 @@ export default class Renderer {
       antialias: !isRetinaScreen,
       powerPreference: "high-performance",
     });
-    // this.instance.physicallyCorrectLights = true;
     this.instance.outputEncoding = sRGBEncoding;
     this.instance.toneMapping = CineonToneMapping;
     this.instance.toneMappingExposure = 1.75;
-    // this.instance.shadowMap.enabled = true;
-    // this.instance.shadowMap.type = PCFSoftShadowMap;
     this.instance.setClearColor("#0C1B51");
     this.instance.setSize(this.sizes.width, this.sizes.height);
     this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 2));
@@ -72,14 +73,27 @@ export default class Renderer {
   }
 
   update() {
+    const now = Date.now() * .001;
+    const deltaTime = now - this.then;
+    this.then = now;
+
+    this.composer?.setSize(this.sizes.width, this.sizes.height);
+
     if (this.experience.activeCamera?.instance && this.instance) {
-      if (this.isRenderTargetOn && this.rtMaterial) {
-        this.rtMaterial.uniforms.uTime.value = this.time.elapsed - this.rtMaterialStartTime;
-        this.instance.setRenderTarget(this.renderTarget);
-        this.instance.render(this.renderTargetScene as Scene, this.renderTargetCamera?.instance as PerspectiveCamera);
+      if (this.isTransitionOn && this.shaderPass) {
+        this.instance.setRenderTarget(this.renderTargetPrev);
+        this.instance.render(this.renderTargetPrevScene as Scene, this.renderTargetPrevCamera?.instance as PerspectiveCamera);
+        this.instance.setRenderTarget(this.renderTargetNext);
+        this.instance.render(this.renderTargetNextScene as Scene, this.renderTargetNextCamera?.instance as PerspectiveCamera);
         this.instance.setRenderTarget(null);
+        
+        this.shaderPass.uniforms.uTime.value = this.time.elapsed - this.transitionStartTime;
+        this.shaderPass.uniforms.tDiffuse1.value = this.renderTargetPrev?.texture;
+        this.shaderPass.uniforms.tDiffuse2.value = this.renderTargetNext?.texture;
+      
+        this.composer?.render(deltaTime);
       }
-      if (this.experience.activeScene) {
+      else {
         this.instance.render(this.experience.activeScene as Scene, this.experience.activeCamera?.instance);
       }
       if (this.isCameraPosLocked) {
@@ -141,40 +155,37 @@ export default class Renderer {
   }
 
   changeScene(nextScene: Scene, nextCamera: Camera) {
-    this.renderTargetScene = this.experience.activeScene;
-    this.renderTargetCamera = this.experience.activeCamera;
-    this.renderTarget = new WebGLRenderTarget(this.sizes.width*2, this.sizes.height*2, { minFilter: LinearFilter, magFilter: NearestFilter });
-    this.isRenderTargetOn = true;
+    this.renderTargetPrevScene = this.experience.activeScene;
+    this.renderTargetPrevCamera = this.experience.activeCamera;
+    this.renderTargetPrev = new WebGLRenderTarget(this.sizes.width*2, this.sizes.height*2, { minFilter: LinearFilter, magFilter: NearestFilter });
+    this.renderTargetNextScene = nextScene;
+    this.renderTargetNextCamera = nextCamera;
+    this.renderTargetNext = new WebGLRenderTarget(this.sizes.width*2, this.sizes.height*2, { minFilter: LinearFilter, magFilter: NearestFilter });
+    this.isTransitionOn = true;
 
-    if (this.renderTarget) {
-      this.renderTarget.texture.encoding = sRGBEncoding;
+    if (this.renderTargetPrev) {
+      this.renderTargetPrev.texture.encoding = sRGBEncoding;
+      this.renderTargetNext.texture.encoding = sRGBEncoding;
     }
 
-    this.rtMaterialStartTime = this.time.elapsed;
-    this.rtMaterial = new ShaderMaterial({
+    this.transitionStartTime = this.time.elapsed;
+
+    this.composer = new EffectComposer(this.instance as WebGLRenderer);
+    this.composer.addPass(new RenderPass(this.renderTargetPrevScene as Scene, this.renderTargetPrevCamera?.instance as PerspectiveCamera));
+    this.shaderPass = new ShaderPass({
       uniforms: {
-        uSceneTexture: { value: this.renderTarget.texture },
+        tDiffuse1: { value: null },
+        tDiffuse2: { value: null },
         uPaperTexture: { value: this.experience.loaders?.items["paper-texture"] },
         uTime: { value: 0 },
         uEase: { value: 0 }
       },
       vertexShader: vert,
-      fragmentShader: frag,
-      transparent: true
-    })
-    const rtPlane = new Mesh(new PlaneBufferGeometry(this.sizes.width/200, this.sizes.height/200), this.rtMaterial);
-
-    if (nextCamera.instance?.position) {
-      rtPlane.lookAt(nextCamera.instance.position);
-      rtPlane.position.copy(nextCamera.instance.position);
-      const { x, y, z } = nextCamera.instance.position;
-      const planePos = new Vector3(x, y, z).normalize().multiply(new Vector3(7.24, 7.24, 7.24));
-      rtPlane.position.sub(planePos);
-      nextScene.add(rtPlane);
-    }
-
-    // this.experience.activeCamera?.controls?.reset();
-    // nextCamera.controls?.reset();
+      fragmentShader: frag
+    });
+    this.shaderPass.material.transparent = true;
+    this.shaderPass.renderToScreen = true;
+    this.composer.addPass(this.shaderPass);
 
     this.experience.activeScene = nextScene;
     this.experience.activeCamera = nextCamera;
@@ -188,7 +199,7 @@ export default class Renderer {
     const tl = anime.timeline({});
     tl.add(
       {
-        targets: this.rtMaterial.uniforms.uEase,
+        targets: this.shaderPass.uniforms.uEase,
         value: 1,
         duration: 2500,
         easing: 'easeInOutQuad'
@@ -197,15 +208,11 @@ export default class Renderer {
     );
 
     setTimeout(() => {
-      nextScene.remove(rtPlane);
-      this.isRenderTargetOn = false;
-    }, 2500);
-    
-    setTimeout(() => {
       if (this.experience.world?.controls) {
         this.experience.world.controls.dampingFactor = 0.05;
       }
       this.isCameraPosLocked = false;
+      this.isTransitionOn = false;
     }, 2500);
   }
 }
