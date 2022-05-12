@@ -64,7 +64,7 @@ export default class Renderer {
     this.instance.toneMapping = CineonToneMapping;
     this.instance.toneMappingExposure = 1.75;
     this.instance.setClearColor("#0C1B51");
-    this.instance.setSize(this.sizes.width, this.sizes.height);
+    this.instance.setSize(this.experience.sizes?.width as number, this.experience.sizes?.height as number);
     this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 2));
   }
 

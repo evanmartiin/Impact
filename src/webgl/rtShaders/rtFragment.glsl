@@ -52,8 +52,8 @@ void main() {
     vec4 asheColor = vec4(0.06, 0.04, 0, 1);
     vec4 sceneColor = texture2D(tDiffuse1, vUv);
     vec4 nextSceneColor = texture2D(tDiffuse2, vUv);
-    vec4 paperColor = texture2D(uPaperTexture, vUv);
-    sceneColor.rgb += (paperColor.r - .9) * .5 * uEase;
+    // vec4 paperColor = texture2D(uPaperTexture, vUv);
+    // sceneColor.rgb += (paperColor.r - .9) * .5 * uEase;
     float time = uTime * .001 * uEase;
 
     float distance = distance(vPosition, vec3(0.)) + .5;
