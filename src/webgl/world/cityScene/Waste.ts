@@ -1,7 +1,7 @@
 import Experience from "@/webgl/Experience";
 import { BoxBufferGeometry, Group, Mesh, MeshBasicMaterial, Object3D } from "three";
 import type Scoreboard from "./Scoreboard";
-import type CityDistrict from "./CityDistrict";
+import type CityDistrict from "./CityScene";
 
 interface position {
   x: number,
@@ -38,8 +38,8 @@ export default class Waste {
     private mesh: Mesh | null;
     
     private experience: Experience = new Experience();
-    private cityDistrict: CityDistrict = this.experience.world?.cityDistrict as CityDistrict;
-    private scoreboard: Scoreboard = this.experience.world?.cityDistrict?.scoreboard as Scoreboard;
+    private cityDistrict: CityDistrict = this.experience.world?.cityScene as CityDistrict;
+    private scoreboard: Scoreboard = this.experience.world?.cityScene?.scoreboard as Scoreboard;
 
   constructor() {
     this.mesh = new Mesh(Waste.geometry, Waste.material);

@@ -1,4 +1,4 @@
-import Experience from "@/webgl/Experience";
+import Experience from '@/webgl/Experience';
 import { defineStore } from "pinia";
 
 export const webglStore = defineStore({

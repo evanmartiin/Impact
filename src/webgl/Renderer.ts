@@ -27,7 +27,8 @@ import Ashes from "./world/entities/Ashes/Ashes";
 
 export default class Renderer {
   private experience: Experience = new Experience();
-  private canvas: HTMLCanvasElement = this.experience.canvas as HTMLCanvasElement;
+  public canvas: HTMLCanvasElement = this.experience
+    .canvas as HTMLCanvasElement;
   private sizes: Sizes = this.experience.sizes as Sizes;
   private mouse: Mouse = this.experience.mouse as Mouse;
   private time: Time = this.experience.time as Time;
@@ -35,7 +36,7 @@ export default class Renderer {
   public raycaster: Raycaster = new Raycaster();
   public intersects: Intersection[] = [];
   private districtNames: string[] = ["maison", "ville", "mamie"];
-  public hoveredDistrict: Object3D | undefined;
+  public hoveredScene: Object3D | undefined;
   public renderTargetPrevScene: Scene | null = null;
   public renderTargetPrevCamera: Camera | null = null;
   public renderTargetPrev: WebGLRenderTarget | null = null;
@@ -63,8 +64,11 @@ export default class Renderer {
     this.instance.outputEncoding = sRGBEncoding;
     this.instance.toneMapping = CineonToneMapping;
     this.instance.toneMappingExposure = 1.75;
+    // this.instance.shadowMap.enabled = true;
+    // this.instance.shadowMap.type = PCFSoftShadowMap;
     this.instance.setClearColor("#0C1B51");
-    this.instance.setSize(this.experience.sizes?.width as number, this.experience.sizes?.height as number);
+    // this.instance.setClearColor("#91caeb");
+    this.instance.setSize(this.sizes.width, this.sizes.height);
     this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 2));
   }
 
@@ -96,7 +100,10 @@ export default class Renderer {
         this.composer?.render(deltaTime);
       }
       else {
-        this.instance.render(this.experience.activeScene as Scene, this.experience.activeCamera?.instance);
+        this.instance.render(
+          this.experience.activeScene as Scene,
+          this.experience.activeCamera?.instance
+        );
       }
       if (this.isCameraPosLocked) {
         this.experience.world?.controls?.reset();
@@ -106,7 +113,10 @@ export default class Renderer {
 
   raycast() {
     this.intersects = [];
-    if (this.experience.activeCamera?.instance && this.experience.world?.earth?.earthGroup) {
+    if (
+      this.experience.activeCamera?.instance &&
+      this.experience.world?.earth?.earthGroup
+    ) {
       this.raycaster.setFromCamera(
         this.mouse.mouseVector,
         this.experience.activeCamera?.instance
@@ -124,24 +134,24 @@ export default class Renderer {
             this.intersects.length > 0 &&
             this.districtNames.includes(this.intersects[0].object.name)
           ) {
-            this.hoveredDistrict = this.intersects[0].object;
-            selectedObjects.push(this.hoveredDistrict);
+            this.hoveredScene = this.intersects[0].object;
+            selectedObjects.push(this.hoveredScene);
           } else {
             selectedObjects =
               this.experience.world.earth.earthGroup.children[0].children.filter(
                 (model) => this.districtNames.includes(model.name)
               );
-            this.hoveredDistrict = undefined;
+            this.hoveredScene = undefined;
           }
           break;
         case "maison":
           let toRaycast: Object3D[] = [];
-          if (this.experience.world.homeDistrict?.instance) {
-            this.experience.world.homeDistrict?.instance?.children.map(
-              (object) => toRaycast.push(object)
+          if (this.experience.world.homeScene?.instance) {
+            this.experience.world.homeScene?.instance?.children.map((object) =>
+              toRaycast.push(object)
             );
 
-            this.experience.world.homeDistrict.game?.targets?.instance.children.map(
+            this.experience.world.homeScene.game?.targets?.instance.children.map(
               (object) => toRaycast.push(object)
             );
 
