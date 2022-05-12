@@ -37,9 +37,24 @@ const Sources: ISource[] = [
     path: "/models/earthv5.glb",
   },
   {
-    name: "housev1",
+    name: "housev1model",
     type: "gltfModel",
-    path: "/models/housev2.glb",
+    path: "/models/housev3.glb",
+  },
+  {
+    name: "grassv1model",
+    type: "gltfModel",
+    path: "/models/grassv3.glb",
+  },
+  {
+    name: "housev1texture",
+    type: "texture",
+    path: "/textures/housev4.jpg",
+  },
+  {
+    name: "grassv1texture",
+    type: "texture",
+    path: "/textures/grassv4.jpg",
   },
   {
     name: "city",
@@ -77,7 +92,6 @@ const Sources: ISource[] = [
     path: "/textures/satellite.jpg",
   },
 
-
   {
     name: "oceans-model",
     type: "gltfModel",
@@ -88,7 +102,6 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/oceans.jpg",
   },
-
 
   {
     name: "continents-model",
@@ -101,7 +114,6 @@ const Sources: ISource[] = [
     path: "/textures/continents.jpg",
   },
 
-
   {
     name: "house-mini-model",
     type: "gltfModel",
@@ -112,7 +124,6 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/house-mini.jpg",
   },
-
 
   {
     name: "city-mini-model",
@@ -125,7 +136,6 @@ const Sources: ISource[] = [
     path: "/textures/city-mini.jpg",
   },
 
-
   {
     name: "granny-mini-model",
     type: "gltfModel",
@@ -137,13 +147,11 @@ const Sources: ISource[] = [
     path: "/textures/granny-mini.jpg",
   },
 
-
   {
     name: "zones-model",
     type: "gltfModel",
     path: "/models/zones.glb",
   },
-
 
   {
     name: "earth-map",

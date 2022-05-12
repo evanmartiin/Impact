@@ -7,11 +7,18 @@ import {
   PerspectiveCamera,
   Scene,
   Vector3,
+  Texture,
+  sRGBEncoding,
+  MeshBasicMaterial,
+  Mesh,
+  ShaderMaterial,
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
 import Camera from "../Camera";
 import SeedGame from "./SeedGame/SeedGame";
+import fragment from "./Shaders/Map/fragment.glsl?raw";
+import vertex from "./Shaders/Map/vertex.glsl?raw";
 
 export default class HomeScene {
   private experience: Experience = new Experience();
@@ -25,13 +32,42 @@ export default class HomeScene {
   public scene: Scene = new Scene();
   public cameraPos: Vector3 = new Vector3(50, 50, 50);
   public camera: Camera = new Camera(this.cameraPos);
+  private models: GLTF[] = [];
+  private textures: Texture[] = [];
 
   constructor() {
-    if (this.camera.instance)
-      this.game = new SeedGame(this.scene, this.camera);
+    if (this.camera.instance) this.game = new SeedGame(this.scene, this.camera);
 
-    const mainModel = this.loaders.items["housev1"] as GLTF;
-    this.scene.add(mainModel.scene);
+    // const mainModel = this.loaders.items["housev1model"] as GLTF;
+    this.models = [
+      this.loaders.items["housev1model"] as GLTF,
+      this.loaders.items["grassv1model"] as GLTF,
+    ];
+    this.textures = [
+      this.loaders.items["housev1texture"] as Texture,
+      this.loaders.items["grassv1texture"] as Texture,
+    ];
+    this.models.forEach((model, index) => {
+      if (this.textures && this.textures[index]) {
+        this.textures[index].flipY = false;
+        this.textures[index].encoding = sRGBEncoding;
+        model.scene.traverse((child) => {
+          if (child instanceof Mesh && this.textures) {
+            const bakedMaterial = new ShaderMaterial({
+              transparent: true,
+              fragmentShader: fragment,
+              vertexShader: vertex,
+              uniforms: {
+                uTexture: { value: this.textures[index] },
+              },
+            });
+            (child as Mesh).material = bakedMaterial;
+          }
+        });
+        this.scene?.add(model.scene);
+      }
+    });
+    // this.scene.add(mainModel.scene);
 
     const sunLight = new DirectionalLight("#ffffff", 4);
     sunLight.castShadow = true;
@@ -51,13 +87,13 @@ export default class HomeScene {
 
   enterGameView() {
     if (!this.game?.isGameView) {
-      if (this.game) this.game.enterView();
+      if (this.game) this.game.enterGameView();
     }
   }
 
   leaveGameView() {
     if (this.game?.isGameView) {
-      if (this.game) this.game.leaveView();
+      if (this.game) this.game.leaveGameView();
     }
   }
 
@@ -93,7 +129,6 @@ export default class HomeScene {
     }) as ButtonApi;
     this.stopButton?.on("click", () => {
       this.leaveGameView();
-      if (this.game) this.game.camdebuging = false;
     });
   }
 }

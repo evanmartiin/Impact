@@ -53,7 +53,8 @@ export default class Renderer {
     this.instance.toneMappingExposure = 1.75;
     // this.instance.shadowMap.enabled = true;
     // this.instance.shadowMap.type = PCFSoftShadowMap;
-    this.instance.setClearColor("#0C1B51");
+    // this.instance.setClearColor("#0C1B51");
+    this.instance.setClearColor("#91caeb");
     this.instance.setSize(this.sizes.width, this.sizes.height);
     this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 2));
   }

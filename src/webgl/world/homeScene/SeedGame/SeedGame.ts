@@ -1,4 +1,5 @@
-import Camera from "@/webgl/world/Camera";
+import { GameCamCtrl } from "./GameCamCtrl/GameCamCtrl";
+import type Camera from "@/webgl/world/Camera";
 import { isLocked, setLockMouseMode } from "@/utils/lockMouseMode";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
 import type Mouse from "@/webgl/controllers/Mouse";
@@ -21,13 +22,8 @@ export default class SeedGame {
   private debug: Debug = this.experience.debug as Debug;
   public instance: Group = new Group();
   private prevCamPos = new Vector3(0, 0, 0);
-  private lookAtPos = new Vector3(0, 0, 0);
   private helper: Helper | null = null;
   private angleTarget = new Vector3();
-  private lookAtPosExpectedX = 0;
-  private lookAtPosExpectedY = 0;
-  private prevLookAtX = 0;
-  private prevLookAtY = 0;
 
   private distanceLookAt = -30;
   private cameraHeight = 7;
@@ -53,11 +49,6 @@ export default class SeedGame {
 
   private shotAngle = 0;
 
-  public camdebuging = false;
-
-  private currentX = window.innerWidth / 2;
-  private currentY = window.innerHeight / 2;
-
   private gameControls: PointerLockControls | null = null;
 
   constructor(scene: Scene, camera: Camera) {
@@ -69,6 +60,8 @@ export default class SeedGame {
     this.camera = camera;
   }
 
+  private gameCamCtrl: GameCamCtrl | null = null;
+
   init() {
     this.isInit = true;
     this.setTargets();
@@ -79,6 +72,7 @@ export default class SeedGame {
     this.set();
     this.setDebug();
     this.helper = new Helper(this.scene as Scene);
+    if (this.camera) this.gameCamCtrl = new GameCamCtrl(this.camera);
   }
 
   setTargets() {
@@ -91,59 +85,8 @@ export default class SeedGame {
     if (this.isGameView) {
       if (this.helper?.instance)
         this.helper.instance.position.set(0, this.cameraHeight, 5);
-      if (!this.camdebuging) this.fixCamera();
       this.seed?.update();
     }
-  }
-
-  fixCamera() {
-    if (this.camera) {
-      this.camera.instance?.position.set(0, this.cameraHeight, 5);
-    }
-    // if (this.camera) this.camera.instance?.lookAt(this.defaultCenterPos);
-    this.setCameraLookAt();
-  }
-
-  setCameraLookAt() {
-    if (this.camera) {
-      let x = this.prevLookAtX;
-      let y = this.prevLookAtY;
-
-      if (this.lookAtPosExpectedY > 0) {
-        x += (this.lookAtPosExpectedY * 16 - x) * 0.02;
-      } else {
-        x += (this.lookAtPosExpectedY * 16 - x) * 0.02;
-      }
-      if (this.lookAtPosExpectedX > 0) {
-        y += (this.lookAtPosExpectedX * 16 - y) * 0.02;
-      } else {
-        y += (this.lookAtPosExpectedX * 16 - y) * 0.02;
-      }
-
-      this.prevLookAtX = x;
-      this.prevLookAtY = y;
-
-      // const xc = -y;
-      // const yc = x + this.heightLookAt;
-      // const zc = -this.distanceLookAt;
-      const xc = -this.lookAtPosExpectedX * 20;
-      const yc = this.lookAtPosExpectedY * 20;
-      const zc = -this.distanceLookAt;
-
-      this.cameraLookAtPoint?.set(xc, yc, zc);
-      this.camera.instance?.lookAt(xc, yc, zc);
-
-      // this.cameraLookAtPoint?.set(xc, yc, zc);
-      // this.camera.instance?.lookAt(xc, yc, zc);
-      // this.helper?.setCursor(xc, yc, zc);
-    }
-  }
-
-  appear() {
-    this.instance.visible = true;
-  }
-  disappear() {
-    this.instance.visible = false;
   }
 
   set() {
@@ -151,8 +94,6 @@ export default class SeedGame {
       this.init();
     } else if (!this.isSet) {
       this.isSet = true;
-      this.appear();
-      this.mouse.on("mousemove", () => this.moveCamera());
       this.mouse.on("mousedown", () => this.mouseClick());
     }
   }
@@ -197,7 +138,7 @@ export default class SeedGame {
   unset() {
     if (this.isSet) {
       this.isSet = false;
-      this.mouse.off("mousemove");
+      // this.mouse.off("mousemove");
       this.mouse.off("mousedown");
     }
   }
@@ -222,79 +163,22 @@ export default class SeedGame {
     }
   }
 
-  enterView() {
-    if (!this.isGameView) {
-      this.isGameView = true;
-      if (this.camera && this.camera) {
-        this.prevCamPos = this.prevCamPos.copy(
-          this.camera.instance?.position as Vector3
-        );
-        this.lookAtPos.copy(this.defaultCenterPos);
-        if (this.camera.controls) this.camera.controls.enabled = false;
-        this.camera.instance?.lookAt(this.defaultCenterPos);
-      }
-      
-      window.addEventListener("keydown", this.keyAction);
-      this.set();
-      setLockMouseMode(this.experience.canvas as HTMLCanvasElement);
-      if (!isLocked(this.experience.canvas as HTMLCanvasElement)) {
-        this.experience.canvas?.requestPointerLock();
-      }
-    }
+  enterGameView() {
+    this.isGameView = true;
+    this.set();
+    this.gameCamCtrl?.setCamGameMode();
+    this.instance.visible = true;
+    window.addEventListener("keydown", this.keyAction);
   }
 
-  leaveView() {
+  leaveGameView() {
     this.isGameView = false;
-    if (this.camera && this.camera) {
-      this.camera.instance?.lookAt(0, 0, 0);
-      if (this.camera.controls) this.camera.controls.enabled = true;
-      this.lookAtPos.set(0, 0, 0);
-      this.camera.instance?.position.copy(this.prevCamPos);
-    }
-    Camera.isCtrlActive = false;
-    this.gameControls?.unlock();
-    this.gameControls?.disconnect();
+    this.gameCamCtrl?.unsetCamGameMode();
     this.unsetDebug();
-    this.disappear();
+    this.instance.visible = false;
 
     window.removeEventListener("keydown", this.keyAction);
     this.unset();
-    // if (isLocked(this.experience.canvas as HTMLCanvasElement)) {
-    //   (this.experience.canvas as any).exitPointerLock();
-    // }
-  }
-
-  moveCamera() {
-    // console.log(
-    //   this.mouse.mouseMoveEvent?.movementX,
-    //   this.mouse.mouseMoveEvent?.movementY
-    // );
-
-    if (
-      this.mouse?.mouseMoveEvent?.movementX &&
-      this.mouse?.mouseMoveEvent?.movementY
-    ) {
-      this.currentX += this.mouse.mouseMoveEvent.movementX;
-      if (this.currentX <= 0) {
-        this.currentX = 0;
-      }
-      if (this.currentX >= window.innerWidth * 10) {
-        this.currentX = window.innerWidth * 10;
-      }
-      this.currentY += this.mouse.mouseMoveEvent.movementY;
-
-      if (this.currentY <= 0) {
-        this.currentY = 0;
-      }
-      if (this.currentY >= window.innerHeight * 10) {
-        this.currentY = window.innerHeight * 10;
-      }
-    }
-    this.lookAtPosExpectedX =
-      (this.currentX - (window.innerWidth * 2) / 2) / (window.innerWidth / 2);
-    this.lookAtPosExpectedY =
-      -(this.currentY - (window.innerHeight * 2) / 2) /
-      ((window.innerHeight * 2) / 2);
   }
 
   setDebug() {
@@ -312,13 +196,6 @@ export default class SeedGame {
     }) as ButtonApi;
     stopButton.on("click", () => {
       this.stop();
-      this.camdebuging = false;
-    });
-    const debugCam = this.debugTab?.addButton({
-      title: "Toggle Cam mode",
-    }) as ButtonApi;
-    debugCam.on("click", () => {
-      this.camdebuging = !this.camdebuging;
     });
   }
 
