@@ -5,13 +5,12 @@ import { DirectionalLight, type Scene, type Vector3 } from "three";
 import type { FolderApi } from "tweakpane";
 import type { district } from "./../../models/district.model";
 import Earth from "./earthScene/Earth";
-import Character from "./homeScene/Character/Character";
 import type Renderer from "../Renderer";
 import HomeScene from "./homeScene/HomeScene";
 import CityScene from "./cityScene/CityScene";
 import type Camera from "./Camera";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import GrandmaDistrict from "./grandmaScene/grandmaDistrict";
+import GrandmaScene from "./grandmaScene/grandmaScene";
 // import type Ashes from "./entities/Ashes/Ashes";
 
 export default class World {
@@ -20,10 +19,10 @@ export default class World {
   private renderer: Renderer = this.experience.renderer as Renderer;
   private canvas: HTMLCanvasElement = this.experience
     .canvas as HTMLCanvasElement;
-  public earth: Earth | null = null;
+  public earthScene: Earth | null = null;
   public homeScene: HomeScene | null = null;
   public cityScene: CityScene | null = null;
-  public grandmaDistrict: GrandmaDistrict | null = null;
+  public grandmaScene: GrandmaScene | null = null;
   private debugTab: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
   public currentScene: district = "earth";
@@ -33,13 +32,34 @@ export default class World {
 
   constructor() {
     this.loaders.on("ready", () => {
-      this.earth = new Earth();
+      this.earthScene = new Earth();
       this.homeScene = new HomeScene();
       this.cityScene = new CityScene();
-      this.grandmaDistrict = new GrandmaDistrict();
+      this.grandmaScene = new GrandmaScene();
 
-      this.experience.activeScene = this.earth.scene;
-      this.experience.activeCamera = this.earth.camera;
+      const workOn = import.meta.env.VITE_WORK_ON;
+      switch (workOn) {
+        case "earth":
+          this.experience.activeScene = this.earthScene.scene;
+          this.experience.activeCamera = this.earthScene.camera;
+          break;
+        case "home":
+          this.experience.activeScene = this.homeScene.scene;
+          this.experience.activeCamera = this.homeScene.camera;
+          break;
+        case "grandma":
+          this.experience.activeScene = this.grandmaScene.scene;
+          this.experience.activeCamera = this.grandmaScene.camera;
+          break;
+        case "city":
+          this.experience.activeScene = this.cityScene.scene;
+          this.experience.activeCamera = this.cityScene.camera;
+          break;
+        default:
+          this.experience.activeScene = this.earthScene.scene;
+          this.experience.activeCamera = this.earthScene.camera;
+          break;
+      }
 
       this.setLight();
       this.setControls();
@@ -48,7 +68,7 @@ export default class World {
   }
 
   update() {
-    this.earth?.update();
+    this.earthScene?.update();
     this.homeScene?.update();
     if (this.isCtrlActive) this.controls?.update();
     // this.ashes?.update();
@@ -69,7 +89,7 @@ export default class World {
 
   setListener() {
     this.controls?.addEventListener("change", () => {
-      this.experience.world?.earth?.updateRelatedToCamera();
+      this.earthScene?.updateRelatedToCamera();
     });
   }
 
@@ -92,7 +112,7 @@ export default class World {
     const switchEarth = this.debugTab?.addButton({ title: "Earth" });
     const switchGrandma = this.debugTab?.addButton({ title: "Grandma" });
 
-    if (this.homeScene && this.earth) {
+    if (this.homeScene && this.earthScene) {
       switchHome?.on("click", () => {
         this.currentScene = "maison";
         this.experience.renderer?.changeScene(
@@ -110,15 +130,15 @@ export default class World {
       switchEarth?.on("click", () => {
         this.currentScene = "earth";
         this.experience.renderer?.changeScene(
-          this.earth?.scene as Scene,
-          this.earth?.camera as Camera
+          this.earthScene?.scene as Scene,
+          this.earthScene?.camera as Camera
         );
       });
       switchGrandma?.on("click", () => {
         this.currentScene = "mamie";
         this.experience.renderer?.changeScene(
-          this.grandmaDistrict?.scene as Scene,
-          this.grandmaDistrict?.camera as Camera
+          this.grandmaScene?.scene as Scene,
+          this.grandmaScene?.camera as Camera
         );
       });
     }
