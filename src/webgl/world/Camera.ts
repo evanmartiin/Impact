@@ -1,6 +1,6 @@
 import type Sizes from "@/webgl/controllers/Sizes";
 import anime from "animejs";
-import { PerspectiveCamera, Vector3 } from "three";
+import { PerspectiveCamera, Scene, Vector3 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Experience from "../Experience";
 
@@ -15,12 +15,11 @@ export default class Camera {
 
   private angle: number = 0;
 
-  constructor(position: Vector3) {
-    this.setInstance(position);
-    this.setControls();
+  constructor(position: Vector3, scene: Scene) {
+    this.setInstance(position, scene);
   }
 
-  setInstance(position: Vector3) {
+  setInstance(position: Vector3, scene: Scene) {
     this.instance = new PerspectiveCamera(
       35,
       this.sizes.width / this.sizes.height,

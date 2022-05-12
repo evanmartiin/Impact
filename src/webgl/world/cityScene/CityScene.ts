@@ -20,7 +20,7 @@ export default class CityScene {
 
   public scene: Scene = new Scene();
   public cameraPos: Vector3 = new Vector3(50, 50, 50);
-  public camera: Camera = new Camera(this.cameraPos);
+  public camera: Camera = new Camera(this.cameraPos, this.scene);
   public scoreboard: Scoreboard = new Scoreboard();
   public trash: Trash | null = null;
 

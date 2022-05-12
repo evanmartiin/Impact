@@ -4,12 +4,10 @@ import Experience from "@/webgl/Experience";
 import {
   DirectionalLight,
   Group,
-  PerspectiveCamera,
   Scene,
   Vector3,
   Texture,
   sRGBEncoding,
-  MeshBasicMaterial,
   Mesh,
   ShaderMaterial,
 } from "three";
@@ -31,9 +29,9 @@ export default class HomeScene {
   public game: SeedGame | null = null;
   public scene: Scene = new Scene();
   public cameraPos: Vector3 = new Vector3(50, 50, 50);
-  public camera: Camera = new Camera(this.cameraPos);
   private models: GLTF[] = [];
   private textures: Texture[] = [];
+  public camera: Camera = new Camera(this.cameraPos, this.scene);
 
   constructor() {
     if (this.camera.instance) this.game = new SeedGame(this.scene, this.camera);

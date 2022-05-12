@@ -152,6 +152,11 @@ const Sources: ISource[] = [
     type: "gltfModel",
     path: "/models/zones.glb",
   },
+  {
+    name: "grandma-model",
+    type: "gltfModel",
+    path: "/models/grandma.glb",
+  },
 
   {
     name: "earth-map",
@@ -167,6 +172,11 @@ const Sources: ISource[] = [
     name: "brazier-texture",
     type: "texture",
     path: "/textures/fire.jpeg",
+  },
+  {
+    name: "paper-texture",
+    type: "texture",
+    path: "/textures/paper.jpg",
   },
 ];
 

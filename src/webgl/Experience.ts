@@ -79,7 +79,6 @@ export default class Experience {
 
   update() {
     // if (this.time) this.animationController?.update(this.time?.delta);
-    this.activeCamera?.update();
     this.world?.update();
     this.renderer?.update();
     this.debug?.update();
@@ -107,7 +106,7 @@ export default class Experience {
       }
     });
     // this.world?.destroy();
-    this.activeCamera?.controls?.dispose();
+    this.world?.controls?.dispose();
     this.renderer?.instance?.dispose();
 
     if (this.debug?.active) this.debug.ui?.dispose();
