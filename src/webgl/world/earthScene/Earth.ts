@@ -47,7 +47,6 @@ import calcGPSFromPos from "@/utils/calcGPSFromPos";
 import anime from "animejs";
 import calcPosFromGPS from "@/utils/calcPosFromGPS";
 import Ashes from "../entities/Ashes/Ashes";
-import Aurora from "./Aurora/Aurora";
 
 export default class Earth extends EventEmitter {
   private experience: Experience = new Experience();
@@ -88,7 +87,6 @@ export default class Earth extends EventEmitter {
   public ISS: ISS | null = null;
   public stars: Stars | null = null;
   public clouds: Clouds | null = null;
-  public aurora: Aurora | null = null;
 
   private hoveredDistrict = this.experience.renderer?.hoveredDistrict;
   private shift = { lat: 30, lon: -20 };
@@ -127,7 +125,6 @@ export default class Earth extends EventEmitter {
     this.ISS = new ISS(this.scene);
     this.stars = new Stars(this.scene);
     this.clouds = new Clouds(3, this.scene);
-    this.aurora = new Aurora(this.scene);
 
     this.setDebug();
   }
@@ -316,7 +313,6 @@ export default class Earth extends EventEmitter {
     this.fire?.update();
     this.stars?.update();
     this.clouds?.update();
-    this.aurora?.update();
   }
 
   updateRelatedToCamera() {
