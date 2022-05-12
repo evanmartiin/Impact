@@ -28,7 +28,7 @@ export default class World {
   private debug: Debug = this.experience.debug as Debug;
   public currentScene: district = "earth";
   public controls: OrbitControls | null = null;
-  public static isCtrlActive = false;
+  public isCtrlActive = true;
   // public ashes: Ashes | null = null;
 
   constructor() {
@@ -50,7 +50,7 @@ export default class World {
   update() {
     this.earth?.update();
     this.homeScene?.update();
-    if (World.isCtrlActive) this.controls?.update();
+    if (this.isCtrlActive) this.controls?.update();
     // this.ashes?.update();
   }
 

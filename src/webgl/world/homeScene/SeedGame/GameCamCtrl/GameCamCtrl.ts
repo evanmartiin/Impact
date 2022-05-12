@@ -2,7 +2,7 @@ import { PointerLockControls } from "three/examples/jsm/controls/PointerLockCont
 import { isLocked, setLockMouseMode } from "@/utils/lockMouseMode";
 import { Euler, Vector3, PerspectiveCamera } from "three";
 import type Camera from "@/webgl/world/Camera";
-import World from "@/webgl/world/World";
+import type World from "@/webgl/world/World";
 import type Mouse from "@/webgl/controllers/Mouse";
 import Experience from "@/webgl/Experience";
 import type Renderer from "@/webgl/Renderer";
@@ -43,7 +43,9 @@ export class GameCamCtrl {
 
   lockMouse() {
     // Desactive orbit control
-    World.isCtrlActive = false;
+    if (this.world) {
+      this.world.isCtrlActive = false;
+    }
     if (this.experience.world?.controls)
       this.experience.world.controls.enabled = false;
 
@@ -57,7 +59,9 @@ export class GameCamCtrl {
 
   unlockMouse() {
     // Active orbit control
-    World.isCtrlActive = true;
+    if (this.world) {
+      this.world.isCtrlActive = true;
+    }
     if (this.experience.world?.controls)
       this.experience.world.controls.enabled = true;
     if (isLocked(this.experience.canvas as HTMLCanvasElement)) {
