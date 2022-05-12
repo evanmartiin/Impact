@@ -1,7 +1,8 @@
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
 import { isLocked, setLockMouseMode } from "@/utils/lockMouseMode";
 import { Euler, Vector3, PerspectiveCamera } from "three";
-import Camera from "@/webgl/world/Camera";
+import type Camera from "@/webgl/world/Camera";
+import World from "@/webgl/world/World";
 import type Mouse from "@/webgl/controllers/Mouse";
 import Experience from "@/webgl/Experience";
 import type Renderer from "@/webgl/Renderer";
@@ -11,6 +12,7 @@ export class GameCamCtrl {
   private renderer: Renderer = this.experience.renderer as Renderer;
   private mouse: Mouse = this.experience.mouse as Mouse;
   private camera: Camera | null = null;
+  private world: World | null = null;
   private _euler = new Euler(0, 0, 0, "YXZ");
   private _PI_2 = Math.PI / 2;
   private pointerSpeed = 1.0;
@@ -32,7 +34,7 @@ export class GameCamCtrl {
 
   constructor(camera: Camera) {
     this.camera = camera;
-    this.mouse.on("mousemove", () => this.moveCamera());
+    this.world = this.experience.world;
     this.gameControls = new PointerLockControls(
       camera.instance as PerspectiveCamera,
       this.renderer.canvas
@@ -41,8 +43,9 @@ export class GameCamCtrl {
 
   lockMouse() {
     // Desactive orbit control
-    Camera.isCtrlActive = false;
-    if (this.camera?.controls) this.camera.controls.enabled = false;
+    World.isCtrlActive = false;
+    if (this.experience.world?.controls)
+      this.experience.world.controls.enabled = false;
 
     setLockMouseMode(this.experience.canvas as HTMLCanvasElement);
     if (!isLocked(this.experience.canvas as HTMLCanvasElement)) {
@@ -54,8 +57,9 @@ export class GameCamCtrl {
 
   unlockMouse() {
     // Active orbit control
-    Camera.isCtrlActive = true;
-    if (this.camera?.controls) this.camera.controls.enabled = true;
+    World.isCtrlActive = true;
+    if (this.experience.world?.controls)
+      this.experience.world.controls.enabled = true;
     if (isLocked(this.experience.canvas as HTMLCanvasElement)) {
       (this.experience.canvas as any).exitPointerLock();
     }
@@ -118,7 +122,7 @@ export class GameCamCtrl {
 
       if (this.camera?.instance) this.camera.instance.rotation.z += Math.PI * 2;
 
-      console.log(this._euler);
+      // console.log(this._euler);
       if (this.camera?.instance)
         this.camera.instance.quaternion.setFromEuler(this._euler);
     }

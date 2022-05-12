@@ -92,21 +92,21 @@ export default class Earth extends EventEmitter {
   private shift = { lat: 30, lon: -20 };
   private districtPositions = [
     {
-      name: "grandma",
+      name: "mamie",
       pos: {
         lat: -10 - this.shift.lat,
         lon: 170 - this.shift.lon,
       },
     },
     {
-      name: "city",
+      name: "ville",
       pos: {
         lat: 30 - this.shift.lat,
         lon: -65 - this.shift.lon,
       },
     },
     {
-      name: "house",
+      name: "maison",
       pos: {
         lat: 40 - this.shift.lat,
         lon: 30 - this.shift.lon,
@@ -153,9 +153,9 @@ export default class Earth extends EventEmitter {
         model.scene.traverse((child) => {
           if (child instanceof Mesh && this.textures) {
             if (
-              child.name === "house" ||
-              child.name === "city" ||
-              child.name === "grandma"
+              child.name === "maison" ||
+              child.name === "ville" ||
+              child.name === "mamie"
             ) {
               const wiggleMaterial = new ShaderMaterial({
                 uniforms: {
@@ -165,11 +165,11 @@ export default class Earth extends EventEmitter {
                 vertexShader: wiggleVertex,
                 fragmentShader: wiggleFragment,
               });
-              if (child.name === "city") {
+              if (child.name === "ville") {
                 child.rotateY(Math.PI * 0.13);
-              } else if (child.name === "house") {
+              } else if (child.name === "maison") {
                 child.rotateY(Math.PI * 0.65);
-              } else if (child.name === "grandma") {
+              } else if (child.name === "mamie") {
                 wiggleMaterial.side = DoubleSide;
                 child.rotateY(Math.PI * -0.1);
               }

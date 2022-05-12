@@ -1,1 +1,1 @@
-export type district = "earth" | "house" | "grandma" | "city";
+export type district = "earth" | "maison" | "mamie" | "ville";
