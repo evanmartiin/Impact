@@ -21,6 +21,10 @@ onMounted(() => {
   const experience = new Experience(document.getElementById("webgl") as HTMLCanvasElement);
   const store = webglStore();
   store.$state = { experience };
+
+  signal.on("change_scene", () => {
+    selectedDistrict.value = "";
+  })
   
   signal.on("loaders_ready", () => {
     signal.on("district_selected", (district: any) => {
@@ -28,6 +32,12 @@ onMounted(() => {
     })
     signal.on("no_district_selected", () => {
       selectedDistrict.value = "";
+    })
+    signal.on("district_hovered", () => {
+      document.body.style.cursor = 'pointer';
+    })
+    signal.on("no_district_hovered", () => {
+      document.body.style.cursor = 'initial';
     })
   })
 });

@@ -74,6 +74,7 @@ export default class Earth {
   public clouds: Clouds | null = null;
 
   private hoveredDistrict = this.experience.renderer?.hoveredScene;
+  private isHoveringDistrict: boolean = false;
   private shift = { lat: 30, lon: -20 };
   private districtPositions = [
     {
@@ -291,6 +292,19 @@ export default class Earth {
           (district) => district.name === this.hoveredDistrict?.name
         )[0].pos;
         this.rotateTo(districtPos);
+      }
+    });
+
+    signal.on("mouse_move", () => {
+      this.getIntersect();
+      this.hoveredDistrict = this.experience.renderer?.hoveredScene;
+      if (this.hoveredDistrict) {
+        signal.emit("district_hovered");
+        this.isHoveringDistrict = true;
+      }
+      if (this.isHoveringDistrict && !this.hoveredDistrict) {
+        signal.emit("no_district_hovered");
+        this.isHoveringDistrict = false;
       }
     });
 

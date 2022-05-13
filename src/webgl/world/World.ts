@@ -1,24 +1,19 @@
 import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
-import { DirectionalLight, type Scene, type Vector3 } from "three";
+import { DirectionalLight, type Scene } from "three";
 import type { FolderApi } from "tweakpane";
 import type { district } from "./../../models/district.model";
 import Earth from "./earthScene/Earth";
-import Character from "./homeScene/Character/Character";
-import type Renderer from "../Renderer";
 import HomeScene from "./homeScene/HomeScene";
 import CityScene from "./cityScene/CityScene";
 import type Camera from "./Camera";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import GrandmaDistrict from "./grandmaScene/grandmaDistrict";
 import signal from 'signal-js';
-// import type Ashes from "./entities/Ashes/Ashes";
 
 export default class World {
   private experience: Experience = new Experience();
-  private renderer: Renderer = this.experience.renderer as Renderer;
-  private canvas: HTMLCanvasElement = this.experience
-    .canvas as HTMLCanvasElement;
+  private canvas: HTMLCanvasElement = this.experience.canvas as HTMLCanvasElement;
   public earth: Earth | null = null;
   public homeScene: HomeScene | null = null;
   public cityScene: CityScene | null = null;
@@ -28,7 +23,6 @@ export default class World {
   public currentScene: district = "earth";
   public controls: OrbitControls | null = null;
   public isCtrlActive = true;
-  // public ashes: Ashes | null = null;
 
   constructor() {
     signal.on("loaders_ready", () => {
@@ -40,6 +34,10 @@ export default class World {
       this.experience.activeScene = this.earth.scene;
       this.experience.activeCamera = this.earth.camera;
 
+      signal.on("change_scene", (name: district) => {
+        this.changeScene(name);
+      })
+
       this.setLight();
       this.setControls();
       this.setDebug();
@@ -50,17 +48,12 @@ export default class World {
     this.earth?.update();
     this.homeScene?.update();
     if (this.isCtrlActive) this.controls?.update();
-    // this.ashes?.update();
   }
 
   setControls() {
     if (this.experience.activeCamera?.instance && this.canvas) {
-      this.controls = new OrbitControls(
-        this.experience.activeCamera.instance,
-        this.canvas
-      );
+      this.controls = new OrbitControls(this.experience.activeCamera.instance, this.canvas);
       this.controls.enableDamping = true;
-      // this.controls.enableZoom = false;
       this.controls.enablePan = false;
       this.setListener();
     }
@@ -82,6 +75,26 @@ export default class World {
     this.experience.activeScene?.add(sunLight);
   }
 
+  changeScene(name: district) {
+    this.currentScene = name;
+    switch (name) {
+      case "earth":
+        this.experience.renderer?.changeScene(this.earth?.scene as Scene, this.earth?.camera as Camera);
+        break;
+      case "maison":
+        this.experience.renderer?.changeScene(this.homeScene?.scene as Scene, this.homeScene?.camera as Camera);
+        break;
+      case "ville":
+        this.experience.renderer?.changeScene(this.cityScene?.scene as Scene, this.cityScene?.camera as Camera);
+        break;
+      case "mamie":
+        this.experience.renderer?.changeScene(this.grandmaDistrict?.scene as Scene, this.grandmaDistrict?.camera as Camera);
+        break;
+      default:
+        break;
+    }
+  }
+
   setDebug() {
     this.debugTab = this.debug.ui?.pages[0].addFolder({
       title: "Change scene",
@@ -92,34 +105,10 @@ export default class World {
     const switchGrandma = this.debugTab?.addButton({ title: "Grandma" });
 
     if (this.homeScene && this.earth) {
-      switchHome?.on("click", () => {
-        this.currentScene = "maison";
-        this.experience.renderer?.changeScene(
-          this.homeScene?.scene as Scene,
-          this.homeScene?.camera as Camera
-        );
-      });
-      switchCity?.on("click", () => {
-        this.currentScene = "ville";
-        this.experience.renderer?.changeScene(
-          this.cityScene?.scene as Scene,
-          this.cityScene?.camera as Camera
-        );
-      });
-      switchEarth?.on("click", () => {
-        this.currentScene = "earth";
-        this.experience.renderer?.changeScene(
-          this.earth?.scene as Scene,
-          this.earth?.camera as Camera
-        );
-      });
-      switchGrandma?.on("click", () => {
-        this.currentScene = "mamie";
-        this.experience.renderer?.changeScene(
-          this.grandmaDistrict?.scene as Scene,
-          this.grandmaDistrict?.camera as Camera
-        );
-      });
+      switchHome?.on("click", () => this.changeScene("maison"));
+      switchCity?.on("click", () => this.changeScene("ville"));
+      switchEarth?.on("click", () => this.changeScene("earth"));
+      switchGrandma?.on("click", () => this.changeScene("mamie"));
     }
   }
 }

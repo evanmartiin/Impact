@@ -1,5 +1,6 @@
 <script setup>
 import { webglStore } from '@/stores/webglStore'
+import signal from 'signal-js';
 
 const props = defineProps({
   name: {
@@ -8,13 +9,17 @@ const props = defineProps({
   }
 })
 
+const changeScene = (name) => {
+    signal.emit("change_scene", name);
+}
+
 const store = webglStore();
 </script>
 
 <template>
 <div class="district-card">
     <h2>{{ props.name }}</h2>
-    <button @click="() => { store.experience.world.changeScene(props.name) }">Move here</button>
+    <button @click="() => changeScene(props.name)">Move here</button>
 </div>
 </template>
 
