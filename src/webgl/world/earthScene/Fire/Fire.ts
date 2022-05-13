@@ -2,7 +2,6 @@ import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
 import { Scene, Mesh, CylinderBufferGeometry, DoubleSide, TextureLoader, Color, AdditiveBlending } from "three";
 import type { FolderApi } from "tweakpane";
-import type Time from "@/webgl/controllers/Time";
 import vert from './shaders/vert.glsl?raw'
 import frag from './shaders/frag.glsl?raw'
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
@@ -10,7 +9,6 @@ import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMateria
 export default class Fire {
   private experience: Experience = new Experience();
   private scene: Scene | null = null;
-  private time: Time = this.experience.time as Time;
   private debug: Debug = this.experience.debug as Debug;
   private debugTab: FolderApi | undefined = undefined;
   private geometry: CylinderBufferGeometry | null = null;
@@ -32,7 +30,6 @@ export default class Fire {
       transparent: true,
       blending: AdditiveBlending,
       uniforms: {
-        uTime: { value: this.time?.elapsed },
         nbWaves: { value: 2. },
         smoothness: { value: 5. },
         fireColor: { value: new Color('#ff8a1e') },
@@ -48,12 +45,6 @@ export default class Fire {
     });
     this.mesh = new Mesh(this.geometry, this.material);
     this.mesh.position.set(0, 3, 0);
-  }
-
-  update() {
-    if (this.material) {
-      this.material.uniforms.uTime.value = this.time.elapsed;
-    }
   }
 
   setDebug() {

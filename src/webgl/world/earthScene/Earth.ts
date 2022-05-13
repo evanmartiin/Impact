@@ -311,7 +311,6 @@ export default class Earth extends EventEmitter {
     };
 
     this.ISS?.update();
-    this.fire?.update();
     this.clouds?.update();
   }
 
