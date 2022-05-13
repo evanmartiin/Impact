@@ -10,6 +10,7 @@ import Renderer from "./Renderer";
 import World from "./world/World";
 import type Camera from "./world/Camera";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
+import signal from 'signal-js';
 
 declare global {
   interface Window {
@@ -54,12 +55,12 @@ export default class Experience {
     this.renderer = new Renderer();
 
     // Resize event
-    this.sizes.on("resize", () => {
+    signal.on("resize", () => {
       this.resize();
     });
 
     // Time tick event
-    this.time.on("tick", () => {
+    signal.on("tick", () => {
       this.update();
     });
 
@@ -87,8 +88,8 @@ export default class Experience {
   }
 
   destroy() {
-    this.sizes?.off("resize");
-    this.time?.off("tick");
+    signal.off("resize");
+    signal.off("tick");
     this.mouse?.destroy();
     // Traverse the whole scene
     this.activeScene?.traverse((child) => {

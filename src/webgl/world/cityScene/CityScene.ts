@@ -10,6 +10,7 @@ import type Debug from "@/webgl/controllers/Debug";
 import type { TabPageApi } from "tweakpane";
 import Scoreboard from "./Scoreboard";
 import Camera from "../Camera";
+import signal from 'signal-js';
 
 export default class CityScene {
   private experience: Experience = new Experience();
@@ -54,7 +55,7 @@ export default class CityScene {
       this.scene.add(Waste.wasteMeshes);
 
       this.scoreboard.startTimer(CityScene.MAX_TIME);
-      this.scoreboard.on("timer_ended", () => {
+      signal.on("timer_ended", () => {
         this.stopGame();
       });
 
@@ -65,7 +66,7 @@ export default class CityScene {
   stopGame() {
     if (CityScene.isPlaying) {
       console.log("Ended, score:", this.scoreboard?.score);
-      this.scoreboard?.off("timer_ended");
+      signal.off("timer_ended");
 
       this.trash?.destroy();
       this.trash = null;

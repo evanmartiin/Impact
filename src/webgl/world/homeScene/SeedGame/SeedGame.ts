@@ -11,6 +11,7 @@ import Targets from "./Targets/Targets";
 import Seed from "./Seed/Seed";
 import type Renderer from "@/webgl/Renderer";
 import Helper from "./Helper/Helper";
+import signal from 'signal-js';
 
 export default class SeedGame {
   private experience: Experience = new Experience();
@@ -94,7 +95,7 @@ export default class SeedGame {
       this.init();
     } else if (!this.isSet) {
       this.isSet = true;
-      this.mouse.on("mousedown", () => this.mouseClick());
+      signal.on("mouse_down", () => this.mouseClick());
     }
   }
 
@@ -138,8 +139,8 @@ export default class SeedGame {
   unset() {
     if (this.isSet) {
       this.isSet = false;
-      // this.mouse.off("mousemove");
-      this.mouse.off("mousedown");
+      // signal.off("mouse_move");
+      signal.off("mouse_down");
     }
   }
 

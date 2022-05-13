@@ -2,21 +2,7 @@ import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import Camera from "@/webgl/world/Camera";
 import type Renderer from "@/webgl/Renderer";
-import {
-  Group,
-  MeshBasicMaterial,
-  Scene,
-  Mesh,
-  Texture,
-  sRGBEncoding,
-  DoubleSide,
-  type IUniform,
-  Vector2,
-  Color,
-  type Shader,
-  PlaneBufferGeometry,
-  Vector3,
-} from "three";
+import { Group, MeshBasicMaterial, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, type IUniform, Vector2, Color, type Shader, PlaneBufferGeometry, Vector3 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Time from "@/webgl/controllers/Time";
 import Fire from "./Fire/Fire";
@@ -40,15 +26,14 @@ import brazierVertex from "./shaders/brazier/brazierVertex.glsl?raw";
 import brazierParsFragment from "./shaders/brazier/brazierParsFragment.glsl?raw";
 import brazierFragment from "./shaders/brazier/brazierFragment.glsl?raw";
 
-import EventEmitter from "@/webgl/controllers/EventEmitter";
 import type { GPSPos } from "@/models/webgl/GPSPos.model";
 import calcGPSFromPos from "@/utils/calcGPSFromPos";
 import anime from "animejs";
 import calcPosFromGPS from "@/utils/calcPosFromGPS";
-import Ashes from "../entities/Ashes/Ashes";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
+import signal from 'signal-js';
 
-export default class Earth extends EventEmitter {
+export default class Earth {
   private experience: Experience = new Experience();
   public scene: Scene = new Scene();
   public cameraPos: Vector3 = new Vector3(0, 4, 6);
@@ -115,8 +100,6 @@ export default class Earth extends EventEmitter {
   ];
 
   constructor() {
-    super();
-
     this.setMesh();
     this.setHalo();
     this.setEvents();
@@ -186,7 +169,6 @@ export default class Earth extends EventEmitter {
               // this.addCustomFog(shader);
               this.addBrazierShader(shader);
             }
-            // child.material.onBeforeCompile = this.addBrazierShader;
           }
         });
         this.earthGroup?.add(model.scene);
@@ -202,11 +184,39 @@ export default class Earth extends EventEmitter {
       }
     });
 
-    this.mouse.on("mouse_grab", () => {
-      this.wiggleShaderUniforms.uWiggleDirection.value =
-        this.mouse.mouseInertia.clone();
+    signal.on("mouse_grab", () => {
+      this.wiggleShaderUniforms.uWiggleDirection.value = this.mouse.mouseInertia.clone();
     });
     this.scene?.add(this.earthGroup);
+
+    // this.earthGroup.position.y = -2;
+    // this.earthGroup.scale.set(0, 0, 0);
+    // this.earthGroup.rotation.y = Math.PI;
+    // signal.on("start_experience", () => this.appear());    
+  }
+
+  appear() {
+    const tl = anime.timeline({});
+    tl.add({
+      targets: this.earthGroup.position,
+      y: 0,
+      duration: 1000,
+      easing: 'steps(20)'
+    }, 0);
+    tl.add({
+      targets: this.earthGroup.scale,
+      x: 1,
+      y: 1,
+      z: 1,
+      duration: 1000,
+      easing: 'steps(20)'
+    }, 0);
+    tl.add({
+      targets: this.earthGroup.rotation,
+      y: 0,
+      duration: 1000,
+      easing: 'steps(20)'
+    }, 0);
   }
 
   addCustomFog = (shader: Shader) => {
@@ -271,12 +281,12 @@ export default class Earth extends EventEmitter {
   }
 
   setEvents() {
-    this.mouse.on("mousedown", () => this.getIntersect());
+    signal.on("mouse_down", () => this.getIntersect());
 
-    this.mouse.on("mouseup", () => {
+    signal.on("mouse_up", () => {
       this.hoveredDistrict = this.experience.renderer?.hoveredScene;
       if (this.hoveredDistrict) {
-        this.trigger("district_selected", [this.hoveredDistrict]);
+        signal.emit("district_selected", this.hoveredDistrict);
         const districtPos = this.districtPositions.filter(
           (district) => district.name === this.hoveredDistrict?.name
         )[0].pos;
@@ -284,15 +294,15 @@ export default class Earth extends EventEmitter {
       }
     });
 
-    this.mouse.on("mousegrab", () => {
-      this.trigger("no_district_selected");
+    signal.on("mouse_grab", () => {
+      signal.emit("no_district_selected");
     });
   }
 
   unSetEvents() {
-    this.mouse.off("mousedown");
-    this.mouse.off("mouseup");
-    this.mouse.off("mousegrab");
+    signal.off("mouse_down");
+    signal.off("mouse_up");
+    signal.off("mouse_grab");
   }
 
   getIntersect() {

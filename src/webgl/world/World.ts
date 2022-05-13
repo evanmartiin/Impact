@@ -1,5 +1,4 @@
 import type Debug from "@/webgl/controllers/Debug";
-import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import { DirectionalLight, type Scene, type Vector3 } from "three";
 import type { FolderApi } from "tweakpane";
@@ -12,11 +11,11 @@ import CityScene from "./cityScene/CityScene";
 import type Camera from "./Camera";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import GrandmaDistrict from "./grandmaScene/grandmaDistrict";
+import signal from 'signal-js';
 // import type Ashes from "./entities/Ashes/Ashes";
 
 export default class World {
   private experience: Experience = new Experience();
-  private loaders: Loaders = this.experience.loaders as Loaders;
   private renderer: Renderer = this.experience.renderer as Renderer;
   private canvas: HTMLCanvasElement = this.experience
     .canvas as HTMLCanvasElement;
@@ -32,7 +31,7 @@ export default class World {
   // public ashes: Ashes | null = null;
 
   constructor() {
-    this.loaders.on("ready", () => {
+    signal.on("loaders_ready", () => {
       this.earth = new Earth();
       this.homeScene = new HomeScene();
       this.cityScene = new CityScene();
