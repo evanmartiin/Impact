@@ -1,11 +1,12 @@
 import Experience from "@/webgl/Experience";
-import { Scene, Mesh, Texture, sRGBEncoding, MeshBasicMaterial, Vector3, ShaderMaterial } from "three";
+import { Scene, Mesh, Texture, sRGBEncoding, MeshBasicMaterial, Vector3 } from "three";
 import type Time from "@/webgl/controllers/Time";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import Trail from "./Trail";
 import type Debug from "@/webgl/controllers/Debug";
 import type { FolderApi } from "tweakpane";
+import type { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 
 export default class ISS {
   private experience: Experience = new Experience();
@@ -74,7 +75,7 @@ export default class ISS {
       radiusInput?.on("change", (e) => {
         ISS.radiusFromEarth = e.value;
         if (this.trail?.mesh) {
-          (this.trail.mesh.material as ShaderMaterial).uniforms.uRadius.value = e.value;
+          (this.trail.mesh.material as ShaderBaseMaterial).uniforms.uRadius.value = e.value;
         }
       })
     }

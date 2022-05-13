@@ -12,7 +12,6 @@ import {
   DoubleSide,
   type IUniform,
   Vector2,
-  ShaderMaterial,
   Color,
   type Shader,
   PlaneBufferGeometry,
@@ -47,6 +46,7 @@ import calcGPSFromPos from "@/utils/calcGPSFromPos";
 import anime from "animejs";
 import calcPosFromGPS from "@/utils/calcPosFromGPS";
 import Ashes from "../entities/Ashes/Ashes";
+import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 
 export default class Earth extends EventEmitter {
   private experience: Experience = new Experience();
@@ -157,7 +157,7 @@ export default class Earth extends EventEmitter {
               child.name === "ville" ||
               child.name === "mamie"
             ) {
-              const wiggleMaterial = new ShaderMaterial({
+              const wiggleMaterial = new ShaderBaseMaterial({
                 uniforms: {
                   ...this.wiggleShaderUniforms,
                   uBakedTexture: { value: this.textures[index] },
@@ -165,6 +165,7 @@ export default class Earth extends EventEmitter {
                 vertexShader: wiggleVertex,
                 fragmentShader: wiggleFragment,
               });
+              
               if (child.name === "ville") {
                 child.rotateY(Math.PI * 0.13);
               } else if (child.name === "maison") {
@@ -311,7 +312,6 @@ export default class Earth extends EventEmitter {
 
     this.ISS?.update();
     this.fire?.update();
-    this.stars?.update();
     this.clouds?.update();
   }
 

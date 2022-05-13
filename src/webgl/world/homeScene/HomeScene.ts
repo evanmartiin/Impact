@@ -1,3 +1,4 @@
+import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
@@ -9,7 +10,6 @@ import {
   Texture,
   sRGBEncoding,
   Mesh,
-  ShaderMaterial,
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
@@ -51,7 +51,7 @@ export default class HomeScene {
         this.textures[index].encoding = sRGBEncoding;
         model.scene.traverse((child) => {
           if (child instanceof Mesh && this.textures) {
-            const bakedMaterial = new ShaderMaterial({
+            const bakedMaterial = new ShaderBaseMaterial({
               transparent: true,
               fragmentShader: fragment,
               vertexShader: vertex,

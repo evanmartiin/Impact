@@ -2,7 +2,7 @@ attribute vec2 aParams;
 
 uniform float uSize;
 uniform float uScale;
-uniform float uTime;
+uniform float uAge;
 
 varying vec4 vPosition;
 varying float vLifespan;
@@ -148,7 +148,7 @@ void main() {
     float lifespan = aParams.x;
     float randOffset = aParams.y;
 
-    vec3 transformed = position + cnoise(vec4(position, uTime * .0001 * randOffset)) * 3.;
+    vec3 transformed = position + cnoise(vec4(position, uAge * .0001 * randOffset)) * 3.;
 
     vec4 modelPosition = modelMatrix * vec4(transformed, 1.);
     vec4 viewPosition = viewMatrix * modelPosition;
