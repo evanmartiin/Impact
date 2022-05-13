@@ -1,20 +1,19 @@
 import Experience from "@/webgl/Experience";
 import vert from './trailShaders/vert.glsl?raw'
 import frag from './trailShaders/frag.glsl?raw'
-import { Vector3, InstancedBufferGeometry, InstancedBufferAttribute, ShaderMaterial, DoubleSide, Scene, Float32BufferAttribute, AdditiveBlending, Points, type IUniform } from "three";
-import type Time from "@/webgl/controllers/Time";
+import { Vector3, InstancedBufferGeometry, InstancedBufferAttribute, Scene, Float32BufferAttribute, AdditiveBlending, Points, type IUniform } from "three";
 import type Debug from "@/webgl/controllers/Debug";
 import type { FolderApi } from "tweakpane";
+import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 
 export default class Trail {
   private experience: Experience = new Experience();
   private scene: Scene | null = null;
-  private time: Time = this.experience.time as Time;
   private debug: Debug = this.experience.debug as Debug;
   private debugTab: FolderApi | undefined = undefined;
 
   private geometry: InstancedBufferGeometry | null = null;
-  private material: ShaderMaterial | null = null;
+  private material: ShaderBaseMaterial | null = null;
 
   public mesh: Points | null = null;
 
@@ -80,9 +79,8 @@ export default class Trail {
   }
 
   setMaterial(ISSPosition: Vector3, radiusFromEarth: number) {
-    this.material = new ShaderMaterial({
+    this.material = new ShaderBaseMaterial({
       uniforms: {
-        uTime: { value: this.time?.elapsed },
         uISSPos: { value: ISSPosition },
         uRadius: { value: radiusFromEarth },
         uLength: { value: .5 },
@@ -107,7 +105,6 @@ export default class Trail {
 
   update(ISSPosition: Vector3) {
     if (this.material) {
-      this.material.uniforms.uTime.value = this.time.elapsed;
       this.material.uniforms.uISSPos.value = ISSPosition;
     }
   }

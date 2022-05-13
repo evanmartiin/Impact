@@ -6,12 +6,12 @@ import {
   DoubleSide,
   Mesh,
   Group,
-  ShaderMaterial,
 } from "three";
 import type { FolderApi } from "tweakpane";
 
 import fragment from "./shaders/fragment.glsl?raw";
 import vertex from "./shaders/vertex.glsl?raw";
+import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 
 export default class SeedFocus {
   private experience: Experience = new Experience();
@@ -22,7 +22,7 @@ export default class SeedFocus {
   private isInit = false;
   public instance: Group = new Group();
   private distanceCurve: Mesh | null = null;
-  private distanceCurveMat: ShaderMaterial | null = null;
+  private distanceCurveMat: ShaderBaseMaterial | null = null;
   private distanceCurveGeo: PlaneGeometry | null = null;
 
   constructor(scene: Scene) {
@@ -31,7 +31,7 @@ export default class SeedFocus {
 
   setDistanceCurve() {
     this.distanceCurveGeo = new PlaneGeometry(1, 1);
-    this.distanceCurveMat = new ShaderMaterial({
+    this.distanceCurveMat = new ShaderBaseMaterial({
       fragmentShader: fragment,
       vertexShader: vertex,
       side: DoubleSide,

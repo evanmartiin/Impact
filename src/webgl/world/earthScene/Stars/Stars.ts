@@ -1,19 +1,18 @@
 import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
-import { Scene, BufferGeometry, Points, BufferAttribute, ShaderMaterial } from "three";
+import { Scene, BufferGeometry, Points, BufferAttribute } from "three";
 import type { FolderApi } from "tweakpane";
-import type Time from "@/webgl/controllers/Time";
 import vert from './shaders/vert.glsl?raw'
 import frag from './shaders/frag.glsl?raw'
+import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 
 export default class Stars {
   private experience: Experience = new Experience();
   private scene: Scene | null = null;
-  private time: Time = this.experience.time as Time;
   private debug: Debug = this.experience.debug as Debug;
   private debugTab: FolderApi | undefined = undefined;
   private geometry: BufferGeometry | null = null;
-  private material: ShaderMaterial | null = null;
+  private material: ShaderBaseMaterial | null = null;
   private mesh: Points | null = null;
 
   constructor(scene: Scene) {
@@ -43,9 +42,8 @@ export default class Stars {
     this.geometry.setAttribute('position', new BufferAttribute(positions, 3));
     this.geometry.setAttribute('aParams', new BufferAttribute(params, 3));
 
-    this.material = new ShaderMaterial({
+    this.material = new ShaderBaseMaterial({
       uniforms: {
-        uTime: { value: this.time.elapsed },
         uSize: { value: this.experience.renderer?.instance?.getPixelRatio() },
         uScale: { value: 20. },
         uRadius: { value: 1. },
@@ -58,12 +56,6 @@ export default class Stars {
     })
     this.mesh = new Points(this.geometry, this.material);
     this.scene?.add(this.mesh);
-  }
-
-  update() {
-    if (this.material) {
-      this.material.uniforms.uTime.value = this.time.elapsed;
-    }
   }
 
   setDebug() {
