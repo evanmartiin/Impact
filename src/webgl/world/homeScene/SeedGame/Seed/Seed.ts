@@ -4,9 +4,11 @@ import {
   MeshStandardMaterial,
   PerspectiveCamera,
   Vector3,
+  Vector2,
   Scene,
   SphereGeometry,
   Mesh,
+  ArrowHelper,
 } from "three";
 
 export default class Seed {
@@ -19,11 +21,16 @@ export default class Seed {
   private mesh: Mesh | null = null;
   private isInit = false;
   private targetPoint: Vector3 | null = null;
+  private cameraDirection: Vector3 = new Vector3();
+
   private isTravelling = false;
   private isVisible = false;
   private shotAngle = 0;
   private deltaMove = 0;
   private maxX = 0;
+  private forPoint = new Vector3(0, 0, 30);
+  private arrowCam: ArrowHelper | null = null;
+  private arrowOri: ArrowHelper | null = null;
 
   constructor(scene: Scene) {
     this.scene = scene;
@@ -32,10 +39,35 @@ export default class Seed {
     this.mesh = new Mesh(this.geometry, this.material);
     this.mesh.position.set(0, 0, 0);
     this.scene?.add(this.mesh);
+
+    const dir = new Vector3(1, 2, 0);
+    const origin = new Vector3(0, 0.8, 0.5);
+    const length = 1;
+    const hexCam = 0xffff00;
+    const hexOri = 0xff0000;
+    this.arrowCam = new ArrowHelper(dir, origin, length, hexCam);
+    this.arrowOri = new ArrowHelper(dir, origin, length, hexOri);
+    this.scene?.add(this.arrowCam);
+    this.scene?.add(this.arrowOri);
+
     this.mesh.visible = false;
   }
 
   shot(targetPointX: number, angle: number, farPoint: number) {
+    this.camera.getWorldDirection(this.cameraDirection);
+    const newCamDirection = new Vector3().copy(this.cameraDirection);
+    newCamDirection.x = 0;
+    newCamDirection;
+    this.arrowCam?.setDirection(newCamDirection);
+
+    const baseDirection = new Vector3().copy(this.forPoint);
+    this.arrowOri?.setDirection(baseDirection);
+    // const baseDirectionV2 = new Vector2(baseDirection.y, baseDirection.z);
+
+    const angled = baseDirection.angleTo(newCamDirection);
+    console.log(angled);
+    // console.log(this.cameraDirection);
+
     if (!this.isTravelling && this.mesh) {
       this.isTravelling = true;
       const hypothenuse = Math.sqrt(

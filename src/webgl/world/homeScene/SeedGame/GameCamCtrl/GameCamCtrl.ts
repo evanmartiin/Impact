@@ -16,13 +16,13 @@ export class GameCamCtrl {
   private _euler = new Euler(0, 0, 0, "YXZ");
   private _PI_2 = Math.PI / 2;
   private pointerSpeed = 1.0;
-  private minPolarAngle = 1.5;
-  private maxPolarAngle = Math.PI - 1;
+  private minPolarAngle = 1.4;
+  private maxPolarAngle = Math.PI - 1.3;
   private prevCamPos = new Vector3(0, 0, 0);
   private gameControls: PointerLockControls | null = null;
   private distanceLookAt = -30;
   private heightLookAt = 0;
-  private cameraHeight = 1.5;
+  private cameraHeight = 0.8;
   private isFirstMove = false;
 
   private defaultCenterPos = new Vector3(
@@ -78,7 +78,7 @@ export class GameCamCtrl {
     this.prevCamPos = this.prevCamPos.copy(
       this.camera?.instance?.position as Vector3
     );
-    this.camera?.instance?.position.copy(new Vector3(0, this.cameraHeight, 0));
+    this.camera?.instance?.position.copy(new Vector3(0, this.cameraHeight, 0.5));
     this.camera?.instance?.lookAt(this.defaultCenterPos);
   }
 
