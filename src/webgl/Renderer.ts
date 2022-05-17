@@ -115,7 +115,7 @@ export default class Renderer {
     this.intersects = [];
     if (
       this.experience.activeCamera?.instance &&
-      this.experience.world?.earth?.earthGroup
+      this.experience.world?.earthScene?.earthGroup
     ) {
       this.raycaster.setFromCamera(
         this.mouse.mouseVector,
@@ -124,7 +124,9 @@ export default class Renderer {
       switch (this.experience.world.currentScene) {
         case "earth":
           this.raycaster
-            .intersectObjects(this.experience.world.earth.earthGroup.children)
+            .intersectObjects(
+              this.experience.world.earthScene.earthGroup.children
+            )
             .map((object) => {
               this.intersects.push(object);
             });
@@ -138,7 +140,7 @@ export default class Renderer {
             selectedObjects.push(this.hoveredScene);
           } else {
             selectedObjects =
-              this.experience.world.earth.earthGroup.children[0].children.filter(
+              this.experience.world.earthScene.earthGroup.children[0].children.filter(
                 (model) => this.districtNames.includes(model.name)
               );
             this.hoveredScene = undefined;
