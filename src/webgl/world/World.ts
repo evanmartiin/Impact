@@ -37,7 +37,7 @@ export default class World {
       this.cityScene = new CityScene();
       this.grandmaScene = new GrandmaScene();
 
-      const workOn = import.meta.env.VITE_WORK_ON;
+      const workOn = import.meta.env.VITE_WORK_ON || "earth";
       switch (workOn) {
         case "earth":
           this.experience.activeScene = this.earthScene.scene;
