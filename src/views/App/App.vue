@@ -18,11 +18,11 @@ onMounted(() => {
   
   if (store.experience.loaders) {
     store.experience.loaders.on('ready', () => {
-      if (store.experience.world?.earth) {
-        store.experience.world.earth.on('district_selected', (district: any) => {
+      if (store.experience.world?.earthScene) {
+        store.experience.world.earthScene.on('district_selected', (district: any) => {
           selectedDistrict.value = district.name;
         })
-        store.experience.world.earth.on('no_district_selected', () => {
+        store.experience.world.earthScene.on('no_district_selected', () => {
           selectedDistrict.value = '';
         })
       }
