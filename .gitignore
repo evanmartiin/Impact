@@ -28,3 +28,6 @@ coverage
 *.sw?
 package-lock.json
 yarn.lock
+.env 
+.env .dev
+.env.dev
