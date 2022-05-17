@@ -9,6 +9,7 @@ import { AxesHelper, Mesh, Scene } from "three";
 import Renderer from "./Renderer";
 import World from "./world/World";
 import type Camera from "./world/Camera";
+import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 
 declare global {
   interface Window {
@@ -82,6 +83,7 @@ export default class Experience {
     this.world?.update();
     this.renderer?.update();
     this.debug?.update();
+    ShaderBaseMaterial.globalShaderUniforms.uTime.value = this.time?.elapsed;
   }
 
   destroy() {

@@ -1,15 +1,16 @@
 import Experience from "@/webgl/Experience";
-import { Scene, BufferGeometry, Points, BufferAttribute, ShaderMaterial, Vector3 } from "three";
+import { Scene, BufferGeometry, Points, BufferAttribute, Vector3 } from "three";
 import vert from './shaders/vert.glsl?raw'
 import frag from './shaders/frag.glsl?raw'
 import type Camera from "../../Camera";
+import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 
 export default class Ashes {
   private experience: Experience = new Experience();
   private scene: Scene | null = null;
   private camera: Camera | null = null;
   private geometry: BufferGeometry | null = null;
-  private material: ShaderMaterial | null = null;
+  private material: ShaderBaseMaterial | null = null;
   private mesh: Points | null = null;
   private startTime: number = 0;
 
@@ -43,9 +44,9 @@ export default class Ashes {
 
     this.startTime = Date.now();
 
-    this.material = new ShaderMaterial({
+    this.material = new ShaderBaseMaterial({
       uniforms: {
-        uTime: { value: 0 },
+        uAge: { value: 0 },
         uSize: { value: this.experience.renderer?.instance?.getPixelRatio() },
         uScale: { value: 20. },
         uRadius: { value: 1. },
@@ -62,7 +63,7 @@ export default class Ashes {
 
   update() {
     if (this.material) {
-      this.material.uniforms.uTime.value = Date.now() - this.startTime;
+      this.material.uniforms.uAge.value = Date.now() - this.startTime;
     }
   }
 }

@@ -1,6 +1,6 @@
 uniform float uRadius;
 uniform float uRatio;
-uniform float uTime;
+uniform float uAge;
 uniform float uThreshold;
 
 varying vec4 vPosition;
@@ -15,10 +15,10 @@ void main() {
   vCoords = vCoords * .5 + .5;
 
   // float blinking = step(uThreshold, isBlinking);
-  // blinking *= cos(uTime * .003 + blinkOffset * 10000.) * .5;
+  // blinking *= cos(uAge * .003 + blinkOffset * 10000.) * .5;
 
   float opacity = 1. - vLifespan;
-  opacity -= uTime * .0003;
+  opacity -= uAge * .0003;
 
   vec3 color = mix(ashColor, fireColor, opacity);
 
