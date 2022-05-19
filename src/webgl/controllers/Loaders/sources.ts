@@ -39,7 +39,7 @@ const Sources: ISource[] = [
   {
     name: "housev1model",
     type: "gltfModel",
-    path: "/models/housev3.glb",
+    path: "/models/housev4.glb",
   },
   {
     name: "grassv1model",
@@ -49,12 +49,12 @@ const Sources: ISource[] = [
   {
     name: "housev1texture",
     type: "texture",
-    path: "/textures/housev4.jpg",
+    path: "/textures/housev5.jpg",
   },
   {
     name: "grassv1texture",
     type: "texture",
-    path: "/textures/grassv4.jpg",
+    path: "/textures/grassv5.jpg",
   },
   {
     name: "city",
