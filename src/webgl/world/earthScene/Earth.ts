@@ -186,7 +186,9 @@ export default class Earth {
     });
 
     signal.on("mouse_grab", () => {
-      this.wiggleShaderUniforms.uWiggleDirection.value = this.mouse.mouseInertia.clone();
+      if (!this.experience.world?.PARAMS.isMaintenanceOn) {
+        this.wiggleShaderUniforms.uWiggleDirection.value = this.mouse.mouseInertia.clone();
+      }
     });
     this.scene?.add(this.earthGroup);
 
@@ -320,7 +322,9 @@ export default class Earth {
   }
 
   getIntersect() {
-    const intersects = this.renderer.raycast();
+    if (!this.experience.world?.PARAMS.isMaintenanceOn) {
+      const intersects = this.renderer.raycast();
+    }
   }
 
   update() {

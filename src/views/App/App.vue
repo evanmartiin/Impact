@@ -4,10 +4,12 @@ import { onMounted, ref } from "vue";
 import { webglStore } from '@/stores/webglStore'
 import DistrictCard from '@/components/DistrictCard.vue'
 import CustomButton from '@/components/CustomButton.vue'
+import Maintenance from '@/components/Maintenance.vue'
 import signal from 'signal-js';
 
 const selectedDistrict = ref('');
 const showScoreboard = ref(false);
+const isMaintenanceOn = ref(false);
 const score = ref(0);
 const experienceStarted = ref(false);
 
@@ -36,6 +38,12 @@ onMounted(() => {
   signal.on("no_district_hovered", () => {
     document.body.style.cursor = 'initial';
   })
+  signal.on("maintenance_on", () => {
+    isMaintenanceOn.value = true;
+  })
+  signal.on("maintenance_off", () => {
+    isMaintenanceOn.value = false;
+  })
 });
 </script>
 
@@ -48,6 +56,7 @@ onMounted(() => {
       <CustomButton :click="start">Start Experience</CustomButton>
     </div>
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
+    <Maintenance v-if="isMaintenanceOn" />
   </main>
 </template>
 

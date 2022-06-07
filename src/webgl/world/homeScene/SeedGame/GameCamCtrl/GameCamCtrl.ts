@@ -45,7 +45,7 @@ export class GameCamCtrl {
   lockMouse() {
     // Desactive orbit control
     if (this.world) {
-      this.world.isCtrlActive = false;
+      this.world.PARAMS.isCtrlActive = false;
     }
     if (this.experience.world?.controls)
       this.experience.world.controls.enabled = false;
@@ -61,7 +61,7 @@ export class GameCamCtrl {
   unlockMouse() {
     // Active orbit control
     if (this.world) {
-      this.world.isCtrlActive = true;
+      this.world.PARAMS.isCtrlActive = true;
     }
     if (this.experience.world?.controls)
       this.experience.world.controls.enabled = true;
