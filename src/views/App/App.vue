@@ -3,8 +3,7 @@ import Experience from "@/webgl/Experience";
 import { onMounted, ref } from "vue";
 import { webglStore } from '@/stores/webglStore'
 import DistrictCard from '@/components/DistrictCard.vue'
-import StartGameScreen from '@/components/StartGameScreen.vue'
-import Scoreboard from '@/components/Scoreboard.vue'
+import CustomButton from '@/components/CustomButton.vue'
 import signal from 'signal-js';
 
 const selectedDistrict = ref('');
@@ -25,20 +24,17 @@ onMounted(() => {
   signal.on("change_scene", () => {
     selectedDistrict.value = "";
   })
-  
-  signal.on("loaders_ready", () => {
-    signal.on("district_selected", (district: any) => {
-      selectedDistrict.value = district.name;
-    })
-    signal.on("no_district_selected", () => {
-      selectedDistrict.value = "";
-    })
-    signal.on("district_hovered", () => {
-      document.body.style.cursor = 'pointer';
-    })
-    signal.on("no_district_hovered", () => {
-      document.body.style.cursor = 'initial';
-    })
+  signal.on("district_selected", (district: any) => {
+    selectedDistrict.value = district.name;
+  })
+  signal.on("no_district_selected", () => {
+    selectedDistrict.value = "";
+  })
+  signal.on("district_hovered", () => {
+    document.body.style.cursor = 'pointer';
+  })
+  signal.on("no_district_hovered", () => {
+    document.body.style.cursor = 'initial';
   })
 });
 </script>
@@ -47,8 +43,9 @@ onMounted(() => {
   <main>
     <canvas id="webgl"></canvas>
     <div id="home" v-if="!experienceStarted">
-      <h1>Home</h1>
-      <button @click="start">Start</button>
+      <h1>IMPACT</h1>
+      <h2>Tagline un peu cool</h2>
+      <CustomButton :click="start">Start Experience</CustomButton>
     </div>
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
   </main>

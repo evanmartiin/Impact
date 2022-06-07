@@ -36,7 +36,7 @@ import signal from 'signal-js';
 export default class Earth {
   private experience: Experience = new Experience();
   public scene: Scene = new Scene();
-  public cameraPos: Vector3 = new Vector3(0, 4, 6);
+  public cameraPos: Vector3 = new Vector3(0, 0, 6);
   private time: Time = this.experience.time as Time;
   public camera: Camera = new Camera(this.cameraPos, this.scene);
   private renderer: Renderer = this.experience.renderer as Renderer;
@@ -75,7 +75,7 @@ export default class Earth {
 
   private hoveredDistrict = this.experience.renderer?.hoveredScene;
   private isHoveringDistrict: boolean = false;
-  private shift = { lat: 30, lon: -20 };
+  private shift = { lat: 20, lon: 0 };
   private districtPositions = [
     {
       name: "mamie",

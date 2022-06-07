@@ -1,6 +1,7 @@
 <script setup>
 import { webglStore } from '@/stores/webglStore'
 import signal from 'signal-js';
+import CustomButton from '@/components/CustomButton.vue'
 
 const props = defineProps({
   name: {
@@ -18,28 +19,45 @@ const store = webglStore();
 
 <template>
 <div class="district-card">
-    <h2>{{ props.name }}</h2>
-    <button @click="() => changeScene(props.name)">Move here</button>
+  <div class="shadow">
+    <div class="clip">
+      <h2>{{ props.name }}</h2>
+      <CustomButton :click="() => changeScene(props.name)">Move here</CustomButton>
+    </div>
+  </div>
 </div>
 </template>
 
 <style scoped lang="scss">
 .district-card {
     background-color: #FAF7F1;
-    padding: 20px;
     position: relative;
     top: 50vh;
     left: 50vw;
-    width: 300px;
-    transform: translate(calc(-50% - 400px), calc(-50% - 50px));
-    padding: 30px 30px;
-    border-radius: 50px;
-    color: #84807E;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 25px;
-    font-family: 'CG Heavy';
+    width: 350px;
+    transform: translate(-50%, calc(-50% + 50px));
+    clip-path: polygon(12% 100%, 4% 95%, 0 53%, 4% 26%, 10% 20%, 43% 17%, 52% 0, 58% 17%, 87% 19%, 95% 25%, 100% 60%, 96% 90%, 63% 97%);
+    padding: 10px;
+
+  .shadow {
+    filter: drop-shadow(5px 5px 2px rgba(0,0,0,.15));
+
+    .clip {
+      color: #84807E;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      font-family: 'CG Heavy';
+      clip-path: polygon(12% 100%, 4% 95%, 0 53%, 4% 26%, 10% 20%, 43% 17%, 52% 0, 58% 17%, 87% 19%, 95% 25%, 100% 60%, 96% 90%, 63% 97%);
+      background-image: url("images/paper-min.png");
+      background-position: center;
+      background-size: 120%;
+      background-repeat: no-repeat;
+      border: none;
+      padding: 30px 20px 20px 20px;
+    }
+  }
 }
 </style>
