@@ -11,7 +11,7 @@ const props = defineProps({
 })
 
 const changeScene = (name) => {
-    signal.emit("change_scene", name);
+  signal.emit("change_scene", name);
 }
 
 const store = webglStore();

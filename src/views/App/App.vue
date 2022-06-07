@@ -5,6 +5,7 @@ import { webglStore } from '@/stores/webglStore'
 import DistrictCard from '@/components/DistrictCard.vue'
 import CustomButton from '@/components/CustomButton.vue'
 import Maintenance from '@/components/Maintenance.vue'
+import Home from '@/components/Home.vue'
 import signal from 'signal-js';
 
 const selectedDistrict = ref('');
@@ -57,6 +58,7 @@ onMounted(() => {
     </div>
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
     <Maintenance v-if="isMaintenanceOn" />
+    <Home v-if="isMaintenanceOn" />
   </main>
 </template>
 
