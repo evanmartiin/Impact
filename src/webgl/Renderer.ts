@@ -24,6 +24,7 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import Ashes from "./world/entities/Ashes/Ashes";
+import signal from 'signal-js';
 
 export default class Renderer {
   private experience: Experience = new Experience();
@@ -168,7 +169,7 @@ export default class Renderer {
     }
   }
 
-  changeScene(nextScene: Scene, nextCamera: Camera) {
+  changeScene(nextScene: Scene, nextCamera: Camera, setMaintenance?: boolean) {
     this.renderTargetPrevScene = this.experience.activeScene;
     this.renderTargetPrevCamera = this.experience.activeCamera;
     this.renderTargetPrev = new WebGLRenderTarget(this.sizes.width*2, this.sizes.height*2, { minFilter: LinearFilter, magFilter: NearestFilter });
@@ -210,11 +211,6 @@ export default class Renderer {
     this.isCameraPosLocked = true;
     this.experience.world?.controls?.saveState();
 
-    // if (this.experience.world) {
-    //   this.experience.world.ashes = null;
-    //   this.experience.world.ashes = new Ashes(nextScene, nextCamera);
-    // }
-
     const tl = anime.timeline({});
     tl.add(
       {
@@ -232,6 +228,10 @@ export default class Renderer {
       }
       this.isCameraPosLocked = false;
       this.isTransitionOn = false;
+
+      if (setMaintenance) {
+        this.experience.world?.setMaintenance();
+      }
     }, 3500);
   }
 }

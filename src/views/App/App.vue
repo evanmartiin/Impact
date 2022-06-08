@@ -1,61 +1,64 @@
 <script setup lang="ts">
 import Experience from "@/webgl/Experience";
 import { onMounted, ref } from "vue";
-import { RouterLink, RouterView } from "vue-router";
 import { webglStore } from '@/stores/webglStore'
 import DistrictCard from '@/components/DistrictCard.vue'
-import StartGameScreen from '@/components/StartGameScreen.vue'
-import Scoreboard from '@/components/Scoreboard.vue'
+import CustomButton from '@/components/CustomButton.vue'
+import Maintenance from '@/components/Maintenance.vue'
+import Home from '@/components/Home.vue'
+import signal from 'signal-js';
 
 const selectedDistrict = ref('');
 const showScoreboard = ref(false);
+const isMaintenanceOn = ref(false);
 const score = ref(0);
+const experienceStarted = ref(false);
+
+const start = () => {
+  experienceStarted.value = true;
+  signal.emit("start_experience");
+}
 
 onMounted(() => {
   const experience = new Experience(document.getElementById("webgl") as HTMLCanvasElement);
   const store = webglStore();
   store.$state = { experience };
-  
-  if (store.experience.loaders) {
-    store.experience.loaders.on('ready', () => {
-      if (store.experience.world?.earthScene) {
-        store.experience.world.earthScene.on('district_selected', (district: any) => {
-          selectedDistrict.value = district.name;
-        })
-        store.experience.world.earthScene.on('no_district_selected', () => {
-          selectedDistrict.value = '';
-        })
-      }
-  
-      // store.experience.world.districts.scoreboard.on("timer_started", () => {
-      //   showScoreboard.value = true;
-  
-      //   store.experience.world.districts.scoreboard.on("timer_ended", () => {
-      //     showScoreboard.value = false;
-      //     store.experience.world.districts.scoreboard.off("timer_ended");
-      //   })
-      // })
-      
-      // store.experience.world.districts.scoreboard.on("score_changed", (newScore: number) => {
-      //   score.value = newScore;
-      // })
-    })
-  }
+
+  signal.on("change_scene", () => {
+    selectedDistrict.value = "";
+  })
+  signal.on("district_selected", (district: any) => {
+    selectedDistrict.value = district.name;
+  })
+  signal.on("no_district_selected", () => {
+    selectedDistrict.value = "";
+  })
+  signal.on("district_hovered", () => {
+    document.body.style.cursor = 'pointer';
+  })
+  signal.on("no_district_hovered", () => {
+    document.body.style.cursor = 'initial';
+  })
+  signal.on("maintenance_on", () => {
+    isMaintenanceOn.value = true;
+  })
+  signal.on("maintenance_off", () => {
+    isMaintenanceOn.value = false;
+  })
 });
 </script>
 
 <template>
   <main>
     <canvas id="webgl"></canvas>
-    <!-- <nav id="nav">
-      <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/experience">Experience</RouterLink>
-      <RouterLink to="/credits">Credits</RouterLink>
-    </nav> -->
-    <!-- <RouterView /> -->
+    <div id="home" v-if="!experienceStarted">
+      <h1>IMPACT</h1>
+      <h2>Tagline un peu cool</h2>
+      <CustomButton :click="start">Start Experience</CustomButton>
+    </div>
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
-      <Scoreboard v-if="showScoreboard" :key="score" />
-    <!-- <StartGameScreen name="Evan" description="Lorem" /> -->
+    <Maintenance v-if="isMaintenanceOn" />
+    <Home v-if="isMaintenanceOn" />
   </main>
 </template>
 

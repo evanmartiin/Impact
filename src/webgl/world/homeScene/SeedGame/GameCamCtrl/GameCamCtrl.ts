@@ -6,6 +6,7 @@ import type World from "@/webgl/world/World";
 import type Mouse from "@/webgl/controllers/Mouse";
 import Experience from "@/webgl/Experience";
 import type Renderer from "@/webgl/Renderer";
+import signal from 'signal-js';
 
 export class GameCamCtrl {
   private experience: Experience = new Experience();
@@ -43,7 +44,7 @@ export class GameCamCtrl {
   lockMouse() {
     // Desactive orbit control
     if (this.world) {
-      this.world.isCtrlActive = false;
+      this.world.PARAMS.isCtrlActive = false;
     }
     if (this.experience.world?.controls)
       this.experience.world.controls.enabled = false;
@@ -60,7 +61,7 @@ export class GameCamCtrl {
   unlockMouse() {
     // Active orbit control
     if (this.world) {
-      this.world.isCtrlActive = true;
+      this.world.PARAMS.isCtrlActive = true;
     }
     if (this.experience.world?.controls)
       this.experience.world.controls.enabled = true;
@@ -73,7 +74,7 @@ export class GameCamCtrl {
 
   setCamGameMode() {
     this.lockMouse();
-    this.mouse.on("mousemove", () => this.moveCamera());
+    signal.on("mouse_move", () => this.moveCamera());
 
     this.prevCamPos = this.prevCamPos.copy(
       this.camera?.instance?.position as Vector3
@@ -84,7 +85,7 @@ export class GameCamCtrl {
 
   unsetCamGameMode() {
     this.unlockMouse();
-    this.mouse.off("mousemove");
+    signal.off("mouse_move");
 
     this.camera?.instance?.position.copy(this.prevCamPos);
     this.camera?.instance?.lookAt(0, 0, 0);

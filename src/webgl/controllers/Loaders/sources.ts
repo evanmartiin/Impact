@@ -178,6 +178,12 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/paper.jpg",
   },
+
+  {
+    name: "matcap-texture",
+    type: "texture",
+    path: "/textures/matcap.jpeg",
+  },
 ];
 
 export default Sources;

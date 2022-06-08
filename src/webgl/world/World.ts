@@ -1,7 +1,6 @@
 import type Debug from "@/webgl/controllers/Debug";
-import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
-import { DirectionalLight, type Scene, type Vector3 } from "three";
+import { AmbientLight, DirectionalLight, HemisphereLight, type Scene } from "three";
 import type { FolderApi } from "tweakpane";
 import type { district } from "./../../models/district.model";
 import Earth from "./earthScene/Earth";
@@ -12,6 +11,8 @@ import type Camera from "./Camera";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import GrandmaScene from "./grandmaScene/grandmaScene";
 // import type Ashes from "./entities/Ashes/Ashes";
+import signal from 'signal-js';
+import type Loaders from "../controllers/Loaders/Loaders";
 
 export default class World {
   private experience: Experience = new Experience();
@@ -24,14 +25,17 @@ export default class World {
   public cityScene: CityScene | null = null;
   public grandmaScene: GrandmaScene | null = null;
   private debugTab: FolderApi | undefined = undefined;
+  private debugTab2: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
   public currentScene: district = "earth";
   public controls: OrbitControls | null = null;
-  public isCtrlActive = true;
-  // public ashes: Ashes | null = null;
+  public PARAMS = {
+    "isMaintenanceOn": false,
+    "isCtrlActive": true
+  }
 
   constructor() {
-    this.loaders.on("ready", () => {
+    signal.on("loaders_ready", () => {
       this.earthScene = new Earth();
       this.homeScene = new HomeScene();
       this.cityScene = new CityScene();
@@ -61,6 +65,10 @@ export default class World {
           break;
       }
 
+      signal.on("change_scene", (name: district) => {
+        this.changeScene(name);
+      })
+
       this.setLight();
       this.setControls();
       this.setDebug();
@@ -70,18 +78,14 @@ export default class World {
   update() {
     this.earthScene?.update();
     this.homeScene?.update();
-    if (this.isCtrlActive) this.controls?.update();
-    // this.ashes?.update();
+    if (this.PARAMS.isCtrlActive) this.controls?.update();
   }
 
   setControls() {
     if (this.experience.activeCamera?.instance && this.canvas) {
-      this.controls = new OrbitControls(
-        this.experience.activeCamera.instance,
-        this.canvas
-      );
+      this.controls = new OrbitControls(this.experience.activeCamera.instance, this.canvas);
       this.controls.enableDamping = true;
-      // this.controls.enableZoom = false;
+      this.controls.enableZoom = false;
       this.controls.enablePan = false;
       this.setListener();
     }
@@ -94,13 +98,55 @@ export default class World {
   }
 
   setLight() {
-    const sunLight = new DirectionalLight("#ffffff", 4);
-    sunLight.castShadow = true;
-    sunLight.shadow.camera.far = 15;
-    sunLight.shadow.mapSize.set(1024, 1024);
-    sunLight.shadow.normalBias = 0.05;
-    sunLight.position.set(200, 0, 200);
+    const sunLight = new HemisphereLight("#ffffff", "#555555", 1);
+    sunLight.position.set(10, 0, 10);
     this.experience.activeScene?.add(sunLight);
+  }
+
+  changeScene(name: district) {
+    this.currentScene = name;
+    let delay = 0;
+    const changeMaintenance = this.PARAMS.isMaintenanceOn;
+    if (changeMaintenance) {
+      this.unsetMaintenance();
+      delay = 1000;
+    }
+    setTimeout(() => {
+      switch (name) {
+        case "earth":
+          this.experience.renderer?.changeScene(this.earthScene?.scene as Scene, this.earthScene?.camera as Camera);
+          break;
+        case "maison":
+          this.experience.renderer?.changeScene(this.homeScene?.scene as Scene, this.homeScene?.camera as Camera);
+          break;
+        case "ville":
+          this.experience.renderer?.changeScene(this.cityScene?.scene as Scene, this.cityScene?.camera as Camera, true);
+          break;
+        case "mamie":
+          this.experience.renderer?.changeScene(this.grandmaScene?.scene as Scene, this.grandmaScene?.camera as Camera, true);
+          break;
+        default:
+          break;
+      }
+    }, delay);
+  }
+
+  setMaintenance() {
+    signal.emit("maintenance_on");
+    this.PARAMS.isMaintenanceOn = true;
+    if (this.controls) {
+      this.controls.enableRotate = false;
+      this.controls.autoRotate = true;
+    }
+  }
+  
+  unsetMaintenance() {
+    signal.emit("maintenance_off");
+    this.PARAMS.isMaintenanceOn = false;
+    if (this.controls) {
+      this.controls.enableRotate = true;
+      this.controls.autoRotate = false;
+    }
   }
 
   setDebug() {
@@ -124,7 +170,8 @@ export default class World {
         this.currentScene = "ville";
         this.experience.renderer?.changeScene(
           this.cityScene?.scene as Scene,
-          this.cityScene?.camera as Camera
+          this.cityScene?.camera as Camera,
+          true
         );
       });
       switchEarth?.on("click", () => {
@@ -138,9 +185,22 @@ export default class World {
         this.currentScene = "mamie";
         this.experience.renderer?.changeScene(
           this.grandmaScene?.scene as Scene,
-          this.grandmaScene?.camera as Camera
+          this.grandmaScene?.camera as Camera,
+          true
         );
       });
     }
+
+    this.debugTab2 = this.debug.ui?.pages[0].addFolder({
+      title: "Maintenance mode",
+    });
+    const switchMaintenance = this.debugTab2?.addInput(this.PARAMS, "isMaintenanceOn", { label: "Toggle" });
+    switchMaintenance?.on("change", () => {
+      if (this.PARAMS.isMaintenanceOn) {
+        this.setMaintenance();
+      } else {
+        this.unsetMaintenance();
+      }
+    });
   }
 }
