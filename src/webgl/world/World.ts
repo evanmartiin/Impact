@@ -41,7 +41,7 @@ export default class World {
       this.cityScene = new CityScene();
       this.grandmaScene = new GrandmaScene();
 
-      const workOn = import.meta.env.VITE_WORK_ON || "earth";
+      const workOn = import.meta.env.VITE_WORK_ON || "home";
       switch (workOn) {
         case "earth":
           this.experience.activeScene = this.earthScene.scene;
@@ -71,6 +71,7 @@ export default class World {
 
       this.setLight();
       this.setControls();
+      this.setIntro();
       this.setDebug();
     });
   }
@@ -89,6 +90,12 @@ export default class World {
       this.controls.enablePan = false;
       this.setListener();
     }
+  }
+
+  setIntro() {
+    this.experience.activeCamera?.instance?.position.set(.6, .5, .4);
+    this.controls?.target.set(0, .4, 0);
+    this.controls?.update();
   }
 
   setListener() {

@@ -51,10 +51,17 @@ onMounted(() => {
 <template>
   <main>
     <canvas id="webgl"></canvas>
-    <div id="home" v-if="!experienceStarted">
-      <h1>IMPACT</h1>
-      <h2>Tagline un peu cool</h2>
+    <div id="intro" v-if="!experienceStarted">
+      <div class="logo">
+        <img src="/images/impact_logo.png" alt="Impact logo">
+        <h2>Save Grandma, Save the Earth!</h2>
+      </div>
       <CustomButton :click="start">Start Experience</CustomButton>
+      <div class="credits">
+        <img src="/images/gobelins_logo.png" alt="Gobelins logo">
+        <p>Ambroise Nicolao - Danut Miculas - Ludwig Pilicer - Evan Martin - Antoine Tardivel</p>
+        <img src="/images/cci_logo.png" alt="CCI logo">
+      </div>
     </div>
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
     <Maintenance v-if="isMaintenanceOn" />
