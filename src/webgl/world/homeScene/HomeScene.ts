@@ -11,6 +11,7 @@ import {
   Texture,
   sRGBEncoding,
   Mesh,
+  CubeTextureLoader,
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
@@ -108,8 +109,18 @@ export default class HomeScene {
     sunLight.position.set(200, 0, 200);
     this.scene.add(sunLight);
 
+    this.setSkybox();
     this.setDebug();
     // this.character.appear();
+  }
+
+  setSkybox() {
+    const loader = new CubeTextureLoader();
+    loader.setPath('textures/skybox/');
+
+    const textureCube = loader.load(['posx.jpeg', 'negx.jpeg', 'posy.jpeg', 'negy.jpeg', 'posz.jpeg', 'negz.jpeg']);
+    textureCube.encoding = sRGBEncoding;
+    this.scene.background = textureCube;
   }
 
   setFloorCollider(mesh: Mesh) {
