@@ -7,7 +7,6 @@ import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
 import { Group, PerspectiveCamera, Vector3, Euler, type Scene } from "three";
 import type { FolderApi, ButtonApi } from "tweakpane";
-import Targets from "./Targets/Targets";
 import Seed from "./Seed/Seed";
 import type Renderer from "@/webgl/Renderer";
 import Helper from "./Helper/Helper";
@@ -41,7 +40,6 @@ export default class SeedGame {
   private isStarted = false;
   public isGameView = false;
 
-  public targets: Targets | null = null;
 
   private seed: Seed | null = null;
 
@@ -65,7 +63,6 @@ export default class SeedGame {
 
   init() {
     this.isInit = true;
-    this.setTargets();
     this.seed = new Seed(this.scene as Scene);
     this.targetPoint = new Vector3();
     this.cameraLookAtPoint = new Vector3();
@@ -76,11 +73,6 @@ export default class SeedGame {
     if (this.camera) this.gameCamCtrl = new GameCamCtrl(this.camera);
   }
 
-  setTargets() {
-    this.targets = new Targets();
-    this.targets.setMesh();
-    if (this.targets.instance) this.instance.add(this.targets.instance);
-  }
 
   update() {
     if (this.isGameView) {
