@@ -37,7 +37,7 @@ import CustomButton from '@/components/CustomButton.vue'
       gap: 15px;
       font-family: 'CG Heavy';
       clip-path: polygon(34% 99%, 4% 95%, 0 53%, 3% 11%, 9% 6%, 29% 4%, 52% 0, 89% 5%, 94% 13%, 99% 29%, 100% 60%, 96% 90%, 63% 97%);
-      background-image: url("images/paper-min.png");
+      background-image: url("/images/paper-min.png");
       background-position: center;
       background-size: 120%;
       background-repeat: no-repeat;

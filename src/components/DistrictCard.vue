@@ -51,7 +51,7 @@ const store = webglStore();
       gap: 15px;
       font-family: 'CG Heavy';
       clip-path: polygon(12% 100%, 4% 95%, 0 53%, 4% 26%, 10% 20%, 43% 17%, 52% 0, 58% 17%, 87% 19%, 95% 25%, 100% 60%, 96% 90%, 63% 97%);
-      background-image: url("images/paper-min.png");
+      background-image: url("/images/paper-min.png");
       background-position: center;
       background-size: 120%;
       background-repeat: no-repeat;
