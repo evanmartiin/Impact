@@ -1,9 +1,10 @@
-import EventEmitter from "@/webgl/controllers/EventEmitter";
 import type { IviewSizeAtDepth } from "@/models/webgl/sizes.model";
 import getViewSizeAtDepth from "@/utils/getViewSizeAtDepth";
 import Experience from "@/webgl/Experience";
 import type { PerspectiveCamera } from "three";
-export default class Sizes extends EventEmitter {
+import signal from 'signal-js';
+
+export default class Sizes {
   public width = 0;
   public height = 0;
   public pixelRatio = 0;
@@ -11,8 +12,6 @@ export default class Sizes extends EventEmitter {
   public viewSizeAtDepth: IviewSizeAtDepth | null = null;
 
   constructor() {
-    super();
-
     this.resize();
 
     // Resize event
@@ -31,6 +30,6 @@ export default class Sizes extends EventEmitter {
     this.height = window.innerHeight;
     this.pixelRatio = Math.min(window.devicePixelRatio, 2);
     this.setViewSizeAtDepth();
-    this.trigger("resize");
+    signal.emit("resize");
   }
 }

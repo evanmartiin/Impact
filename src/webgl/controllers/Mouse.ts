@@ -1,9 +1,9 @@
-import EventEmitter from "@/webgl/controllers/EventEmitter";
 import type Sizes from "@/webgl/controllers/Sizes";
 import Experience from "@/webgl/Experience";
 import { Vector2 } from "three";
+import signal from 'signal-js';
 
-export default class Mouse extends EventEmitter {
+export default class Mouse {
   private experience = new Experience();
   private sizes: Sizes | null = this.experience.sizes;
   public top = 0;
@@ -21,8 +21,6 @@ export default class Mouse extends EventEmitter {
   public mouseMoveEvent: null | MouseEvent = null;
 
   constructor() {
-    super();
-
     //Mouse event
     window.addEventListener("mousemove", (e) => this.update(e));
     document.addEventListener("mouseenter", () => this.setIsInScreen(true));
@@ -30,18 +28,18 @@ export default class Mouse extends EventEmitter {
     document.addEventListener("mouseleave", () => this.setIsInScreen(false));
     document.addEventListener("mousedown", () => {
       this.mouseClicking = true;
-      this.trigger("mousedown");
+      signal.emit("mouse_down");
     });
     document.addEventListener("mouseup", () => {
       this.mouseClicking = false;
-      this.trigger("mouseup");
+      signal.emit("mouse_up");
     });
   }
 
   update(e: globalThis.MouseEvent) {
     this.mouseMoveEvent = e;
     if (this.mouseClicking) {
-      this.trigger("mousegrab");
+      signal.emit("mouse_grab");
     }
     this.top = e.clientY;
     this.left = e.clientX;
@@ -74,15 +72,15 @@ export default class Mouse extends EventEmitter {
         window.innerHeight;
     }
     if (this.isInScreen === false) this.setIsInScreen(true);
-    this.trigger("mousemove");
+    signal.emit("mouse_move");
   }
 
   setIsInScreen(state: boolean) {
-    this.trigger("mouseSwitch");
+    signal.emit("mouse_switch");
     if (state) {
-      this.trigger("mouseEnter");
+      signal.emit("mouse_enter");
     } else {
-      this.trigger("mouseLeave");
+      signal.emit("mouse_leave");
     }
     this.isInScreen = state;
   }

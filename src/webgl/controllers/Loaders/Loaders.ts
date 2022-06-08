@@ -1,11 +1,11 @@
-import EventEmitter from "@/webgl/controllers/EventEmitter";
 import type { ILoaders, TfileLoader } from "@/models/webgl/loaders.model";
 import type { ISource } from "@/models/webgl/source.model";
 import { TextureLoader } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
+import signal from 'signal-js';
 
-export default class Loaders extends EventEmitter {
+export default class Loaders {
   private sources: ISource[];
   public items: { [key: string]: TfileLoader };
   private toLoad: number | null = null;
@@ -13,8 +13,6 @@ export default class Loaders extends EventEmitter {
   private loaders: ILoaders = {};
 
   constructor(sources: ISource[]) {
-    super();
-
     this.sources = sources;
     this.items = {};
     this.toLoad = this.sources.length;
@@ -54,7 +52,7 @@ export default class Loaders extends EventEmitter {
     this.loaded++;
 
     if (this.loaded === this.toLoad) {
-      this.trigger("ready");
+      signal.emit("loaders_ready");
     }
   }
 }

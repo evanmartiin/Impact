@@ -1,8 +1,8 @@
-import EventEmitter from "@/webgl/controllers/EventEmitter";
 import type Time from "@/webgl/controllers/Time";
 import Experience from "@/webgl/Experience";
+import signal from 'signal-js';
 
-export default class Scoreboard extends EventEmitter {
+export default class Scoreboard {
   static instance: Scoreboard;
 
   private experience: Experience = new Experience();
@@ -15,16 +15,14 @@ export default class Scoreboard extends EventEmitter {
 
   private maxTime: number = 0;
 
-  constructor() {
-    super();
-  }
+  constructor() {}
 
   startTimer(MAX_TIME: number) {
     if (!this.isCounting) {
       this.maxTime = MAX_TIME;
       this.resetTimer();
       this.startTime = this.time.elapsed;
-      this.trigger("timer_started");
+      signal.emit("timer_started");
       console.log(`Timer started for ${this.maxTime}ms.`);
     } else {
       console.log(`Timer already counting. (${this.elapsedTime}/${this.maxTime}ms)`);
@@ -38,7 +36,7 @@ export default class Scoreboard extends EventEmitter {
   }
 
   stopTimer() {
-    this.trigger("timer_ended");
+    signal.emit("timer_ended");
     console.log(`Timer ended at ${this.elapsedTime}ms.`);
     this.resetTimer();
   }
@@ -46,7 +44,7 @@ export default class Scoreboard extends EventEmitter {
   increaseScore() {
     this.score++;
     console.log('Score:', this.score);
-    this.trigger("score_changed", [this.score]);
+    signal.emit("score_changed", this.score);
   }
 
   update() {

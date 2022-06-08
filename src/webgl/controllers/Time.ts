@@ -1,14 +1,12 @@
-import EventEmitter from "@/webgl/controllers/EventEmitter";
+import signal from 'signal-js';
 
-export default class Time extends EventEmitter {
+export default class Time {
   private start: number | null = null;
   private current: number | null = null;
   public elapsed = 0;
   public delta = 16;
 
   constructor() {
-    super();
-
     // Setup
     this.start = Date.now();
     this.current = this.start;
@@ -27,7 +25,7 @@ export default class Time extends EventEmitter {
       this.elapsed = this.current - this.start;
     }
 
-    this.trigger("tick");
+    signal.emit("tick");
 
     window.requestAnimationFrame(() => {
       this.tick();
