@@ -17,15 +17,14 @@ export class GameCamCtrl {
   private _euler = new Euler(0, 0, 0, "YXZ");
   private _PI_2 = Math.PI / 2;
   private pointerSpeed = 1.0;
-  private minPolarAngle = 1.5;
-  private maxPolarAngle = Math.PI - 1;
-  private minPolarAngleHorizontal = -1;
-  private maxPolarAngleHorizontal = Math.PI;
+  private minPolarAngle = 1.4;
+  private maxPolarAngle = Math.PI - 1.3;
   private prevCamPos = new Vector3(0, 0, 0);
   private gameControls: PointerLockControls | null = null;
   private distanceLookAt = -30;
   private heightLookAt = 0;
-  private cameraHeight = 1;
+  private cameraHeight = 0.8;
+  private isFirstMove = false;
 
   private defaultCenterPos = new Vector3(
     this.distanceLookAt,
@@ -56,6 +55,7 @@ export class GameCamCtrl {
     }
     this.gameControls?.lock();
     this.gameControls?.connect();
+    this.isFirstMove = true;
   }
 
   unlockMouse() {
@@ -79,7 +79,7 @@ export class GameCamCtrl {
     this.prevCamPos = this.prevCamPos.copy(
       this.camera?.instance?.position as Vector3
     );
-    this.camera?.instance?.position.copy(new Vector3(0, this.cameraHeight, 1));
+    this.camera?.instance?.position.copy(new Vector3(0, this.cameraHeight, 0.5));
     this.camera?.instance?.lookAt(this.defaultCenterPos);
   }
 
@@ -114,24 +114,21 @@ export class GameCamCtrl {
         this._PI_2 - this.maxPolarAngle,
         Math.min(this._PI_2 - this.minPolarAngle, this._euler.x)
       );
-
-      this._euler.y = Math.max(
-        this._PI_2 - this.maxPolarAngleHorizontal,
-        Math.min(this._PI_2 - this.minPolarAngleHorizontal, this._euler.y)
-      );
-
-      // this._euler.z = Math.max(
-      //   this._PI_2 - this.maxPolarAngleHorizontal,
-      //   Math.min(this._PI_2 - this.minPolarAngleHorizontal, this._euler.z)
-      // );
-
-      if (this.camera?.instance) this.camera.instance.rotation.z += Math.PI * 2;
-
-      // console.log(this._euler);
+      if (this._euler.y > 0) {
+        if (this._euler.y < 2.635) {
+          this._euler.y = 2.635;
+        }
+      } else {
+        if (this._euler.y > -2.633) {
+          this._euler.y = -2.633;
+        }
+      }
+      if (this.isFirstMove) {
+        this.isFirstMove = false;
+        this._euler.y = Math.PI;
+      }
       if (this.camera?.instance)
         this.camera.instance.quaternion.setFromEuler(this._euler);
     }
-    // if (this.camera?.instance)
-    // console.log((this.camera.instance.rotation.x += 1));
   }
 }

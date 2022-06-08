@@ -4,20 +4,26 @@ import { AmbientLight, DirectionalLight, HemisphereLight, type Scene } from "thr
 import type { FolderApi } from "tweakpane";
 import type { district } from "./../../models/district.model";
 import Earth from "./earthScene/Earth";
+import type Renderer from "../Renderer";
 import HomeScene from "./homeScene/HomeScene";
 import CityScene from "./cityScene/CityScene";
 import type Camera from "./Camera";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import GrandmaDistrict from "./grandmaScene/grandmaDistrict";
+import GrandmaScene from "./grandmaScene/grandmaScene";
+// import type Ashes from "./entities/Ashes/Ashes";
 import signal from 'signal-js';
+import type Loaders from "../controllers/Loaders/Loaders";
 
 export default class World {
   private experience: Experience = new Experience();
-  private canvas: HTMLCanvasElement = this.experience.canvas as HTMLCanvasElement;
-  public earth: Earth | null = null;
+  private loaders: Loaders = this.experience.loaders as Loaders;
+  private renderer: Renderer = this.experience.renderer as Renderer;
+  private canvas: HTMLCanvasElement = this.experience
+    .canvas as HTMLCanvasElement;
+  public earthScene: Earth | null = null;
   public homeScene: HomeScene | null = null;
   public cityScene: CityScene | null = null;
-  public grandmaDistrict: GrandmaDistrict | null = null;
+  public grandmaScene: GrandmaScene | null = null;
   private debugTab: FolderApi | undefined = undefined;
   private debugTab2: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
@@ -30,13 +36,34 @@ export default class World {
 
   constructor() {
     signal.on("loaders_ready", () => {
-      this.earth = new Earth();
+      this.earthScene = new Earth();
       this.homeScene = new HomeScene();
       this.cityScene = new CityScene();
-      this.grandmaDistrict = new GrandmaDistrict();
+      this.grandmaScene = new GrandmaScene();
 
-      this.experience.activeScene = this.earth.scene;
-      this.experience.activeCamera = this.earth.camera;
+      const workOn = import.meta.env.VITE_WORK_ON || "earth";
+      switch (workOn) {
+        case "earth":
+          this.experience.activeScene = this.earthScene.scene;
+          this.experience.activeCamera = this.earthScene.camera;
+          break;
+        case "home":
+          this.experience.activeScene = this.homeScene.scene;
+          this.experience.activeCamera = this.homeScene.camera;
+          break;
+        case "grandma":
+          this.experience.activeScene = this.grandmaScene.scene;
+          this.experience.activeCamera = this.grandmaScene.camera;
+          break;
+        case "city":
+          this.experience.activeScene = this.cityScene.scene;
+          this.experience.activeCamera = this.cityScene.camera;
+          break;
+        default:
+          this.experience.activeScene = this.earthScene.scene;
+          this.experience.activeCamera = this.earthScene.camera;
+          break;
+      }
 
       signal.on("change_scene", (name: district) => {
         this.changeScene(name);
@@ -49,7 +76,7 @@ export default class World {
   }
 
   update() {
-    this.earth?.update();
+    this.earthScene?.update();
     this.homeScene?.update();
     if (this.PARAMS.isCtrlActive) this.controls?.update();
   }
@@ -66,7 +93,7 @@ export default class World {
 
   setListener() {
     this.controls?.addEventListener("change", () => {
-      this.experience.world?.earth?.updateRelatedToCamera();
+      this.earthScene?.updateRelatedToCamera();
     });
   }
 
@@ -87,7 +114,7 @@ export default class World {
     setTimeout(() => {
       switch (name) {
         case "earth":
-          this.experience.renderer?.changeScene(this.earth?.scene as Scene, this.earth?.camera as Camera);
+          this.experience.renderer?.changeScene(this.earthScene?.scene as Scene, this.earthScene?.camera as Camera);
           break;
         case "maison":
           this.experience.renderer?.changeScene(this.homeScene?.scene as Scene, this.homeScene?.camera as Camera);
@@ -96,7 +123,7 @@ export default class World {
           this.experience.renderer?.changeScene(this.cityScene?.scene as Scene, this.cityScene?.camera as Camera, true);
           break;
         case "mamie":
-          this.experience.renderer?.changeScene(this.grandmaDistrict?.scene as Scene, this.grandmaDistrict?.camera as Camera, true);
+          this.experience.renderer?.changeScene(this.grandmaScene?.scene as Scene, this.grandmaScene?.camera as Camera, true);
           break;
         default:
           break;
@@ -131,11 +158,37 @@ export default class World {
     const switchEarth = this.debugTab?.addButton({ title: "Earth" });
     const switchGrandma = this.debugTab?.addButton({ title: "Grandma" });
 
-    if (this.homeScene && this.earth) {
-      switchHome?.on("click", () => this.changeScene("maison"));
-      switchCity?.on("click", () => this.changeScene("ville"));
-      switchEarth?.on("click", () => this.changeScene("earth"));
-      switchGrandma?.on("click", () => this.changeScene("mamie"));
+    if (this.homeScene && this.earthScene) {
+      switchHome?.on("click", () => {
+        this.currentScene = "maison";
+        this.experience.renderer?.changeScene(
+          this.homeScene?.scene as Scene,
+          this.homeScene?.camera as Camera
+        );
+      });
+      switchCity?.on("click", () => {
+        this.currentScene = "ville";
+        this.experience.renderer?.changeScene(
+          this.cityScene?.scene as Scene,
+          this.cityScene?.camera as Camera,
+          true
+        );
+      });
+      switchEarth?.on("click", () => {
+        this.currentScene = "earth";
+        this.experience.renderer?.changeScene(
+          this.earthScene?.scene as Scene,
+          this.earthScene?.camera as Camera
+        );
+      });
+      switchGrandma?.on("click", () => {
+        this.currentScene = "mamie";
+        this.experience.renderer?.changeScene(
+          this.grandmaScene?.scene as Scene,
+          this.grandmaScene?.camera as Camera,
+          true
+        );
+      });
     }
 
     this.debugTab2 = this.debug.ui?.pages[0].addFolder({
