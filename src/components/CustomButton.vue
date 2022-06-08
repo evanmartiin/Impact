@@ -36,7 +36,7 @@ button {
 
     .clip {
       clip-path: polygon(1% 5%, 53% 0, 99% 5%, 100% 54%, 99% 97%, 49% 100%, 1% 97%, 0 51%);
-      background-image: url("images/button.png");
+      background-image: url("/images/button.png");
       background-position: center;
       background-size: 110%;
       background-repeat: no-repeat;

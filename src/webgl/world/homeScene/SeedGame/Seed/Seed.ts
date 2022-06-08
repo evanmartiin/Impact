@@ -1,4 +1,4 @@
-import Loaders from '@/webgl/controllers/Loaders/Loaders';
+import type Loaders from '@/webgl/controllers/Loaders/Loaders';
 import anime from "animejs";
 import Experience from "@/webgl/Experience";
 import {

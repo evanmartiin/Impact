@@ -12,7 +12,7 @@ const back = () => {
 <button class="back" @click="back">
   <div class="shadow">
     <div class="clip">
-      <img src="images/earth.png" alt="">
+      <img src="/images/earth.png" alt="">
     </div>
   </div>
 </button>
@@ -44,7 +44,7 @@ const back = () => {
       justify-content: center;
       font-family: 'CG Heavy';
       clip-path: polygon(24% 100%, 8% 89%, 0 58%, 5% 18%, 43% 0, 81% 6%, 100% 29%, 96% 74%, 78% 97%);
-      background-image: url("images/paper-min.png");
+      background-image: url("/images/paper-min.png");
       background-position: center;
       background-size: 120%;
       background-repeat: round;
