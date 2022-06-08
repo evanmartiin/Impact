@@ -85,7 +85,7 @@ export default class World {
     if (this.experience.activeCamera?.instance && this.canvas) {
       this.controls = new OrbitControls(this.experience.activeCamera.instance, this.canvas);
       this.controls.enableDamping = true;
-      this.controls.enableZoom = false;
+      this.controls.enableZoom = true;
       this.controls.enablePan = false;
       this.setListener();
     }

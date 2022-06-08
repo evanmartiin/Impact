@@ -16,6 +16,7 @@
     "sass": "^1.49.9",
     "signal-js": "^3.0.1",
     "three": "^0.135.0",
+    "three-mesh-bvh": "^0.5.11",
     "tweakpane": "^3.0.7",
     "vue": "^3.2.31",
     "vue-router": "^4.0.12"

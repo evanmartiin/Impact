@@ -1,3 +1,4 @@
+import type Time from "@/webgl/controllers/Time";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
@@ -14,15 +15,19 @@ import {
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
 import Camera from "../Camera";
+import Lumberjack from "./SeedGame/Lumberjack/Lumberjack";
 import SeedGame from "./SeedGame/SeedGame";
 import fragment from "./Shaders/Map/fragment.glsl?raw";
 import vertex from "./Shaders/Map/vertex.glsl?raw";
+import { MeshBVH, MeshBVHVisualizer } from "three-mesh-bvh";
+import PhysicCtrl from "./SeedGame/Controllers/PhysicCtrl";
 
 export default class HomeScene {
   private experience: Experience = new Experience();
   private loaders: Loaders = this.experience.loaders as Loaders;
   private debugTab: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
+  private time: Time = this.experience.time as Time;
   public instance: Group = new Group();
   private startButton: ButtonApi | null = null;
   private stopButton: ButtonApi | null = null;
@@ -32,6 +37,21 @@ export default class HomeScene {
   private models: GLTF[] = [];
   private textures: Texture[] = [];
   public camera: Camera = new Camera(this.cameraPos, this.scene);
+  private lumberjack: Lumberjack | null = null;
+  private floorMesh: Mesh | null = null;
+  private Trees: Mesh[] = [];
+  private physicCtrl = new PhysicCtrl(this.scene, true);
+  private floorVisualizer: MeshBVHVisualizer | null = null;
+  private params = {
+    firstPerson: false,
+
+    displayCollider: true,
+    displayBVH: true,
+    visualizeDepth: 10,
+    gravity: -10,
+    playerSpeed: 10,
+    physicsSteps: 5,
+  };
 
   constructor() {
     if (this.camera.instance) this.game = new SeedGame(this.scene, this.camera);
@@ -60,12 +80,26 @@ export default class HomeScene {
               },
             });
             (child as Mesh).material = bakedMaterial;
+            if (index === 1) {
+              this.setFloorCollider(child);
+            } else {
+              this.physicCtrl.addCollider(child);
+            }
           }
         });
+        // model.scene.visible = false;
         this.scene?.add(model.scene);
       }
     });
     // this.scene.add(mainModel.scene);
+
+    this.lumberjack = new Lumberjack(
+      this.scene as Scene,
+      this.floorMesh as Mesh,
+      this.physicCtrl.colliders,
+      this.camera
+    );
+    this.lumberjack.set();
 
     const sunLight = new DirectionalLight("#ffffff", 4);
     sunLight.castShadow = true;
@@ -79,8 +113,30 @@ export default class HomeScene {
     // this.character.appear();
   }
 
+  setFloorCollider(mesh: Mesh) {
+    mesh.geometry.boundsTree = new MeshBVH(mesh.geometry);
+
+    this.floorVisualizer = new MeshBVHVisualizer(
+      mesh,
+      this.params.visualizeDepth
+    );
+    this.floorMesh = mesh;
+
+    this.scene?.add(this.floorVisualizer);
+  }
+
   update() {
     if (this.game) this.game.update();
+    if (this.floorMesh) {
+      this.floorMesh.visible = this.params.displayCollider;
+      if (this.floorVisualizer)
+        this.floorVisualizer.visible = this.params.displayBVH;
+
+      const physicsSteps = this.params.physicsSteps;
+      for (let i = 0; i < physicsSteps; i++) {
+        this.lumberjack?.update((this.time.delta / physicsSteps) * 0.0001);
+      }
+    }
   }
 
   enterGameView() {
