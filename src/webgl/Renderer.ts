@@ -154,10 +154,6 @@ export default class Renderer {
               toRaycast.push(object)
             );
 
-            this.experience.world.homeScene.game?.targets?.instance.children.map(
-              (object) => toRaycast.push(object)
-            );
-
             this.raycaster.intersectObjects(toRaycast).map((object) => {
               this.intersects.push(object);
             });
