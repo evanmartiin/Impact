@@ -39,22 +39,27 @@ const Sources: ISource[] = [
   {
     name: "housev1model",
     type: "gltfModel",
-    path: "/models/housev4.glb",
+    path: "/models/housev8.glb",
   },
   {
     name: "grassv1model",
     type: "gltfModel",
-    path: "/models/grassv3.glb",
+    path: "/models/grassv8.glb",
   },
   {
     name: "housev1texture",
     type: "texture",
-    path: "/textures/housev5.jpg",
+    path: "/textures/bakedHousev8.jpg",
+  },
+  {
+    name: "seedMatCap",
+    type: "texture",
+    path: "/textures/seedMatCap.jpg",
   },
   {
     name: "grassv1texture",
     type: "texture",
-    path: "/textures/grassv5.jpg",
+    path: "/textures/bakedGrassv8.jpg",
   },
   {
     name: "city",

@@ -1,4 +1,4 @@
-import { GameCamCtrl } from "./GameCamCtrl/GameCamCtrl";
+import { GameCamCtrl } from "./Controllers/GameCamCtrl";
 import type Camera from "@/webgl/world/Camera";
 import { isLocked, setLockMouseMode } from "@/utils/lockMouseMode";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
@@ -26,7 +26,7 @@ export default class SeedGame {
   private angleTarget = new Vector3();
 
   private distanceLookAt = -30;
-  private cameraHeight = 7;
+  private cameraHeight = 0.5;
   private heightLookAt = 0;
 
   private defaultCenterPos = new Vector3(
@@ -84,7 +84,7 @@ export default class SeedGame {
   update() {
     if (this.isGameView) {
       if (this.helper?.instance)
-        this.helper.instance.position.set(0, this.cameraHeight, 5);
+        this.helper.instance.position.set(0, this.cameraHeight, 0.01);
       this.seed?.update();
     }
   }

@@ -1,3 +1,4 @@
+import Loaders from '@/webgl/controllers/Loaders/Loaders';
 import anime from "animejs";
 import Experience from "@/webgl/Experience";
 import {
@@ -9,15 +10,18 @@ import {
   SphereGeometry,
   Mesh,
   ArrowHelper,
+  MeshMatcapMaterial,
+  Texture,
 } from "three";
 
 export default class Seed {
   private experience: Experience = new Experience();
+  private loaders: Loaders = this.experience.loaders as Loaders;
   private camera: PerspectiveCamera = this.experience.world?.homeScene?.camera
     .instance as PerspectiveCamera;
   private scene: Scene | null = null;
   private geometry: SphereGeometry | null = null;
-  private material: MeshStandardMaterial | null = null;
+  private material: MeshMatcapMaterial | null = null;
   private mesh: Mesh | null = null;
   private targetPoint: Vector3 | null = null;
   private cameraDirection: Vector3 = new Vector3();
@@ -29,20 +33,21 @@ export default class Seed {
   private farPointRef = new Vector3(0, 0, 30);
   private arrowCam: ArrowHelper | null = null;
   private arrowOri: ArrowHelper | null = null;
-  private origin = new Vector3(0, 0.8, 0.5);
+  private origin = new Vector3(0, 0.5, 0.01);
   private xzDirection = new Vector2(0, 0);
   private ballDirection = new Vector3(0, 0, 0);
 
   constructor(scene: Scene) {
     this.scene = scene;
     this.geometry = new SphereGeometry(0.05, 16, 16);
-    this.material = new MeshStandardMaterial({ color: 0xff0000 });
+    this.material = new MeshMatcapMaterial({ color: 0x000 });
+    this.material.matcap = this.loaders.items["seedMatCap"] as Texture;
     this.mesh = new Mesh(this.geometry, this.material);
     this.resetPos();
     this.scene?.add(this.mesh);
 
     const dir = new Vector3(1, 2, 0);
-    const length = 1;
+    const length = 0.1;
     const hexCam = 0xffff00;
     const hexOri = 0xff0000;
     this.arrowCam = new ArrowHelper(dir, this.origin, length, hexCam);
@@ -63,12 +68,12 @@ export default class Seed {
     this.arrowCam?.setDirection(newCamDirection);
     const baseDirection = new Vector3().copy(this.farPointRef);
     this.arrowOri?.setDirection(baseDirection);
-    if(this.cameraDirection.y > 0){
+    if (this.cameraDirection.y > 0) {
       this.shotAngle = baseDirection.angleTo(newCamDirection) + Math.PI / 6;
-    }else{
+    } else {
       this.shotAngle = Math.PI / 6 - baseDirection.angleTo(newCamDirection);
     }
-    
+
     this.zValue = 0;
     this.resetPos();
     this.isTravelling = true;
