@@ -59,7 +59,7 @@ onMounted(() => {
       <CustomButton :click="start">Start Experience</CustomButton>
       <div class="credits">
         <img src="/images/gobelins_logo.png" alt="Gobelins logo">
-        <p>Ambroise Nicolao - Danut Miculas - Ludwig Pilicer - Evan Martin - Antoine Tardivel</p>
+        <p>Ambroise Nicolao - Danut Miculas - Ludwig Pilicer - Evan Martin - Antoine Tardivel - Timon Idrissi</p>
         <img src="/images/cci_logo.png" alt="CCI logo">
       </div>
     </div>

@@ -116,9 +116,9 @@ export default class HomeScene {
 
   setSkybox() {
     const loader = new CubeTextureLoader();
-    loader.setPath('textures/skybox/');
+    loader.setPath('textures/skybox/home/');
 
-    const textureCube = loader.load(['posx.jpeg', 'negx.jpeg', 'posy.jpeg', 'negy.jpeg', 'posz.jpeg', 'negz.jpeg']);
+    const textureCube = loader.load(['px.jpg', 'px.jpg', 'py.jpg', 'ny.jpg', 'px.jpg', 'px.jpg']);
     textureCube.encoding = sRGBEncoding;
     this.scene.background = textureCube;
   }

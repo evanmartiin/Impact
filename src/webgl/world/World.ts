@@ -1,6 +1,6 @@
 import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
-import { AmbientLight, DirectionalLight, HemisphereLight, type Scene } from "three";
+import { AmbientLight, AxesHelper, CatmullRomCurve3, DirectionalLight, HemisphereLight, Mesh, MeshBasicMaterial, MeshNormalMaterial, Object3D, PerspectiveCamera, TubeGeometry, Vector3, type Scene } from "three";
 import type { FolderApi } from "tweakpane";
 import type { district } from "./../../models/district.model";
 import Earth from "./earthScene/Earth";
@@ -13,6 +13,7 @@ import GrandmaScene from "./grandmaScene/grandmaScene";
 // import type Ashes from "./entities/Ashes/Ashes";
 import signal from 'signal-js';
 import type Loaders from "../controllers/Loaders/Loaders";
+import Intro from "./Intro";
 
 export default class World {
   private experience: Experience = new Experience();
@@ -33,6 +34,7 @@ export default class World {
     "isMaintenanceOn": false,
     "isCtrlActive": true
   }
+  private intro: Intro | null = null;
 
   constructor() {
     signal.on("loaders_ready", () => {
@@ -70,15 +72,25 @@ export default class World {
       })
 
       this.setLight();
-      this.setControls();
+      // this.setAxis();
       this.setIntro();
       this.setDebug();
     });
   }
 
+  setAxis() {
+    const axesHelper = new AxesHelper(1.4);
+    this.experience.activeScene?.add(axesHelper);
+  }
+
+  setIntro() {
+    this.intro = new Intro();
+  }
+
   update() {
     this.earthScene?.update();
     this.homeScene?.update();
+    this.intro?.update();
     if (this.PARAMS.isCtrlActive) this.controls?.update();
   }
 
@@ -90,12 +102,6 @@ export default class World {
       this.controls.enablePan = false;
       this.setListener();
     }
-  }
-
-  setIntro() {
-    this.experience.activeCamera?.instance?.position.set(.6, .5, .4);
-    this.controls?.target.set(0, .4, 0);
-    this.controls?.update();
   }
 
   setListener() {
