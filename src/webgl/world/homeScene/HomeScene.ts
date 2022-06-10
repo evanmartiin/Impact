@@ -4,13 +4,13 @@ import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import {
-  DirectionalLight,
   Group,
   Scene,
   Vector3,
   Texture,
   sRGBEncoding,
   Mesh,
+  CubeTextureLoader,
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
@@ -31,7 +31,7 @@ export default class HomeScene {
   private stopButton: ButtonApi | null = null;
   public game: SeedGame | null = null;
   public scene: Scene = new Scene();
-  public cameraPos: Vector3 = new Vector3(50, 50, 50);
+  public cameraPos: Vector3 = new Vector3(10, 10, 10);
   private models: GLTF[] = [];
   private textures: Texture[] = [];
   public camera: Camera = new Camera(this.cameraPos, this.scene);
@@ -41,6 +41,7 @@ export default class HomeScene {
     this.setFloor();
     this.setGame();
     this.setDebug();
+    this.setSkybox();
   }
 
   setGame() {
@@ -84,18 +85,22 @@ export default class HomeScene {
     });
   }
 
-  setLight() {
-    const sunLight = new DirectionalLight("#ffffff", 4);
-    sunLight.castShadow = true;
-    sunLight.shadow.camera.far = 15;
-    sunLight.shadow.mapSize.set(1024, 1024);
-    sunLight.shadow.normalBias = 0.05;
-    sunLight.position.set(200, 0, 200);
-    this.scene.add(sunLight);
+  setSkybox() {
+    const loader = new CubeTextureLoader();
+    loader.setPath("textures/skybox/home/");
+    loader.load(
+      ["px.jpg", "px.jpg", "py.jpg", "ny.jpg", "px.jpg", "px.jpg"],
+      (textureCube) => {
+        textureCube.encoding = sRGBEncoding;
+        this.scene.background = textureCube;
+      }
+    );
   }
 
   update() {
-    if (this.game) this.game.update();
+    if (this.game) {
+      this.game.update();
+    }
   }
 
   enterGameView() {

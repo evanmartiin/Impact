@@ -19,7 +19,7 @@ const props = defineProps({
 
 <style scoped lang="scss">
 button {
-  background-color: #A7DF49;
+  background-color: #ABCA8F;
   color: #0D1C51;
   border: none;
   clip-path: polygon(2% 4%, 46% 0, 98% 5%, 100% 61%, 98% 94%, 54% 99%, 2% 97%, 0 39%);
@@ -36,7 +36,7 @@ button {
 
     .clip {
       clip-path: polygon(1% 5%, 53% 0, 99% 5%, 100% 54%, 99% 97%, 49% 100%, 1% 97%, 0 51%);
-      background-image: url("/images/button.png");
+      background-image: url("/images/paper-min.png");
       background-position: center;
       background-size: 110%;
       background-repeat: no-repeat;

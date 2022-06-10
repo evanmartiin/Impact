@@ -68,12 +68,6 @@ export default class Experience {
     // this.setAxis();
   }
 
-  setAxis() {
-    const axesHelper = new AxesHelper(3);
-
-    this.activeScene?.add(axesHelper);
-  }
-
   resize() {
     this.activeCamera?.resize();
     this.renderer?.resize();
