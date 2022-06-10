@@ -1,6 +1,8 @@
-import type Loaders from '@/webgl/controllers/Loaders/Loaders';
-import anime from "animejs";
+import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
+import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
+import fragment from "./Shaders/fragment.glsl?raw";
+import vertex from "./Shaders/vertex.glsl?raw";
 import {
   MeshStandardMaterial,
   PerspectiveCamera,
@@ -12,7 +14,11 @@ import {
   ArrowHelper,
   MeshMatcapMaterial,
   Texture,
+  sRGBEncoding,
 } from "three";
+import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
+import seedSettings from "./SeedSettings";
+import gameCamSettings from "../Controllers/GameCam/GameCamSettings";
 
 export default class Seed {
   private experience: Experience = new Experience();
@@ -20,9 +26,11 @@ export default class Seed {
   private camera: PerspectiveCamera = this.experience.world?.homeScene?.camera
     .instance as PerspectiveCamera;
   private scene: Scene | null = null;
+
   private geometry: SphereGeometry | null = null;
   private material: MeshMatcapMaterial | null = null;
   private mesh: Mesh | null = null;
+
   private targetPoint: Vector3 | null = null;
   private cameraDirection: Vector3 = new Vector3();
   private zValue = 0;
@@ -33,19 +41,45 @@ export default class Seed {
   private farPointRef = new Vector3(0, 0, 30);
   private arrowCam: ArrowHelper | null = null;
   private arrowOri: ArrowHelper | null = null;
-  private origin = new Vector3(0, 0.5, 0.01);
+  private origin = gameCamSettings.gameCameraPosition;
   private xzDirection = new Vector2(0, 0);
-  private ballDirection = new Vector3(0, 0, 0);
+  private texture: Texture | null = null;
 
   constructor(scene: Scene) {
     this.scene = scene;
-    this.geometry = new SphereGeometry(0.05, 16, 16);
-    this.material = new MeshMatcapMaterial({ color: 0x000 });
-    this.material.matcap = this.loaders.items["seedMatCap"] as Texture;
-    this.mesh = new Mesh(this.geometry, this.material);
-    this.resetPos();
-    this.scene?.add(this.mesh);
+    this.setSeed();
+    this.setArrowHelpers();
+  }
 
+  setSeed() {
+    const model = this.loaders.items["seed-model"] as GLTF;
+    this.texture = this.loaders.items["poppingtrees-seed-texture"] as Texture;
+    this.texture.flipY = false;
+    this.texture.encoding = sRGBEncoding;
+    model.scene.traverse((child) => {
+      if (child instanceof Mesh && this.texture) {
+        const bakedMaterial = new ShaderBaseMaterial({
+          transparent: true,
+          fragmentShader: fragment,
+          vertexShader: vertex,
+          uniforms: {
+            uTexture: { value: this.texture },
+          },
+        });
+        (child as Mesh).material = bakedMaterial;
+        this.mesh = child;
+      }
+    });
+    this.scene?.add(model.scene);
+
+    if (this.mesh) {
+      this.mesh.visible = false;
+      this.resetPos();
+      this.scene?.add(this.mesh);
+    }
+  }
+
+  setArrowHelpers() {
     const dir = new Vector3(1, 2, 0);
     const length = 0.1;
     const hexCam = 0xffff00;
@@ -54,14 +88,11 @@ export default class Seed {
     this.arrowOri = new ArrowHelper(dir, this.origin, length, hexOri);
     this.scene?.add(this.arrowCam);
     this.scene?.add(this.arrowOri);
-
-    this.mesh.visible = false;
   }
 
-  shot(targetPointX: number, angle: number, farPoint: number) {
+  shot() {
     if (this.mesh) this.mesh.visible = true;
     this.camera.getWorldDirection(this.cameraDirection);
-    console.log(this.cameraDirection);
     this.xzDirection.set(this.cameraDirection.x, this.cameraDirection.z);
     const newCamDirection = new Vector3().copy(this.cameraDirection);
     newCamDirection.x = 0;
@@ -73,19 +104,20 @@ export default class Seed {
     } else {
       this.shotAngle = Math.PI / 6 - baseDirection.angleTo(newCamDirection);
     }
-
+    this.shotAngle -= 0.25;
     this.zValue = 0;
     this.resetPos();
     this.isTravelling = true;
+    console.log(this.shotAngle);
   }
 
   getHeight(x: number) {
-    const gravity = 1;
-    const speed = 5;
     const angle = this.shotAngle;
     const res =
       Math.tan(angle) * x -
-      (gravity / (2 * speed * Math.pow(Math.cos(angle), 2))) * Math.pow(x, 2);
+      (seedSettings.gravity /
+        (2 * seedSettings.speed * Math.pow(Math.cos(angle), 2))) *
+        Math.pow(x, 2);
     return res;
   }
 
@@ -104,13 +136,7 @@ export default class Seed {
   }
 
   moveModelX() {
-    if (this.maxX > 0) {
-      if (this.mesh && this.mesh.position.x < this.maxX)
-        this.mesh.position.x += this.deltaMove;
-    } else {
-      if (this.mesh && this.mesh.position.x > this.maxX)
-        this.mesh.position.x += this.deltaMove;
-    }
+    if (this.mesh) this.mesh.position.x += this.deltaMove;
   }
 
   update() {
@@ -124,5 +150,21 @@ export default class Seed {
         this.isTravelling = false;
       }
     }
+  }
+
+  setDebug() {
+    // this.debugTab = this.debug.ui?.pages[2].addFolder({ title: "Game shot" });
+    // const startButton = this.debugTab?.addButton({
+    //   title: "Start Game",
+    // }) as ButtonApi;
+    // startButton.on("click", () => {
+    //   this.start();
+    // });
+    // const stopButton = this.debugTab?.addButton({
+    //   title: "Stop Game",
+    // }) as ButtonApi;
+    // stopButton.on("click", () => {
+    //   this.stop();
+    // });
   }
 }

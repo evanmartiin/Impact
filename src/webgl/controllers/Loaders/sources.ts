@@ -39,17 +39,17 @@ const Sources: ISource[] = [
   {
     name: "housev1model",
     type: "gltfModel",
-    path: "/models/housev8.glb",
+    path: "/models/housev9.glb",
   },
   {
     name: "grassv1model",
     type: "gltfModel",
-    path: "/models/grassv8.glb",
+    path: "/models/grassv9.glb",
   },
   {
     name: "housev1texture",
     type: "texture",
-    path: "/textures/bakedHousev8.jpg",
+    path: "/textures/bakedHousev9.jpg",
   },
   {
     name: "seedMatCap",
@@ -59,7 +59,7 @@ const Sources: ISource[] = [
   {
     name: "grassv1texture",
     type: "texture",
-    path: "/textures/bakedGrassv8.jpg",
+    path: "/textures/bakedGrassv9.jpg",
   },
   {
     name: "city",
@@ -183,11 +183,27 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/paper.jpg",
   },
-
   {
     name: "matcap-texture",
     type: "texture",
     path: "/textures/matcap.jpeg",
+  },
+  // SEED
+  {
+    name: "seed-model",
+    type: "gltfModel",
+    path: "/models/seed.glb",
+  },
+  {
+    name: "poppingtrees-seed-texture",
+    type: "texture",
+    path: "/textures/poppingtrees-seed.jpg",
+  },
+  // CURSOR
+  {
+    name: "cursor-texture",
+    type: "texture",
+    path: "/textures/cursor.png",
   },
 ];
 

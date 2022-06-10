@@ -10,9 +10,13 @@ import {
   Box3,
 } from "three";
 import type { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import type { ICollider } from "../Controllers/PhysicCtrl";
+import PhysicCtrl from "../Controllers/Physic/PhysicCtrl";
+import type { ICollider } from "../Controllers/Physic/PhysicCtrl";
+import physicSettings from "../Controllers/Physic/PhysicSettings";
+import lamberjackSettings from "./LumberjackSettings";
 
 export default class Lumberjack {
+  private physicCtrl: PhysicCtrl | null = null;
   private controls: OrbitControls | null = null;
   private geometry: BoxGeometry | null = null;
   private material: MeshBasicMaterial | null = null;
@@ -20,15 +24,6 @@ export default class Lumberjack {
   private scene: Scene | null;
   private playerVelocity = new Vector3();
   private playerIsOnGround = false;
-  private params = {
-    firstPerson: false,
-    displayCollider: true,
-    displayBVH: true,
-    visualizeDepth: 10,
-    gravity: -250,
-    playerSpeed: 10,
-    physicsSteps: 5,
-  };
   private upVector = new Vector3(0, 1, 0);
   private tempVector = new Vector3();
   private tempVector2 = new Vector3();
@@ -41,14 +36,11 @@ export default class Lumberjack {
   private bkdPressed = false;
   private lftPressed = false;
   private rgtPressed = false;
-  constructor(
-    scene: Scene,
-    floor: Mesh,
-    colliders: ICollider[],
-    camera: Camera
-  ) {
-    this.floor = floor;
-    this.colliders = colliders;
+  constructor(scene: Scene, camera: Camera) {
+    this.physicCtrl = new PhysicCtrl(scene);
+    console.log(this.physicCtrl.colliders);
+    this.floor = this.physicCtrl.floorMesh;
+    this.colliders = this.physicCtrl.colliders;
     this.scene = scene;
     this.controls = camera.controls;
   }
@@ -57,7 +49,7 @@ export default class Lumberjack {
       this.geometry = new BoxGeometry(0.02, 0.02, 0.02);
       this.material = new MeshBasicMaterial({ color: 0x00ff00 });
       this.instance = new Mesh(this.geometry, this.material);
-      this.instance.position.set(0, 0.5, 1);
+      this.instance.position.copy(lamberjackSettings.basePosition);
       (this.instance as any).capsuleInfo = {
         radius: 0.02,
         segment: new Line3(new Vector3(), new Vector3(0, 0.02, 0.0)),
@@ -118,7 +110,7 @@ export default class Lumberjack {
   update(delta: number) {
     this.playerVelocity.y += this.playerIsOnGround
       ? 0
-      : delta * this.params.gravity;
+      : delta * lamberjackSettings.gravity;
     this.instance?.position.addScaledVector(this.playerVelocity, delta);
 
     const angle = this.controls?.getAzimuthalAngle() || 0;
@@ -127,7 +119,7 @@ export default class Lumberjack {
       this.tempVector.set(0, 0, -0.2).applyAxisAngle(this.upVector, angle);
       this.instance?.position.addScaledVector(
         this.tempVector,
-        this.params.playerSpeed * delta
+        lamberjackSettings.playerSpeed * delta
       );
     }
 
@@ -135,7 +127,7 @@ export default class Lumberjack {
       this.tempVector.set(0, 0, 0.2).applyAxisAngle(this.upVector, angle);
       this.instance?.position.addScaledVector(
         this.tempVector,
-        this.params.playerSpeed * delta
+        lamberjackSettings.playerSpeed * delta
       );
     }
 
@@ -143,7 +135,7 @@ export default class Lumberjack {
       this.tempVector.set(-0.2, 0, 0).applyAxisAngle(this.upVector, angle);
       this.instance?.position.addScaledVector(
         this.tempVector,
-        this.params.playerSpeed * delta
+        lamberjackSettings.playerSpeed * delta
       );
     }
 
@@ -151,7 +143,7 @@ export default class Lumberjack {
       this.tempVector.set(0.2, 0, 0).applyAxisAngle(this.upVector, angle);
       this.instance?.position.addScaledVector(
         this.tempVector,
-        this.params.playerSpeed * delta
+        lamberjackSettings.playerSpeed * delta
       );
     }
 
@@ -201,32 +193,32 @@ export default class Lumberjack {
         }
       },
     });
-    this.colliders.map(c=>{
-        c.collider.geometry.boundsTree!.shapecast({
-          intersectsBounds: (box) => {
-            return box.intersectsBox(this.tempBox);
-          },
-          intersectsTriangle: (tri) => {
-            // check if the triangle is intersecting the capsule and adjust the
-            // capsule position if it is.
-            const triPoint = this.tempVector;
-            const capsulePoint = this.tempVector2;
+    this.colliders.map((c) => {
+      c.collider.geometry.boundsTree!.shapecast({
+        intersectsBounds: (box) => {
+          return box.intersectsBox(this.tempBox);
+        },
+        intersectsTriangle: (tri) => {
+          // check if the triangle is intersecting the capsule and adjust the
+          // capsule position if it is.
+          const triPoint = this.tempVector;
+          const capsulePoint = this.tempVector2;
 
-            const distance = tri.closestPointToSegment(
-              this.tempSegment,
-              triPoint,
-              capsulePoint
-            );
-            if (distance < capsuleInfo.radius) {
-              const depth = capsuleInfo.radius - distance;
-              const direction = capsulePoint.sub(triPoint).normalize();
+          const distance = tri.closestPointToSegment(
+            this.tempSegment,
+            triPoint,
+            capsulePoint
+          );
+          if (distance < capsuleInfo.radius) {
+            const depth = capsuleInfo.radius - distance;
+            const direction = capsulePoint.sub(triPoint).normalize();
 
-              this.tempSegment.start.addScaledVector(direction, depth);
-              this.tempSegment.end.addScaledVector(direction, depth);
-            }
-          },
-        });
-    })
+            this.tempSegment.start.addScaledVector(direction, depth);
+            this.tempSegment.end.addScaledVector(direction, depth);
+          }
+        },
+      });
+    });
 
     // get the adjusted position of the capsule collider in world space after checking
     // triangle collisions and moving it. capsuleInfo.segment.start is assumed to be
@@ -271,6 +263,6 @@ export default class Lumberjack {
 
   resetPos() {
     this.playerVelocity.set(0, 0, 0);
-    this.instance?.position.set(0, 0.5, 1);
+    this.instance?.position.copy(lamberjackSettings.basePosition);
   }
 }
