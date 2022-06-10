@@ -11,6 +11,7 @@ import {
   Texture,
   sRGBEncoding,
   Mesh,
+  CubeTextureLoader,
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
@@ -33,18 +34,17 @@ export default class HomeScene {
   private stopButton: ButtonApi | null = null;
   public game: SeedGame | null = null;
   public scene: Scene = new Scene();
-  public cameraPos: Vector3 = new Vector3(50, 50, 50);
+  public cameraPos: Vector3 = new Vector3(10, 10, 10);
   private models: GLTF[] = [];
   private textures: Texture[] = [];
   public camera: Camera = new Camera(this.cameraPos, this.scene);
   private lumberjack: Lumberjack | null = null;
   private floorMesh: Mesh | null = null;
   private Trees: Mesh[] = [];
-  private physicCtrl = new PhysicCtrl(this.scene, true);
+  private physicCtrl = new PhysicCtrl(this.scene, false);
   private floorVisualizer: MeshBVHVisualizer | null = null;
   private params = {
     firstPerson: false,
-
     displayCollider: true,
     displayBVH: true,
     visualizeDepth: 10,
@@ -109,8 +109,18 @@ export default class HomeScene {
     sunLight.position.set(200, 0, 200);
     this.scene.add(sunLight);
 
+    this.setSkybox();
     this.setDebug();
     // this.character.appear();
+  }
+
+  setSkybox() {
+    const loader = new CubeTextureLoader();
+    loader.setPath('textures/skybox/home/');
+
+    const textureCube = loader.load(['px.jpg', 'px.jpg', 'py.jpg', 'ny.jpg', 'px.jpg', 'px.jpg']);
+    textureCube.encoding = sRGBEncoding;
+    this.scene.background = textureCube;
   }
 
   setFloorCollider(mesh: Mesh) {
@@ -120,6 +130,7 @@ export default class HomeScene {
       mesh,
       this.params.visualizeDepth
     );
+    this.floorVisualizer.visible = false;
     this.floorMesh = mesh;
 
     this.scene?.add(this.floorVisualizer);
@@ -129,8 +140,8 @@ export default class HomeScene {
     if (this.game) this.game.update();
     if (this.floorMesh) {
       this.floorMesh.visible = this.params.displayCollider;
-      if (this.floorVisualizer)
-        this.floorVisualizer.visible = this.params.displayBVH;
+      // if (this.floorVisualizer)
+        // this.floorVisualizer.visible = this.params.displayBVH;
 
       const physicsSteps = this.params.physicsSteps;
       for (let i = 0; i < physicsSteps; i++) {
