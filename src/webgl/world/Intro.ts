@@ -65,7 +65,6 @@ export default class Intro {
     this.mesh = new Mesh(this.geometry, this.material);
 
     this.setCamera();
-    this.handleMouse();
   }
 
   setCamera() {
@@ -73,8 +72,31 @@ export default class Intro {
     const { x, y, z } = this.position;
     if (this.experience.activeCamera?.instance) {
       this.experience.activeCamera.instance.position.set(x, y, z);
-      this.experience.activeCamera.instance.lookAt(0, .4, 0);
-      this.baseCameraSpherical = new Spherical().setFromVector3(this.experience.activeCamera.instance.position.clone());
+      this.experience.activeCamera.instance.lookAt(0, 500, 0);
+
+      const dummy = new Object3D();
+      dummy.position.set(x, y, z);
+      dummy.lookAt(0, .4, 0);
+      this.baseCameraSpherical = new Spherical().setFromVector3(dummy.position.clone());
+
+      const targetY = { value: 0 };
+      const tl = anime.timeline({});
+      tl.add(
+        {
+          targets: targetY,
+          value: [500, .4],
+          duration: 3000,
+          easing: 'easeOutExpo',
+          change: () => {
+            this.experience.activeCamera?.instance?.lookAt(0, targetY.value, 0);
+          },
+          complete: () => {
+            signal.emit("camera_ready");
+            this.handleMouse();
+          }
+        },
+        0
+      );
     }
   }
 

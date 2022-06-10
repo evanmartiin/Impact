@@ -51,6 +51,9 @@ export default class Loaders {
 
     this.loaded++;
 
+    const pct = Math.floor(this.loaded / (this.toLoad as number) * 100);
+    signal.emit("loading", pct);
+
     if (this.loaded === this.toLoad) {
       signal.emit("loaders_ready");
     }
