@@ -5,6 +5,9 @@ import {
   TubeGeometry,
   Spherical,
   Object3D,
+  CatmullRomCurve3,
+  MeshNormalMaterial,
+  Mesh,
 } from "three";
 import signal from "signal-js";
 import type Sizes from "../../../controllers/Sizes";
@@ -25,24 +28,11 @@ export default class Intro {
   constructor() {
     signal.on("start_experience", () => this.start());
 
-    this.setPath();
-  }
-
-  setPath() {
-    this.geometry = new TubeGeometry(
-      introSettings.pipeSpline,
-      100,
-      0.01,
-      2,
-      true
-    );
-
     this.setCamera();
   }
 
   setCamera() {
-    this.geometry?.parameters.path.getPointAt(0, this.position);
-    const { x, y, z } = this.position;
+    const { x, y, z } = introSettings.pipeSpline[0];
     if (this.experience.activeCamera?.instance) {
       this.experience.activeCamera.instance.position.set(x, y, z);
       this.experience.activeCamera.instance.lookAt(0, 500, 0);
@@ -90,9 +80,22 @@ export default class Intro {
   }
 
   start() {
-    this.startTime = this.time.elapsed;
-    this.isIntroRunning = true;
     signal.off("mouse_move");
+
+    const points = [
+      this.experience.activeCamera?.instance?.position.clone() as Vector3,
+      ...introSettings.pipeSpline.slice(1)
+    ];
+
+    this.geometry = new TubeGeometry(
+      new CatmullRomCurve3(points),
+      100,
+      0.01,
+      2
+    );
+
+    this.isIntroRunning = true;
+    this.startTime = this.time.elapsed;
   }
 
   stop() {
