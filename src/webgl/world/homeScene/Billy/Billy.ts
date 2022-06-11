@@ -79,7 +79,6 @@ export default class Billy {
     console.log(this.model);
 
     this.instance = this.model.scene;
-    this.instance.rotateX(-Math.PI * 0.5);
     this.instance.scale.set(1, 1, 1);
     this.instance.position.set(0, 0, 0.1);
     this.scene?.add(this.instance);
