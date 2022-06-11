@@ -58,7 +58,7 @@ export default class Intro {
         {
           targets: targetY,
           value: [500, .1],
-          duration: 3000,
+          duration: 5000,
           easing: 'easeOutExpo',
           change: () => {
             this.experience.activeCamera?.instance?.lookAt(0, targetY.value, 0);

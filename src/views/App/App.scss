@@ -125,49 +125,69 @@ main,
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   position: absolute;
   top: 0;
   left: 0;
   color: #ffffff;
   background-color: rgba(0, 9, 94, 1);
 
-  .content {
-    position: absolute;
-    top: 30%;
+  .loading {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    gap: 50px;
 
-    .logo {
-      .impact-logo {
-        height: 130px;
-        margin: 0 2px;
+    #earth {
+      width: 200px;
+    }
+  
+    #progress-bar {
+      bottom: 30%;
+      height: 10px;
+      width: 200px;
+      border: 2px solid white;
+      border-radius: 50px;
+      background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 0%);
+    }
+  }
 
-        &.letter-A {
-          margin: 0 -22px 0 -35px;
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 50vh;
+
+    .text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .logo {
+        .impact-logo {
+          height: 130px;
+          margin: 0 2px;
+  
+          &.letter-A {
+            margin: 0 -22px 0 -35px;
+          }
         }
+      }
+
+      h2 {
+        font-size: 40px;
+        margin-top: 20px;
+        text-shadow: 4px 4px 4px rgba(13, 28, 81, 0.1);
       }
     }
 
-    h2 {
-      font-size: 40px;
-      margin-top: 20px;
-      text-shadow: 4px 4px 4px rgba(13, 28, 81, 0.1);
+    #start-button {
+      opacity: 0;
+      transform: translateY(100);
+      pointer-events: none;
     }
-  }
-
-  #progress-bar {
-    position: absolute;
-    bottom: 30%;
-    height: 50px;
-    width: 500px;
-    background: linear-gradient(90deg, rgba(200,255,191,1) 0%, rgba(255,210,210,1) 0%);
-  }
-
-  #start-button {
-    position: absolute;
-    bottom: 30%;
   }
 
   .credits {
