@@ -22,8 +22,22 @@ const score = ref(0);
 const experienceStarted = ref(false);
 
 const start = () => {
-  experienceStarted.value = true;
   signal.emit("start_experience");
+  const tl = anime.timeline({});
+  tl.add(
+    {
+      targets: '.content-el',
+      opacity: [1, 0],
+      translateY: [0, 50],
+      duration: 1000,
+      delay: anime.stagger(100, { direction: 'reverse' }),
+      easing: 'easeOutBack',
+      complete: () => {
+        experienceStarted.value = true;
+      }
+    },
+    0
+  );
 }
 
 onMounted(() => {
@@ -165,7 +179,7 @@ const endLoading = () => {
       </div>
       <div class="content" v-show="!showLoading">
         <div class="text">
-          <div class="logo">
+          <div class="logo content-el">
             <img class="impact-logo" src="/images/impact_logo/i.png" alt="Impact logo I">
             <img class="impact-logo" src="/images/impact_logo/m.png" alt="Impact logo M">
             <img class="impact-logo" src="/images/impact_logo/p.png" alt="Impact logo P">
@@ -173,9 +187,9 @@ const endLoading = () => {
             <img class="impact-logo" src="/images/impact_logo/c.png" alt="Impact logo C">
             <img class="impact-logo" src="/images/impact_logo/t.png" alt="Impact logo T">
           </div>
-          <h2 id="baseline">Save Grandma, Save the Earth!</h2>
+          <h2 id="baseline" class="content-el">Save Grandma, Save the Earth!</h2>
         </div>
-        <CustomButton id="start-button" :click="start">Start Experience</CustomButton>
+        <CustomButton id="start-button" class="content-el" :click="start">Start Experience</CustomButton>
       </div>
       <!-- <div class="credits">
         <img src="/images/gobelins_logo.png" alt="Gobelins logo">

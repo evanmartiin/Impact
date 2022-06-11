@@ -1,4 +1,4 @@
-import { CatmullRomCurve3, Vector3 } from "three";
+import { Vector3 } from "three";
 
 const introSettings = {
   pipeSpline: [

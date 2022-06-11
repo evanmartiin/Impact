@@ -111,7 +111,6 @@ export default class Intro {
       const t = (this.time.elapsed - this.startTime) / looptime;
       const easeInOut = t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
       const easeBounce = (1 - (Math.cos(t * Math.PI * 2) * .5 + .5)) / 10;
-
       if (t <= 1) {
         this.geometry?.parameters.path.getPointAt(easeInOut, this.position);
         const { x, y, z } = this.position;
