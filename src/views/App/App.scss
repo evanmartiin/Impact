@@ -120,26 +120,36 @@ main,
 }
 
 #intro {
-  width: 90vw;
-  height: 80vh;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
   position: absolute;
-  top: 10vh;
-  left: 5vw;
+  top: 0;
+  left: 0;
   color: #ffffff;
+  background-color: rgba(0, 9, 94, 1);
 
-  .logo {
+  .content {
+    position: absolute;
+    top: 30%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
 
-    img {
-      height: 130px;
+    .logo {
+      .impact-logo {
+        height: 130px;
+        margin: 0 2px;
+
+        &.letter-A {
+          margin: 0 -22px 0 -35px;
+        }
+      }
     }
-  
+
     h2 {
       font-size: 40px;
       margin-top: 20px;
@@ -147,6 +157,18 @@ main,
     }
   }
 
+  #progress-bar {
+    position: absolute;
+    bottom: 30%;
+    height: 50px;
+    width: 500px;
+    background: linear-gradient(90deg, rgba(200,255,191,1) 0%, rgba(255,210,210,1) 0%);
+  }
+
+  #start-button {
+    position: absolute;
+    bottom: 30%;
+  }
 
   .credits {
     display: flex;
