@@ -7,6 +7,7 @@ import type Mouse from "@/webgl/controllers/Mouse";
 import Experience from "@/webgl/Experience";
 import type Renderer from "@/webgl/Renderer";
 import signal from 'signal-js';
+import gameCamSettings from "./GameCamSettings";
 
 export class GameCamCtrl {
   private experience: Experience = new Experience();
@@ -23,7 +24,6 @@ export class GameCamCtrl {
   private gameControls: PointerLockControls | null = null;
   private distanceLookAt = -30;
   private heightLookAt = 0;
-  private cameraHeight = 0.5;
   private isFirstMove = false;
 
   private defaultCenterPos = new Vector3(
@@ -41,7 +41,7 @@ export class GameCamCtrl {
     );
   }
 
-  lockMouse() {
+  private lockMouse() {
     // Desactive orbit control
     if (this.world) {
       this.world.PARAMS.isCtrlActive = false;
@@ -58,7 +58,7 @@ export class GameCamCtrl {
     this.isFirstMove = true;
   }
 
-  unlockMouse() {
+  private unlockMouse() {
     // Active orbit control
     if (this.world) {
       this.world.PARAMS.isCtrlActive = true;
@@ -79,7 +79,7 @@ export class GameCamCtrl {
     this.prevCamPos = this.prevCamPos.copy(
       this.camera?.instance?.position as Vector3
     );
-    this.camera?.instance?.position.copy(new Vector3(0, this.cameraHeight, 0.01));
+    this.camera?.instance?.position.copy(gameCamSettings.gameCameraPosition);
     this.camera?.instance?.lookAt(this.defaultCenterPos);
   }
 
@@ -91,7 +91,7 @@ export class GameCamCtrl {
     this.camera?.instance?.lookAt(0, 0, 0);
   }
 
-  moveCamera() {
+  private moveCamera() {
     if (this.mouse.mouseMoveEvent) {
       const movementX =
         this.mouse.mouseMoveEvent.movementX ||

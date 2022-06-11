@@ -37,21 +37,6 @@ const Sources: ISource[] = [
     path: "/models/earthv5.glb",
   },
   {
-    name: "housev1model",
-    type: "gltfModel",
-    path: "/models/housev8.glb",
-  },
-  {
-    name: "grassv1model",
-    type: "gltfModel",
-    path: "/models/grassv8.glb",
-  },
-  {
-    name: "housev1texture",
-    type: "texture",
-    path: "/textures/bakedHousev8.jpg",
-  },
-  {
     name: "seedMatCap",
     type: "texture",
     path: "/textures/seedMatCap.jpg",
@@ -59,7 +44,7 @@ const Sources: ISource[] = [
   {
     name: "grassv1texture",
     type: "texture",
-    path: "/textures/bakedGrassv8.jpg",
+    path: "/textures/bakedGrassv9.jpg",
   },
   {
     name: "city",
@@ -183,11 +168,81 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/paper.jpg",
   },
-
   {
     name: "matcap-texture",
     type: "texture",
     path: "/textures/matcap.jpeg",
+  },
+  // HOUSE GRASS
+  {
+    name: "grassv1model",
+    type: "gltfModel",
+    path: "/models/HouseScene/grass.glb",
+  },
+  {
+    name: "housev1texture",
+    type: "texture",
+    path: "/textures/HouseScene/bakedHouse.jpg",
+  },
+  // HOUSE SCENE
+  {
+    name: "housev1model",
+    type: "gltfModel",
+    path: "/models/HouseScene/house.glb",
+  },
+  {
+    name: "housev1texture",
+    type: "texture",
+    path: "/textures/HouseScene/bakedHouse.jpg",
+  },
+  // CURSOR
+  {
+    name: "cursor-texture",
+    type: "texture",
+    path: "/textures/cursor.png",
+  },
+  // BILLY
+  {
+    name: "billy-model",
+    type: "gltfModel",
+    path: "/models/Characters/Billy/billyModel.glb",
+  },
+  {
+    name: "billy-model-test",
+    type: "gltfModel",
+    path: "/models/character.glb",
+  },
+  {
+    name: "billy-texture",
+    type: "texture",
+    path: "/textures/Characters/Billy/billyTextureV2.jpg",
+  },
+  // TREES
+  {
+    name: "big-tree-model",
+    type: "gltfModel",
+    path: "/models/Trees/bigTree.glb",
+  },
+  {
+    name: "medium-tree-model",
+    type: "gltfModel",
+    path: "/models/Trees/mediumTree.glb",
+  },
+  {
+    name: "small-tree-model",
+    type: "gltfModel",
+    path: "/models/Trees/smallTree.glb",
+  },
+  // SEED
+  {
+    name: "seed-model",
+    type: "gltfModel",
+    path: "/models/seed.glb",
+  },
+  {
+    name: "poppingtrees-seed-texture",
+    type: "texture",
+    path: "/textures/poppingtrees-seed.jpg",
   },
 ];
 
