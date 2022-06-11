@@ -24,6 +24,8 @@ export default class Intro {
   private isIntroRunning: boolean = false;
   private startTime: number = 0;
   private baseCameraSpherical: Spherical | null = null;
+  private verifCam: boolean = false;
+  private nextCamPos: Vector3 = new Vector3();
 
   constructor() {
     signal.on("start_experience", () => this.start());
@@ -55,6 +57,8 @@ export default class Intro {
           },
           complete: () => {
             signal.emit("camera_ready");
+            this.verifCam = true;
+            this.nextCamPos = this.experience.activeCamera?.instance?.position.clone() as Vector3;
             this.handleMouse();
           }
         },
@@ -73,14 +77,14 @@ export default class Intro {
         const spherical = new Spherical().setFromVector3(this.experience.activeCamera.instance.position);
         spherical.phi = this.baseCameraSpherical.phi + shift.y;
         spherical.theta = this.baseCameraSpherical.theta + shift.x;
-        this.experience.activeCamera.instance.position.setFromSpherical(spherical);
-        this.experience.activeCamera?.instance?.lookAt(0, .1, 0);
+        this.nextCamPos.setFromSpherical(spherical);
       }
     });
   }
 
   start() {
     signal.off("mouse_move");
+    this.verifCam = false;
 
     const points = [
       this.experience.activeCamera?.instance?.position.clone() as Vector3,
@@ -103,6 +107,7 @@ export default class Intro {
     this.experience.world?.setControls();
     this.experience.world?.controls?.target.set(0, 0, 0);
     signal.off("mouse_move");
+    this.verifCam = false;
   }
 
   update() {
@@ -120,6 +125,17 @@ export default class Intro {
       } else {
         this.stop();
       }
+    }
+
+    const distance = this.experience.activeCamera?.instance?.position.distanceTo(this.nextCamPos) as number;
+    if (distance > 0.001 && this.verifCam) {
+      const { x, y, z } = this.experience.activeCamera?.instance?.position as Vector3;
+      this.experience.activeCamera?.instance?.position.set(
+        x + (this.nextCamPos.x - x) * .1,
+        y + (this.nextCamPos.y - y) * .1,
+        z + (this.nextCamPos.z - z) * .1
+      );
+      this.experience.activeCamera?.instance?.lookAt(0, .1, 0);
     }
   }
 }
