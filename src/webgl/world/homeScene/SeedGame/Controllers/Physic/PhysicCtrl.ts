@@ -1,5 +1,6 @@
 import type { Mesh, Scene } from "three";
 import { MeshBVH, MeshBVHVisualizer } from "three-mesh-bvh";
+import physicSettings from "./PhysicSettings";
 
 export interface ICollider {
   id: number;
@@ -10,33 +11,57 @@ export interface IVisualizer {
   visualizer: MeshBVHVisualizer;
 }
 
+declare global {
+  interface Window {
+    physicCtrl: PhysicCtrl;
+  }
+}
+
 export default class PhysicCtrl {
+  static instance: PhysicCtrl;
+
   private scene: Scene | null = null;
   public colliders: ICollider[] = [];
   private visualizers: IVisualizer[] = [];
-  private BVHDefaultVisibility = false;
+  public floorMesh: Mesh | null = null;
+  private floorVisualizer: MeshBVHVisualizer | null = null;
   private lastId = 0;
-  private params = {
-    visualizeDepth: 10,
-  };
 
-  constructor(scene: Scene, BVHDefaultVisibility = false) {
+  constructor(scene: Scene) {
     this.scene = scene;
-    this.BVHDefaultVisibility = BVHDefaultVisibility;
+    if (PhysicCtrl.instance) {
+      return PhysicCtrl.instance;
+    }
+    PhysicCtrl.instance = this;
+
+    // Global access
+    window.physicCtrl = this;
   }
 
   addCollider(collider: Mesh): number {
     collider.geometry.boundsTree = new MeshBVH(collider.geometry);
-    const visualizer = new MeshBVHVisualizer(
-      collider,
-      this.params.visualizeDepth
-    );
-    if (!this.BVHDefaultVisibility) visualizer.visible = false;
-    this.scene?.add(visualizer);
+    // const visualizer = new MeshBVHVisualizer(
+    //   collider,
+    //   physicSettings.visualizeDepth
+    // );
+    // visualizer.visible = physicSettings.displayBVH;
+    // this.scene?.add(visualizer);
     const id = this.getNewId();
     this.colliders.push({ id, collider });
-    this.visualizers.push({ id, visualizer });
-    return this.visualizers.length - 1;
+    // this.visualizers.push({ id, visualizer });
+    // return this.visualizers.length - 1;
+    return 1;
+  }
+  addFloor(mesh: Mesh) {
+    mesh.geometry.boundsTree = new MeshBVH(mesh.geometry);
+
+    this.floorVisualizer = new MeshBVHVisualizer(
+      mesh,
+      physicSettings.visualizeDepth
+    );
+    this.floorMesh = mesh;
+
+    this.scene?.add(this.floorVisualizer);
   }
 
   removeCollider(id: number) {

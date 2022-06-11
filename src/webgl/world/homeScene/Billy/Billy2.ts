@@ -1,21 +1,23 @@
+import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import type Time from "@/webgl/controllers/Time";
 import Experience from "@/webgl/Experience";
-import { Group, type Scene } from "three";
+import { Group, Mesh, sRGBEncoding, Texture, type Scene } from "three";
 import { AnimationMixer, type AnimationAction } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi } from "tweakpane";
-import SeedFocus from "@/webgl/world/homeScene/SeedFocus/SeedFocus";
+import fragment from "./Shaders/fragment.glsl?raw";
+import vertex from "./Shaders/vertex.glsl?raw";
 
 interface IAnimation {
   mixer: AnimationMixer | null;
   actions: { [key: string]: AnimationAction };
   play: null | ((name: string) => void);
 }
-type TSpeed = "fast" | "slow";
+type TAnimationName = "halfturn" | "idle";
 
-export default class Character {
+export default class Billy {
   private experience: Experience = new Experience();
   private loaders: Loaders = this.experience.loaders as Loaders;
   protected scene: Scene | null = null;
@@ -23,65 +25,60 @@ export default class Character {
   public instance: Group | null = null;
   public items: Group = new Group();
   private isDisplayed = false;
-  private isInit = false;
   private debugFolder: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
+  private instanceGroup = new Group();
   private model: GLTF | null = null;
+  private material: ShaderBaseMaterial | null = null;
+  private texture: Texture | null = null;
+  private currentAnim: TAnimationName = "idle";
   private animation: IAnimation = {
     mixer: null,
     actions: {},
     play: null,
   };
-  private speed: TSpeed = "fast";
-  private seedFocus: SeedFocus | null = null;
 
   constructor(scene: Scene) {
     this.scene = scene;
+    this.setDebug();
+    this.init();
   }
 
   init() {
-    this.model = this.loaders.items["homeGameCharacter"] as GLTF;
+    this.model = this.loaders.items["billy-model"] as GLTF;
+    this.texture = this.loaders.items["billy-texture"] as Texture;
+    this.texture.flipY = false;
+    this.texture.encoding = sRGBEncoding;
+    this.material = new ShaderBaseMaterial({
+      transparent: true,
+      fragmentShader: fragment,
+      vertexShader: vertex,
+      uniforms: {
+        uTexture: { value: this.texture },
+      },
+    });
+    this.model.scene.traverse((child) => {
+      if (child instanceof Mesh && this.texture) {
+        child.material = this.material;
+      }
+    });
+    console.log(this.model);
+
     this.instance = this.model.scene;
-    if (this.instance) {
-      this.instance?.scale.set(0.25, 0.25, 0.25);
-      this.instance?.position.set(-0.4, 0.3, 2.2);
-      this.instance.rotation.y = 0.54;
-      this.seedFocus = new SeedFocus(this.scene as Scene);
-      this.seedFocus.appear();
-      this.items.add(this.seedFocus.instance);
-      this.instance.add(this.items);
-      this.scene?.add(this.instance);
-      this.setDebug();
-      this.setAnimation();
-    }
+    this.instance.scale.set(1, 1, 1);
+    this.instanceGroup.add(this.instance);
+    this.instanceGroup.rotateY(-Math.PI * 0.5);
+    this.instanceGroup.position.set(0, 0, 0.1);
+    this.scene?.add(this.instanceGroup);
+    this.setAnimation();
+
     this.isDisplayed = true;
-    this.isInit = true;
   }
 
   setDebug() {
-    this.debugFolder = this.debug.ui?.pages[1].addFolder({ title: "Character" });
-    if (this.instance?.position) {
-      this.debugFolder?.addInput(this.instance?.position, "x", {
-        min: -10,
-        max: 10,
-        step: 0.1,
-      });
-      this.debugFolder?.addInput(this.instance?.position, "y", {
-        min: -10,
-        max: 10,
-        step: 0.01,
-      });
-      this.debugFolder?.addInput(this.instance?.position, "z", {
-        min: -10,
-        max: 10,
-        step: 0.01,
-      });
-      this.debugFolder?.addInput(this.instance?.rotation, "y", {
-        min: -5,
-        max: 5,
-        step: 0.01,
-      });
-    }
+    this.debugFolder = this.debug.ui?.pages[2].addFolder({
+      title: "Character",
+    });
   }
   setAnimation() {
     // Mixer
@@ -90,15 +87,17 @@ export default class Character {
     // Actions
     this.animation.actions = {};
     if (this.model && this.animation) {
-      this.animation.actions["fast"] = this.animation.mixer.clipAction(
+      this.animation.actions["halfturn"] = this.animation.mixer.clipAction(
         this.model.animations[0]
       );
-      this.animation.actions["slow"] = this.animation.mixer.clipAction(
+      this.animation.actions["idle"] = this.animation.mixer.clipAction(
         this.model.animations[1]
       );
 
-      this.animation.actions["current"] = this.animation.actions.fast;
+      this.animation.actions["current"] =
+        this.animation.actions[this.currentAnim];
       this.animation.actions.current.play();
+
       // Play the action
       this.animation.play = (name) => {
         const newAction = this.animation.actions[name];
@@ -112,39 +111,34 @@ export default class Character {
 
     // Debug
     if (this.debug.active) {
-      const playFast = this.debugFolder?.addButton({
-        title: "playFast",
+      const halfturn = this.debugFolder?.addButton({
+        title: "PLay halfturn",
       });
-      const playSlow = this.debugFolder?.addButton({
-        title: "playSlow",
+      const idle = this.debugFolder?.addButton({
+        title: "Play idle",
       });
-      playFast?.on("click", () => this.setSpeed("fast"));
-      playSlow?.on("click", () => this.setSpeed("slow"));
+      halfturn?.on("click", () => this.setAnim("halfturn"));
+      idle?.on("click", () => this.setAnim("idle"));
     }
   }
 
-  setSpeed(speed: TSpeed) {
+  setAnim(animName: TAnimationName) {
     if (this.animation?.play) {
-      this.animation.play(speed);
-      this.speed = speed;
+      this.animation.play(animName);
+      this.currentAnim = animName;
     }
   }
 
-  appear() {
-    if (!this.isInit) {
-      this.init();
-    } else {
+  set() {
+    if (!this.isDisplayed) {
       if (this.instance) this.instance.visible = true;
-      this.seedFocus?.appear();
     }
-    this.isDisplayed = true;
   }
 
-  disappear() {
-    if (this.isInit && this.isDisplayed) {
+  unset() {
+    if (this.isDisplayed) {
       if (this.instance) this.instance.visible = false;
       this.isDisplayed = false;
-      this.seedFocus?.disappear();
     }
   }
 

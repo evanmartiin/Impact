@@ -26,14 +26,14 @@ export default class Helper {
   }
 
   init() {
-    this.geometry = new SphereGeometry(0.05, 16, 16);
+    this.geometry = new SphereGeometry(0.005, 16, 16);
     this.material = new MeshStandardMaterial({ color: 0xff0000 });
     this.instance = new Mesh(this.geometry, this.material);
     this.instance.position.set(0, 0, 0);
-    this.scene?.add(this.instance);
+    // this.scene?.add(this.instance);
     this.cursor = new Mesh(this.geometry, this.material);
     this.cursor.position.set(0, 0, 0);
-    this.scene?.add(this.cursor);
+    // this.scene?.add(this.cursor);
   }
 
   setCursor(x: number, y: number, z: number) {
