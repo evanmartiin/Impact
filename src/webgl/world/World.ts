@@ -13,7 +13,7 @@ import GrandmaScene from "./grandmaScene/grandmaScene";
 // import type Ashes from "./entities/Ashes/Ashes";
 import signal from 'signal-js';
 import type Loaders from "../controllers/Loaders/Loaders";
-import Intro from "./Intro";
+import Intro from "./homeScene/Intro/Intro";
 
 export default class World {
   private experience: Experience = new Experience();

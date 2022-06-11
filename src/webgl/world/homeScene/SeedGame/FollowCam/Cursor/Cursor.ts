@@ -4,7 +4,6 @@ import Experience from "@/webgl/Experience";
 import {
   PlaneBufferGeometry,
   Mesh,
-  MeshBasicMaterial,
   PlaneGeometry,
   Texture,
   Group,

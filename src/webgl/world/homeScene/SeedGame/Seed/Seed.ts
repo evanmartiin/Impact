@@ -1,170 +1,342 @@
-import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
+import type Time from "@/webgl/controllers/Time";
 import Experience from "@/webgl/Experience";
-import fragment from "./Shaders/fragment.glsl?raw";
-import vertex from "./Shaders/vertex.glsl?raw";
 import {
   MeshStandardMaterial,
   PerspectiveCamera,
   Vector3,
-  Vector2,
   Scene,
-  SphereGeometry,
   Mesh,
-  ArrowHelper,
-  MeshMatcapMaterial,
-  Texture,
-  sRGBEncoding,
+  MeshBasicMaterial,
+  SphereBufferGeometry,
+  Color,
+  Sphere,
+  RingBufferGeometry,
 } from "three";
-import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
+import PhysicCtrl from "../Controllers/Physic/PhysicCtrl";
+import Tree from "../Tree/Tree";
 import seedSettings from "./SeedSettings";
-import gameCamSettings from "../Controllers/GameCam/GameCamSettings";
 
 export default class Seed {
   private experience: Experience = new Experience();
   private loaders: Loaders = this.experience.loaders as Loaders;
   private camera: PerspectiveCamera = this.experience.world?.homeScene?.camera
     .instance as PerspectiveCamera;
-  private scene: Scene | null = null;
-
-  private geometry: SphereGeometry | null = null;
-  private material: MeshMatcapMaterial | null = null;
-  private mesh: Mesh | null = null;
-
-  private targetPoint: Vector3 | null = null;
+  private physicCtrl: PhysicCtrl | null = null;
+  private time: Time = this.experience.time as Time;
   private cameraDirection: Vector3 = new Vector3();
-  private zValue = 0;
-  private isTravelling = false;
-  private shotAngle = 0;
-  private deltaMove = 0;
-  private maxX = 0;
-  private farPointRef = new Vector3(0, 0, 30);
-  private arrowCam: ArrowHelper | null = null;
-  private arrowOri: ArrowHelper | null = null;
-  private origin = gameCamSettings.gameCameraPosition;
-  private xzDirection = new Vector2(0, 0);
-  private texture: Texture | null = null;
+  private scene: Scene | null = null;
+  private seeds: Mesh[] = [];
+  private hits: Mesh[] = [];
+  private tempSphere = new Sphere();
+  private deltaVec = new Vector3();
+  private tempVec = new Vector3();
+  private forwardVector = new Vector3(0, 0, 1);
 
   constructor(scene: Scene) {
     this.scene = scene;
-    this.setSeed();
-    this.setArrowHelpers();
+    this.physicCtrl = new PhysicCtrl(scene);
   }
 
-  setSeed() {
-    const model = this.loaders.items["seed-model"] as GLTF;
-    this.texture = this.loaders.items["poppingtrees-seed-texture"] as Texture;
-    this.texture.flipY = false;
-    this.texture.encoding = sRGBEncoding;
-    model.scene.traverse((child) => {
-      if (child instanceof Mesh && this.texture) {
-        const bakedMaterial = new ShaderBaseMaterial({
-          transparent: true,
-          fragmentShader: fragment,
-          vertexShader: vertex,
-          uniforms: {
-            uTexture: { value: this.texture },
-          },
-        });
-        (child as Mesh).material = bakedMaterial;
-        this.mesh = child;
-      }
-    });
-    this.scene?.add(model.scene);
+  createSeed() {
+    const white = new Color(0xffffff);
+    const color = new Color(0x263238 / 2)
+      .lerp(white, 0.5)
+      .convertSRGBToLinear();
+    const seedMesh = new Mesh(
+      new SphereBufferGeometry(1, 20, 20),
+      new MeshStandardMaterial({ color })
+    );
+    this.scene?.add(seedMesh);
+    seedMesh.castShadow = true;
+    seedMesh.receiveShadow = true;
+    seedMesh.material.shadowSide = 2;
 
-    if (this.mesh) {
-      this.mesh.visible = false;
-      this.resetPos();
-      this.scene?.add(this.mesh);
-    }
-  }
+    const radius = 0.5 * seedSettings.sphereSize;
+    seedMesh.scale.setScalar(radius);
+    (seedMesh as any).collider = new Sphere(seedMesh.position, radius);
+    (seedMesh as any).velocity = new Vector3(0, 0, 0);
+    (seedMesh as any).mass = (Math.pow(radius, 3) * Math.PI * 4) / 3;
 
-  setArrowHelpers() {
-    const dir = new Vector3(1, 2, 0);
-    const length = 0.1;
-    const hexCam = 0xffff00;
-    const hexOri = 0xff0000;
-    this.arrowCam = new ArrowHelper(dir, this.origin, length, hexCam);
-    this.arrowOri = new ArrowHelper(dir, this.origin, length, hexOri);
-    this.scene?.add(this.arrowCam);
-    this.scene?.add(this.arrowOri);
+    this.seeds.push(seedMesh);
+    return seedMesh;
   }
 
   shot() {
-    if (this.mesh) this.mesh.visible = true;
+    const seed = this.createSeed();
     this.camera.getWorldDirection(this.cameraDirection);
-    this.xzDirection.set(this.cameraDirection.x, this.cameraDirection.z);
-    const newCamDirection = new Vector3().copy(this.cameraDirection);
-    newCamDirection.x = 0;
-    this.arrowCam?.setDirection(newCamDirection);
-    const baseDirection = new Vector3().copy(this.farPointRef);
-    this.arrowOri?.setDirection(baseDirection);
-    if (this.cameraDirection.y > 0) {
-      this.shotAngle = baseDirection.angleTo(newCamDirection) + Math.PI / 6;
-    } else {
-      this.shotAngle = Math.PI / 6 - baseDirection.angleTo(newCamDirection);
+    seed.position
+      .copy(this.camera.position)
+      .addScaledVector(this.cameraDirection, 0.15);
+    (seed as any).velocity
+      .set(0, 0, 0)
+      .addScaledVector(this.cameraDirection, 15)
+      .multiplyScalar(0.5);
+  }
+
+  updateSphereCollisions(deltaTime: number) {
+    for (let i = 0, l = this.seeds.length; i < l; i++) {
+      const seed = this.seeds[i];
+      const sphereCollider = (seed as any).collider;
+
+      // move the sphere
+      (seed as any).velocity.y += seedSettings.gravity * deltaTime;
+      sphereCollider.center.addScaledVector((seed as any).velocity, deltaTime);
+
+      // remove the spheres if they've left the world
+      if (sphereCollider.center.y < -10) {
+        this.seeds.splice(i, 1);
+        i--;
+        l--;
+        if (Array.isArray(seed.material)) {
+          seed.material.map((m) => {
+            m.dispose();
+          });
+        } else {
+          seed.material.dispose();
+        }
+        seed.geometry.dispose();
+        this.scene?.remove(seed);
+        continue;
+      }
+
+      // get the sphere position in world space
+      this.tempSphere.copy((seed as any).collider);
+
+      let collided = false;
+      if (this.physicCtrl?.floorMesh?.geometry.boundsTree)
+        this.physicCtrl?.floorMesh?.geometry.boundsTree.shapecast({
+          intersectsBounds: (box: any) => {
+            return box.intersectsSphere(this.tempSphere);
+          },
+
+          intersectsTriangle: (tri: any) => {
+            // get delta between closest point and center
+            tri.closestPointToPoint(this.tempSphere.center, this.deltaVec);
+            this.deltaVec.sub(this.tempSphere.center);
+            const distance = this.deltaVec.length();
+
+            // add mesh to test
+            if (distance < this.tempSphere.radius) {
+              // move the sphere position to be outside the triangle
+              const radius = this.tempSphere.radius;
+              const depth = distance - radius;
+              this.deltaVec.multiplyScalar(1 / distance);
+              this.tempSphere.center.addScaledVector(this.deltaVec, depth);
+
+              collided = true;
+              console.log(tri);
+              const nwhite = new Color(0xff0000);
+              const ncolor = new Color(0x263238 / 2)
+                .lerp(nwhite, 0.5)
+                .convertSRGBToLinear();
+              if (this.scene) new Tree(this.scene, "medium", seed.position);
+              // const TestSeedMesh = new Mesh(
+              //   new SphereBufferGeometry(0.0075, 20, 20),
+              //   new MeshStandardMaterial({ color: ncolor })
+              // );
+              // TestSeedMesh.position.set(
+              //   seed.position.x,
+              //   seed.position.y,
+              //   seed.position.z
+              // );
+              // TestSeedMesh.scale.setScalar(2);
+              // this.scene?.add(TestSeedMesh);
+            }
+          },
+
+          traverseBoundsOrder: (box: any) => {
+            return (
+              box.distanceToPoint(this.tempSphere.center) -
+              this.tempSphere.radius
+            );
+          },
+        });
+
+      if (collided) {
+        // get the delta direction and reflect the velocity across it
+        this.deltaVec
+          .subVectors(this.tempSphere.center, sphereCollider.center)
+          .normalize();
+        (seed as any).velocity.reflect(this.deltaVec);
+
+        // dampen the velocity and apply some drag
+        const dot = (seed as any).velocity.dot(this.deltaVec);
+        (seed as any).velocity.addScaledVector(this.deltaVec, -dot * 0.5);
+        (seed as any).velocity.multiplyScalar(Math.max(1.0 - deltaTime, 0));
+
+        // update the sphere collider position
+        sphereCollider.center.copy(this.tempSphere.center);
+
+        // find the point on the surface that was hit
+        this.tempVec
+          .copy(this.tempSphere.center)
+          .addScaledVector(this.deltaVec, -this.tempSphere.radius);
+        this.onCollide(seed, null, this.tempVec, this.deltaVec, dot, 0.05);
+      }
     }
-    this.shotAngle -= 0.25;
-    this.zValue = 0;
-    this.resetPos();
-    this.isTravelling = true;
-    console.log(this.shotAngle);
-  }
 
-  getHeight(x: number) {
-    const angle = this.shotAngle;
-    const res =
-      Math.tan(angle) * x -
-      (seedSettings.gravity /
-        (2 * seedSettings.speed * Math.pow(Math.cos(angle), 2))) *
-        Math.pow(x, 2);
-    return res;
-  }
+    // Handle sphere collisions
+    for (let i = 0, l = this.seeds.length; i < l; i++) {
+      const s1 = this.seeds[i];
+      const c1 = (s1 as any).collider;
+      for (let j = i + 1; j < l; j++) {
+        const s2 = this.seeds[j];
+        const c2 = (s2 as any).collider;
 
-  setTarget(targetPoint: Vector3) {
-    if (this.targetPoint) {
-      this.targetPoint.copy(targetPoint);
-    } else {
-      this.targetPoint = new Vector3().copy(targetPoint);
+        // If they actually intersected
+        this.deltaVec.subVectors(c1.center, c2.center);
+        const depth = this.deltaVec.length() - (c1.radius + c2.radius);
+        if (depth < 0) {
+          this.deltaVec.normalize();
+
+          // get the magnitude of the velocity in the hit direction
+          const v1dot = (s1 as any).velocity.dot(this.deltaVec);
+          const v2dot = (s2 as any).velocity.dot(this.deltaVec);
+
+          // distribute how much to offset the spheres based on how
+          // quickly they were going relative to each other. The ball
+          // that was moving should move back the most. Add a max value
+          // to avoid jitter.
+          const offsetRatio1 = Math.max(v1dot, 0.2);
+          const offsetRatio2 = Math.max(v2dot, 0.2);
+
+          const total = offsetRatio1 + offsetRatio2;
+          const ratio1 = offsetRatio1 / total;
+          const ratio2 = offsetRatio2 / total;
+
+          // correct the positioning of the spheres
+          c1.center.addScaledVector(this.deltaVec, -ratio1 * depth);
+          c2.center.addScaledVector(this.deltaVec, ratio2 * depth);
+
+          // Use the momentum formula to adjust velocities
+          const velocityDifference = new Vector3();
+          velocityDifference
+            .addScaledVector(this.deltaVec, -v1dot)
+            .addScaledVector(this.deltaVec, v2dot);
+
+          const velDiff = velocityDifference.length();
+          const m1 = (s1 as any).mass;
+          const m2 = (s2 as any).mass;
+
+          // Compute new velocities in the moving frame of the sphere that
+          // moved into the other.
+          let newVel1, newVel2;
+          const damping = 0.5;
+          if (
+            velocityDifference.dot((s1 as any).velocity) >
+            velocityDifference.dot((s2 as any).velocity)
+          ) {
+            newVel1 = (damping * velDiff * (m1 - m2)) / (m1 + m2);
+            newVel2 = (damping * velDiff * 2 * m1) / (m1 + m2);
+
+            // remove any existing relative velocity from the moving sphere
+            newVel1 -= velDiff;
+          } else {
+            newVel1 = (damping * velDiff * 2 * m2) / (m1 + m2);
+            newVel2 = (damping * velDiff * (m2 - m1)) / (m1 + m2);
+
+            // remove any existing relative velocity from the moving sphere
+            newVel2 -= velDiff;
+          }
+
+          // Apply new velocities
+          velocityDifference.normalize();
+          (s1 as any).velocity.addScaledVector(velocityDifference, newVel1);
+          (s2 as any).velocity.addScaledVector(velocityDifference, newVel2);
+
+          this.tempVec
+            .copy(c1.center)
+            .addScaledVector(this.deltaVec, -c1.radius);
+          this.onCollide(s1, s2, this.tempVec, this.deltaVec, velDiff, 0);
+        }
+      }
+
+      s1.position.copy(c1.center);
     }
   }
-
-  resetPos() {
-    if (this.mesh) {
-      this.mesh.position.copy(this.origin);
+  onCollide(
+    object1: Mesh,
+    object2: Mesh | null,
+    point: Vector3,
+    normal: Vector3,
+    velocity: number,
+    offset = 0
+  ) {
+    if (velocity < Math.max(Math.abs(0.04 * seedSettings.gravity), 5)) {
+      return;
     }
-  }
 
-  moveModelX() {
-    if (this.mesh) this.mesh.position.x += this.deltaMove;
+    // Create an animation when objects collide
+    const effectScale =
+      Math.max(
+        object2
+          ? Math.max(
+              (object1 as any).collider.radius,
+              (object2 as any).collider.radius
+            )
+          : (object1 as any).collider.radius,
+        0.4
+      ) * 2.0;
+    const plane = new Mesh(
+      new RingBufferGeometry(0, 1, 30),
+      new MeshBasicMaterial({
+        side: 2,
+        transparent: true,
+        depthWrite: false,
+      })
+    );
+    (plane as any).lifetime = 0;
+    (plane as any).maxLifetime = 0.4;
+    (plane as any).maxScale =
+      effectScale *
+      Math.max(Math.sin((Math.min(velocity / 200, 1) * Math.PI) / 2), 0.35);
+
+    plane.position.copy(point).addScaledVector(normal, offset);
+    plane.quaternion.setFromUnitVectors(this.forwardVector, normal);
+    this.scene?.add(plane);
+    this.hits.push(plane);
   }
 
   update() {
-    if (this.isTravelling && this.mesh) {
-      this.mesh.position.y = this.getHeight(this.zValue * 5);
-      this.zValue += 0.01;
-      this.mesh.position.x += this.xzDirection.normalize().x * 0.07;
-      this.mesh.position.z += this.xzDirection.normalize().y * 0.07;
-      this.moveModelX();
-      if (this.mesh?.position.z > 30) {
-        this.isTravelling = false;
+    if (this.physicCtrl && this.physicCtrl.colliders.length > 0) {
+      const steps = seedSettings.physicsSteps;
+      for (let i = 0; i < steps; i++) {
+        this.updateSphereCollisions((this.time.delta * 0.001) / steps);
       }
     }
-  }
 
-  setDebug() {
-    // this.debugTab = this.debug.ui?.pages[2].addFolder({ title: "Game shot" });
-    // const startButton = this.debugTab?.addButton({
-    //   title: "Start Game",
-    // }) as ButtonApi;
-    // startButton.on("click", () => {
-    //   this.start();
-    // });
-    // const stopButton = this.debugTab?.addButton({
-    //   title: "Stop Game",
-    // }) as ButtonApi;
-    // stopButton.on("click", () => {
-    //   this.stop();
-    // });
+    // Update collision animations
+    for (let i = 0, l = this.hits.length; i < l; i++) {
+      const hit = this.hits[i];
+      (hit as any).lifetime += this.time.delta;
+
+      const ratio = (hit as any).lifetime / (hit as any).maxLifetime;
+      let scale = Math.sin((ratio * 4.5 * Math.PI) / 4);
+      scale = 1.0 - Math.pow(1.0 - scale, 2);
+      hit.scale.setScalar(scale * (hit as any).maxScale);
+      if (Array.isArray(hit.material)) {
+        hit.material.map((m) => {
+          m.opacity = 1.0 - Math.sin((ratio * 2 * Math.PI) / 4);
+        });
+      } else {
+        hit.material.opacity = 1.0 - Math.sin((ratio * 2 * Math.PI) / 4);
+      }
+
+      if (ratio >= 1) {
+        this.hits.splice(i, 1);
+        (hit as any).parent.remove(hit);
+        hit.geometry.dispose();
+        if (Array.isArray(hit.material)) {
+          hit.material.map((m) => {
+            m.dispose();
+          });
+        } else {
+          hit.material.dispose();
+        }
+        i--;
+        l--;
+      }
+    }
   }
 }

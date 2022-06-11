@@ -6,7 +6,7 @@ import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
 import { Group, PerspectiveCamera, Vector3, type Scene } from "three";
 import type { FolderApi, ButtonApi } from "tweakpane";
-import Seed from "./Seed/Seed2";
+import Seed from "./Seed/Seed";
 import type Renderer from "@/webgl/Renderer";
 import Helper from "./Helper/Helper";
 import signal from "signal-js";

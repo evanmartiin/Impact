@@ -40,16 +40,17 @@ export default class PhysicCtrl {
 
   addCollider(collider: Mesh): number {
     collider.geometry.boundsTree = new MeshBVH(collider.geometry);
-    const visualizer = new MeshBVHVisualizer(
-      collider,
-      physicSettings.visualizeDepth
-    );
-    visualizer.visible = physicSettings.displayBVH;
-    this.scene?.add(visualizer);
+    // const visualizer = new MeshBVHVisualizer(
+    //   collider,
+    //   physicSettings.visualizeDepth
+    // );
+    // visualizer.visible = physicSettings.displayBVH;
+    // this.scene?.add(visualizer);
     const id = this.getNewId();
     this.colliders.push({ id, collider });
-    this.visualizers.push({ id, visualizer });
-    return this.visualizers.length - 1;
+    // this.visualizers.push({ id, visualizer });
+    // return this.visualizers.length - 1;
+    return 1;
   }
   addFloor(mesh: Mesh) {
     mesh.geometry.boundsTree = new MeshBVH(mesh.geometry);

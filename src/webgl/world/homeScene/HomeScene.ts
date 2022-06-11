@@ -1,4 +1,5 @@
 import type Time from "@/webgl/controllers/Time";
+import Billy from "./Billy/Billy";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
@@ -36,9 +37,11 @@ export default class HomeScene {
   private textures: Texture[] = [];
   public camera: Camera = new Camera(this.cameraPos, this.scene);
   private physicCtrl = new PhysicCtrl(this.scene);
+  private billy: Billy | null = null;
 
   constructor() {
     this.setFloor();
+    this.setBilly();
     this.setGame();
     this.setDebug();
     this.setSkybox();
@@ -46,6 +49,10 @@ export default class HomeScene {
 
   setGame() {
     if (this.camera.instance) this.game = new SeedGame(this.scene, this.camera);
+  }
+
+  setBilly() {
+    this.billy = new Billy(this.scene);
   }
 
   setFloor() {
@@ -57,7 +64,6 @@ export default class HomeScene {
       this.loaders.items["housev1texture"] as Texture,
       this.loaders.items["grassv1texture"] as Texture,
     ];
-
     this.models.forEach((model, index) => {
       if (this.textures && this.textures[index]) {
         this.textures[index].flipY = false;
@@ -100,6 +106,7 @@ export default class HomeScene {
   update() {
     if (this.game) {
       this.game.update();
+      this.billy?.update();
     }
   }
 
