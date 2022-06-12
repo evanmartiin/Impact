@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@tweakpane/core": "^1.0.8",
+    "@types/howler": "^2.2.7",
     "@types/three": "^0.137.0",
     "animejs": "^3.2.1",
+    "howler": "^2.2.3",
     "pinia": "^2.0.11",
     "sass": "^1.49.9",
     "signal-js": "^3.0.1",

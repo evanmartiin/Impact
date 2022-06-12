@@ -1,6 +1,7 @@
 import Debug from "@/webgl/controllers/Debug";
 import Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Sources from "@/webgl/controllers/Loaders/sources";
+import SoundSources from "@/webgl/controllers/Sound/sources";
 import Mouse from "@/webgl/controllers/Mouse";
 import Sizes from "@/webgl/controllers/Sizes";
 import Time from "@/webgl/controllers/Time";
@@ -11,6 +12,8 @@ import World from "./world/World";
 import type Camera from "./world/Camera";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import signal from 'signal-js';
+import Sound from "./controllers/Sound/Sound";
+import type { SoundSource } from "@/models/webgl/sound.model";
 
 declare global {
   interface Window {
@@ -26,12 +29,14 @@ export default class Experience {
   public sizes: Sizes | null = null;
   public mouse: Mouse | null = null;
   public time: Time | null = null;
+  public sound: Sound | null = null;
   public activeScene: Scene | null = null;
   public activeCamera: Camera | null = null;
   public loaders: Loaders | null = null;
   public renderer: Renderer | null = null;
 
   private sources: ISource[] | null = null;
+  private soundSources: SoundSource[] | null = null;
   public world: World | null = null;
 
   constructor(_canvas?: HTMLCanvasElement) {
@@ -46,7 +51,9 @@ export default class Experience {
     // Options
     if (_canvas) this.canvas = _canvas;
     this.sources = Sources;
+    this.soundSources = SoundSources;
     this.loaders = new Loaders(this.sources);
+    this.sound = new Sound(this.soundSources);
     this.sizes = new Sizes();
     this.mouse = new Mouse();
     this.time = new Time();

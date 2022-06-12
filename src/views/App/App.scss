@@ -210,7 +210,7 @@ main,
 
       &:hover {
         .start-el {
-          animation: bounce .3s ease alternate infinite;
+          animation: bounce .3s ease alternate 2;
 
           @for $i from 1 through 16 {
             &:nth-of-type(#{$i}) {

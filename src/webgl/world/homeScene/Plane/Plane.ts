@@ -40,7 +40,7 @@ export default class Plane {
         this.mesh.material = material;
 
         this.scene?.add(this.mesh);
-        this.mesh.scale.set(.05, .05, .05);
+        this.mesh.scale.set(.04, .04, .04);
 
         this.startTime = this.time.elapsed;
       }
