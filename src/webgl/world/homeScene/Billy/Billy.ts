@@ -71,11 +71,17 @@ export default class Billy {
         uTexture: { value: this.texture },
       },
     });
-    // this.model.scene.traverse((child) => {
-    //   if (child instanceof Mesh && this.texture) {
-    //     child.material = this.material;
-    //   }
-    // });
+    this.model.scene.traverse((child) => {
+      if (child instanceof Mesh && this.texture) {
+        if (Array.isArray(child.material)) {
+          child.material.map((m) => {
+            m = this.material;
+          });
+        } else {
+          child.material = this.material;
+        }
+      }
+    });
     console.log(this.model);
 
     this.instance = this.model.scene;
