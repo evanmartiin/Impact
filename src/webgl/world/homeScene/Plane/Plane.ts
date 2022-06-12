@@ -82,7 +82,9 @@ export default class Plane {
     this.path?.parameters.path.getPointAt(t, this.position);
     this.path?.parameters.path.getPointAt((t + .02) % 1, this.lookAt);
     this.mesh?.position.copy(this.position);
+    this.mesh?.position.setY(.3 + Math.sin(t * Math.PI * 2) * .1);
     this.mesh?.lookAt(this.lookAt);
     this.mesh?.rotateZ(Math.PI * this.computeAngle(t));
+    
   }
 }
