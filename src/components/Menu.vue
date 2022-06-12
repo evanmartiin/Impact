@@ -3,7 +3,7 @@ import signal from 'signal-js';
 import CustomButton from '@/components/CustomButton.vue'
 import RoundButton from '@/components/RoundButton.vue'
 import anime from 'animejs';
-import { onMounted, ref } from 'vue-demi';
+import { onMounted, ref } from 'vue';
 
 const isMenuOpened = ref(false);
 
