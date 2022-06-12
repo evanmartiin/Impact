@@ -1,22 +1,22 @@
 @font-face {
   font-family: "CG Light";
-  src: url("/public/fonts/CocoGothic-Light.ttf") format("truetype");
+  src: url("/fonts/CocoGothic-Light.ttf") format("truetype");
 }
 @font-face {
   font-family: "CG Bold";
-  src: url("/public/fonts/CocoGothic-Bold.ttf") format("truetype");
+  src: url("/fonts/CocoGothic-Bold.ttf") format("truetype");
 }
 @font-face {
   font-family: "CG Heavy";
-  src: url("/public/fonts/CocoGothic-Heavy.ttf") format("truetype");
+  src: url("/fonts/CocoGothic-Heavy.ttf") format("truetype");
 }
 @font-face {
   font-family: "CG Fat";
-  src: url("/public/fonts/CocoGothic-Fat.ttf") format("truetype");
+  src: url("/fonts/CocoGothic-Fat.ttf") format("truetype");
 }
 @font-face {
   font-family: "Mikado";
-  src: url("/public/fonts/MikadoBold.otf") format("opentype");
+  src: url("/fonts/MikadoBold.otf") format("opentype");
 }
 
 *,
@@ -119,7 +119,7 @@ main,
   height: 100%;
 }
 
-#home {
+#intro {
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -129,21 +129,80 @@ main,
   position: absolute;
   top: 0;
   left: 0;
-  background-image: url("/images/paper.png");
-  background-color: #FAF7F1;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+  color: #ffffff;
+  background-color: rgba(0, 9, 94, 1);
 
-  h1 {
-    font-size: 100px;
-    padding: 0;
+  .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 50px;
+
+    #earth {
+      width: 200px;
+    }
+  
+    #progress-bar {
+      bottom: 30%;
+      height: 10px;
+      width: 200px;
+      border: 2px solid white;
+      border-radius: 50px;
+      background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 0%);
+    }
   }
 
-  h2 {
-    font-size: 30px;
-    padding: 0;
-    margin-bottom: 100px;
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 50vh;
+
+    .text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .logo {
+        .impact-logo {
+          height: 130px;
+          margin: 0 2px;
+  
+          &.letter-A {
+            margin: 0 -22px 0 -35px;
+          }
+        }
+      }
+
+      h2 {
+        font-size: 40px;
+        margin-top: 20px;
+        text-shadow: 4px 4px 4px rgba(13, 28, 81, 0.1);
+      }
+    }
+
+    #start-button {
+      opacity: 0;
+      transform: translateY(100);
+      pointer-events: none;
+    }
+  }
+
+  .credits {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    img {
+      height: 50px;
+    }
+
+    p {
+      font-size: 15px;
+    }
   }
 }
 

@@ -1,20 +1,24 @@
-import { GameCamCtrl } from "./Controllers/GameCamCtrl";
+import { GameCamCtrl } from "./Controllers/GameCam/GameCamCtrl";
 import type Camera from "@/webgl/world/Camera";
-import { isLocked, setLockMouseMode } from "@/utils/lockMouseMode";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
 import type Mouse from "@/webgl/controllers/Mouse";
 import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
-import { Group, PerspectiveCamera, Vector3, Euler, type Scene } from "three";
+import { Group, PerspectiveCamera, Vector3, type Scene } from "three";
 import type { FolderApi, ButtonApi } from "tweakpane";
-import Targets from "./Targets/Targets";
 import Seed from "./Seed/Seed";
 import type Renderer from "@/webgl/Renderer";
 import Helper from "./Helper/Helper";
-import signal from 'signal-js';
+import signal from "signal-js";
+import Lumberjack from "./Lumberjack/Lumberjack";
+import physicSettings from "./Controllers/Physic/PhysicSettings";
+import type Time from "@/webgl/controllers/Time";
+import FollowGameCam from "./FollowCam/FollowGameCam";
+import seedSettings from "./Seed/SeedSettings";
 
 export default class SeedGame {
   private experience: Experience = new Experience();
+  private time: Time = this.experience.time as Time;
   private mouse: Mouse = this.experience.mouse as Mouse;
   private scene: Scene | null = null;
   private renderer: Renderer = this.experience.renderer as Renderer;
@@ -25,6 +29,8 @@ export default class SeedGame {
   private prevCamPos = new Vector3(0, 0, 0);
   private helper: Helper | null = null;
   private angleTarget = new Vector3();
+  private lumberjack: Lumberjack | null = null;
+  private followCameraGroup: FollowGameCam | null = null;
 
   private distanceLookAt = -30;
   private cameraHeight = 0.5;
@@ -41,10 +47,7 @@ export default class SeedGame {
   private isStarted = false;
   public isGameView = false;
 
-  public targets: Targets | null = null;
-
   private seed: Seed | null = null;
-
   private targetPoint: Vector3 | null = null;
   private cameraLookAtPoint: Vector3 | null = null;
 
@@ -65,21 +68,15 @@ export default class SeedGame {
 
   init() {
     this.isInit = true;
-    this.setTargets();
     this.seed = new Seed(this.scene as Scene);
     this.targetPoint = new Vector3();
     this.cameraLookAtPoint = new Vector3();
     this.scene?.add(this.instance);
+    this.setLumberjack();
     this.set();
     this.setDebug();
     this.helper = new Helper(this.scene as Scene);
     if (this.camera) this.gameCamCtrl = new GameCamCtrl(this.camera);
-  }
-
-  setTargets() {
-    this.targets = new Targets();
-    this.targets.setMesh();
-    if (this.targets.instance) this.instance.add(this.targets.instance);
   }
 
   update() {
@@ -87,6 +84,11 @@ export default class SeedGame {
       if (this.helper?.instance)
         this.helper.instance.position.set(0, this.cameraHeight, 0.01);
       this.seed?.update();
+    }
+
+    const physicsSteps = physicSettings.physicsSteps;
+    for (let i = 0; i < physicsSteps; i++) {
+      this.lumberjack?.update((this.time.delta / physicsSteps) * 0.0001);
     }
   }
 
@@ -106,34 +108,15 @@ export default class SeedGame {
       this.angleTarget.set(0, 0, 0);
     }
     this.angleTarget.y = this.cameraHeight;
-    this.seed?.shot(
-      this.angleTarget.x,
-      this.getShotAngle(this.angleTarget),
-      this.distanceLookAt
+    this.seed?.shot();
+  }
+
+  setLumberjack() {
+    this.lumberjack = new Lumberjack(
+      this.scene as Scene,
+      this.camera as Camera
     );
-  }
-
-  radiansToDegrees(radians: number) {
-    var pi = Math.PI;
-    return radians * (180 / pi);
-  }
-
-  getIntersects() {
-    // const intersects = this.renderer.raycast();
-    // if (intersects[0]) {
-    //   this.targetPoint?.copy(intersects[0].object.position);
-    // }
-  }
-
-  getShotAngle(target: Vector3) {
-    const adjacent = this.camera?.instance?.position.distanceTo(
-      target
-    ) as number;
-    let opposite = this.cameraLookAtPoint?.y || 0;
-    opposite += this.cameraHeight;
-    this.shotAngle =
-      (Math.atan(opposite / adjacent) * 100 * Math.PI) / 180 - Math.PI / 6;
-    return this.shotAngle;
+    this.lumberjack.set();
   }
 
   unset() {
@@ -169,6 +152,7 @@ export default class SeedGame {
     this.set();
     this.gameCamCtrl?.setCamGameMode();
     this.instance.visible = true;
+    this.followCameraGroup = new FollowGameCam(this.camera as Camera);
     window.addEventListener("keydown", this.keyAction);
   }
 
@@ -177,6 +161,7 @@ export default class SeedGame {
     this.gameCamCtrl?.unsetCamGameMode();
     this.unsetDebug();
     this.instance.visible = false;
+    this.followCameraGroup?.hide();
 
     window.removeEventListener("keydown", this.keyAction);
     this.unset();
@@ -197,6 +182,16 @@ export default class SeedGame {
     }) as ButtonApi;
     stopButton.on("click", () => {
       this.stop();
+    });
+    this.debugTab?.addInput(seedSettings, "gravity", {
+      min: -10,
+      max: 20,
+      step: 0.1,
+    });
+    this.debugTab?.addInput(seedSettings, "speed", {
+      min: -10,
+      max: 20,
+      step: 0.01,
     });
   }
 
