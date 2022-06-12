@@ -183,10 +183,46 @@ main,
       }
     }
 
+    @keyframes bounce {
+      from {
+        transform: translateY(0px);
+      }
+      to {
+        transform: translateY(-5px);
+      }
+    }
+    @keyframes no-bounce {
+      to {
+        transform: translateY(0px);
+      }
+    }
+
     #start-button {
       opacity: 0;
       transform: translateY(100);
       pointer-events: none;
+      color: #ffffff;
+      background-color: transparent;
+      border: none;
+      padding: 0 10px;
+
+      .start-el {
+        display: inline-block;
+      }
+
+      &:hover {
+        cursor: pointer;
+        
+        .start-el {
+          animation: bounce .3s ease alternate infinite;
+
+          @for $i from 1 through 16 {
+            &:nth-of-type(#{$i}) {
+              animation-delay: #{$i * .03}s;
+            }
+          }
+        }
+      }
     }
   }
 

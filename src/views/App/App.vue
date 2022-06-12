@@ -111,6 +111,7 @@ const animLogo = () => {
     0
   );
   splitLetters(document.getElementById("baseline") as HTMLElement, "<span class='baseline-el' style='display: inline-block'>", "</span>");
+  splitLetters(document.getElementById("start-button") as HTMLElement, "<span class='start-el' style='display: inline-block'>", "</span>");
 }
 
 const endLoading = () => {
@@ -189,7 +190,8 @@ const endLoading = () => {
           </div>
           <h2 id="baseline" class="content-el">Save Grandma, Save the Earth!</h2>
         </div>
-        <CustomButton id="start-button" class="content-el" :click="start">Start Experience</CustomButton>
+        <button id="start-button" class="content-el" :click="start">Start Experience</button>
+        <!-- <CustomButton id="start-button" class="content-el" :click="start">Start Experience</CustomButton> -->
       </div>
       <!-- <div class="credits">
         <img src="/images/gobelins_logo.png" alt="Gobelins logo">
