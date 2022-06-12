@@ -28,7 +28,7 @@ export default class Intro {
   private nextCamPos: Vector3 = new Vector3();
 
   constructor() {
-    signal.on("start_experience", () => this.stop());
+    signal.on("start_experience", () => this.start());
 
     this.setCamera();
   }
@@ -100,6 +100,8 @@ export default class Intro {
 
     this.isIntroRunning = true;
     this.startTime = this.time.elapsed;
+
+    this.experience.sound?.play(["button", "camera-intro", "ambient-home"]);
   }
 
   stop() {

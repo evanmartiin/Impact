@@ -99,8 +99,8 @@ select {
   padding: 0;
   // overflow: hidden;
 
-  cursor: url("/images/cursor.png") 5 5, auto;
   cursor: url("/images/cursor.png") 5 5, pointer;
+  cursor: url("/images/cursor.png") 5 5, auto;
 }
 
 ::-webkit-scrollbar {
