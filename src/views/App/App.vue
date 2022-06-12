@@ -3,10 +3,10 @@ import Experience from "@/webgl/Experience";
 import { onMounted, ref } from "vue";
 import { webglStore } from '@/stores/webglStore'
 import DistrictCard from '@/components/DistrictCard.vue'
-import CustomButton from '@/components/CustomButton.vue'
 import RoundButton from '@/components/RoundButton.vue'
 import Maintenance from '@/components/Maintenance.vue'
 import Home from '@/components/Home.vue'
+import Menu from '@/components/Menu.vue'
 import signal from 'signal-js';
 import anime from "animejs";
 import { splitLetters } from 'textsplitter';
@@ -180,8 +180,8 @@ const endLoading = () => {
   );
 }
 
-const toggleMenu = () => {
-  
+const openMenu = () => {
+  signal.emit("open_menu");
 }
 </script>
 
@@ -205,10 +205,11 @@ const toggleMenu = () => {
           </div>
           <h2 id="baseline" class="content-el">Save Grandma, Save the Earth !</h2>
         </div>
-        <RoundButton id="menu-button" class="content-el" :icon="'menu'" :click="toggleMenu" />
+        <RoundButton id="menu-button" class="content-el" :icon="'menu'" :click="openMenu" />
         <button id="start-button" class="content-el" @click="start">Start Experience</button>
       </div>
     </div>
+    <Menu />
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
     <Maintenance v-if="isMaintenanceOn" />
     <Home v-if="isMaintenanceOn" />
