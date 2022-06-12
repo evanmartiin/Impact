@@ -12,6 +12,8 @@ import {
   sRGBEncoding,
   Mesh,
   CubeTextureLoader,
+  type IUniform,
+  Vector2,
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
@@ -21,6 +23,9 @@ import fragment from "./Shaders/Map/fragment.glsl?raw";
 import vertex from "./Shaders/Map/vertex.glsl?raw";
 import PhysicCtrl from "./SeedGame/Controllers/Physic/PhysicCtrl";
 import Plane from "./Plane/Plane";
+
+import wiggleVertex from "./Shaders/wiggle/vertex.glsl?raw";
+import wiggleFragment from "./Shaders/wiggle/fragment.glsl?raw";
 
 export default class HomeScene {
   private experience: Experience = new Experience();
@@ -41,6 +46,10 @@ export default class HomeScene {
   private billy: Billy | null = null;
   private plane: Plane | null = null;
 
+  private wiggleShaderUniforms: { [uniform: string]: IUniform<any> } = {
+    uWiggleRatio: { value: .1 },
+  };
+
   constructor() {
     this.setFloor();
     this.setBilly();
@@ -59,6 +68,19 @@ export default class HomeScene {
     this.billy = new Billy(this.scene);
   }
 
+  applyWiggle(texture: Texture) {
+    const wiggleMaterial = new ShaderBaseMaterial({
+      uniforms: {
+        ...this.wiggleShaderUniforms,
+        uBakedTexture: { value: texture },
+      },
+      vertexShader: wiggleVertex,
+      fragmentShader: wiggleFragment,
+    });
+
+    return wiggleMaterial;
+  }
+
   setFloor() {
     this.models = [
       this.loaders.items["housev1model"] as GLTF,
@@ -74,15 +96,19 @@ export default class HomeScene {
         this.textures[index].encoding = sRGBEncoding;
         model.scene.traverse((child) => {
           if (child instanceof Mesh && this.textures) {
-            const bakedMaterial = new ShaderBaseMaterial({
-              transparent: true,
-              fragmentShader: fragment,
-              vertexShader: vertex,
-              uniforms: {
-                uTexture: { value: this.textures[index] },
-              },
-            });
-            (child as Mesh).material = bakedMaterial;
+            if (child.name.includes("tree")) {
+              child.material = this.applyWiggle(this.textures[index]);
+            } else {
+              const bakedMaterial = new ShaderBaseMaterial({
+                transparent: true,
+                fragmentShader: fragment,
+                vertexShader: vertex,
+                uniforms: {
+                  uTexture: { value: this.textures[index] },
+                },
+              });
+              (child as Mesh).material = bakedMaterial;
+            }
             if (index === 1) {
               this.physicCtrl.addFloor(child);
             } else {
@@ -159,6 +185,13 @@ export default class HomeScene {
     }) as ButtonApi;
     this.stopButton?.on("click", () => {
       this.leaveGameView();
+    });
+
+    const debugTab2 = this.debug.ui?.pages[2].addFolder({ title: "Wiggle" });
+    debugTab2?.addInput(this.wiggleShaderUniforms.uWiggleRatio, "value", {
+      min: 0,
+      max: 3,
+      label: "Ratio"
     });
   }
 }

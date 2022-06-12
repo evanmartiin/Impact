@@ -78,7 +78,6 @@ export default class Plane {
   update() {
     const looptime = 15000;
     const t = ((this.time.elapsed - this.startTime) % looptime) / looptime;
-    const easeBounce = (1 - (Math.cos(t * Math.PI * 2) * .5 + .5)) / 10;
 
     this.path?.parameters.path.getPointAt(t, this.position);
     this.path?.parameters.path.getPointAt((t + .02) % 1, this.lookAt);
