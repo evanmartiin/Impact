@@ -76,7 +76,7 @@ export default class Billy {
     //     child.material = this.material;
     //   }
     // });
-    console.log(this.model);
+    // console.log(this.model);
 
     this.instance = this.model.scene;
     this.instance.rotateX(-Math.PI * 0.5);

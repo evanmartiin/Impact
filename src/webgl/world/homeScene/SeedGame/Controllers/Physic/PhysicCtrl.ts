@@ -61,7 +61,7 @@ export default class PhysicCtrl {
     );
     this.floorMesh = mesh;
 
-    this.scene?.add(this.floorVisualizer);
+    // this.scene?.add(this.floorVisualizer);
   }
 
   removeCollider(id: number) {

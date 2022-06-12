@@ -1,7 +1,7 @@
-import { CatmullRomCurve3, Vector3 } from "three";
+import { Vector3 } from "three";
 
 const introSettings = {
-  pipeSpline: new CatmullRomCurve3([
+  pipeSpline: [
     new Vector3(0.82308394348547, 0.25, 0.40098479075095),
     new Vector3(0.82308394348547, 0.24173913043478, 0.36613802259126),
     new Vector3(0.80955245260884, 0.23347826086957, 0.21999802213577),
@@ -25,6 +25,6 @@ const introSettings = {
     new Vector3(-0.21191782205278, 0.08478260869565, 0.35600900979443),
     new Vector3(-0.11674172773837, 0.07652173913043, 0.32501307920666),
     new Vector3(-0.05902645785045, 0.06826086956522, 0.2723605522915),
-  ]),
+  ],
 };
 export default introSettings;

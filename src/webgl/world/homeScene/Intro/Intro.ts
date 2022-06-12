@@ -5,6 +5,9 @@ import {
   TubeGeometry,
   Spherical,
   Object3D,
+  CatmullRomCurve3,
+  MeshNormalMaterial,
+  Mesh,
 } from "three";
 import signal from "signal-js";
 import type Sizes from "../../../controllers/Sizes";
@@ -21,28 +24,17 @@ export default class Intro {
   private isIntroRunning: boolean = false;
   private startTime: number = 0;
   private baseCameraSpherical: Spherical | null = null;
+  private verifCam: boolean = false;
+  private nextCamPos: Vector3 = new Vector3();
 
   constructor() {
     signal.on("start_experience", () => this.start());
-
-    this.setPath();
-  }
-
-  setPath() {
-    this.geometry = new TubeGeometry(
-      introSettings.pipeSpline,
-      100,
-      0.01,
-      2,
-      true
-    );
 
     this.setCamera();
   }
 
   setCamera() {
-    this.geometry?.parameters.path.getPointAt(0, this.position);
-    const { x, y, z } = this.position;
+    const { x, y, z } = introSettings.pipeSpline[0];
     if (this.experience.activeCamera?.instance) {
       this.experience.activeCamera.instance.position.set(x, y, z);
       this.experience.activeCamera.instance.lookAt(0, 500, 0);
@@ -58,13 +50,15 @@ export default class Intro {
         {
           targets: targetY,
           value: [500, .1],
-          duration: 3000,
+          duration: 5000,
           easing: 'easeOutExpo',
           change: () => {
             this.experience.activeCamera?.instance?.lookAt(0, targetY.value, 0);
           },
           complete: () => {
             signal.emit("camera_ready");
+            this.verifCam = true;
+            this.nextCamPos = this.experience.activeCamera?.instance?.position.clone() as Vector3;
             this.handleMouse();
           }
         },
@@ -83,16 +77,29 @@ export default class Intro {
         const spherical = new Spherical().setFromVector3(this.experience.activeCamera.instance.position);
         spherical.phi = this.baseCameraSpherical.phi + shift.y;
         spherical.theta = this.baseCameraSpherical.theta + shift.x;
-        this.experience.activeCamera.instance.position.setFromSpherical(spherical);
-        this.experience.activeCamera?.instance?.lookAt(0, .1, 0);
+        this.nextCamPos.setFromSpherical(spherical);
       }
     });
   }
 
   start() {
-    this.startTime = this.time.elapsed;
-    this.isIntroRunning = true;
     signal.off("mouse_move");
+    this.verifCam = false;
+
+    const points = [
+      this.experience.activeCamera?.instance?.position.clone() as Vector3,
+      ...introSettings.pipeSpline.slice(1)
+    ];
+
+    this.geometry = new TubeGeometry(
+      new CatmullRomCurve3(points),
+      100,
+      0.01,
+      2
+    );
+
+    this.isIntroRunning = true;
+    this.startTime = this.time.elapsed;
   }
 
   stop() {
@@ -100,6 +107,7 @@ export default class Intro {
     this.experience.world?.setControls();
     this.experience.world?.controls?.target.set(0, 0, 0);
     signal.off("mouse_move");
+    this.verifCam = false;
   }
 
   update() {
@@ -108,7 +116,6 @@ export default class Intro {
       const t = (this.time.elapsed - this.startTime) / looptime;
       const easeInOut = t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
       const easeBounce = (1 - (Math.cos(t * Math.PI * 2) * .5 + .5)) / 10;
-
       if (t <= 1) {
         this.geometry?.parameters.path.getPointAt(easeInOut, this.position);
         const { x, y, z } = this.position;
@@ -118,6 +125,17 @@ export default class Intro {
       } else {
         this.stop();
       }
+    }
+
+    const distance = this.experience.activeCamera?.instance?.position.distanceTo(this.nextCamPos) as number;
+    if (distance > 0.001 && this.verifCam) {
+      const { x, y, z } = this.experience.activeCamera?.instance?.position as Vector3;
+      this.experience.activeCamera?.instance?.position.set(
+        x + (this.nextCamPos.x - x) * .1,
+        y + (this.nextCamPos.y - y) * .1,
+        z + (this.nextCamPos.z - z) * .1
+      );
+      this.experience.activeCamera?.instance?.lookAt(0, .1, 0);
     }
   }
 }
