@@ -58,7 +58,7 @@ export default class Plane {
 
   computeAngle(t: number) {
     const prevPosVec3 = new Vector3()
-    const prevTime = (t - .05) % 1;
+    const prevTime = (t - .02) % 1;
     this.path?.parameters.path.getPointAt(prevTime >= 0 ? prevTime : 0, prevPosVec3);
 
     const prevPos = new Vector2(prevPosVec3.x, prevPosVec3.z);
@@ -70,7 +70,7 @@ export default class Plane {
     let turnAngle = Math.acos(currentDirection.dot(nextDirection));
     const signAngle = currentDirection.cross(nextDirection) > 0;
     turnAngle *= signAngle ? 1 : -1;
-    turnAngle *= .2;
+    turnAngle *= .5;
 
     return turnAngle;
   }
@@ -80,7 +80,7 @@ export default class Plane {
     const t = ((this.time.elapsed - this.startTime) % looptime) / looptime;
 
     this.path?.parameters.path.getPointAt(t, this.position);
-    this.path?.parameters.path.getPointAt((t + .05) % 1, this.lookAt);
+    this.path?.parameters.path.getPointAt((t + .02) % 1, this.lookAt);
     this.mesh?.position.copy(this.position);
     this.mesh?.lookAt(this.lookAt);
     this.mesh?.rotateZ(Math.PI * this.computeAngle(t));
