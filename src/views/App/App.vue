@@ -4,12 +4,12 @@ import { onMounted, ref } from "vue";
 import { webglStore } from '@/stores/webglStore'
 import DistrictCard from '@/components/DistrictCard.vue'
 import CustomButton from '@/components/CustomButton.vue'
+import RoundButton from '@/components/RoundButton.vue'
 import Maintenance from '@/components/Maintenance.vue'
 import Home from '@/components/Home.vue'
 import signal from 'signal-js';
 import anime from "animejs";
 import { splitLetters } from 'textsplitter';
-
 
 const selectedDistrict = ref('');
 const showScoreboard = ref(false);
@@ -167,6 +167,21 @@ const endLoading = () => {
     },
     0
   );
+  tl.add(
+    {
+      targets: '#menu-button',
+      opacity: [0, 1],
+      translateY: [-100, 0],
+      duration: 500,
+      delay: 3000,
+      easing: 'easeOutBack'
+    },
+    0
+  );
+}
+
+const toggleMenu = () => {
+  
 }
 </script>
 
@@ -190,14 +205,9 @@ const endLoading = () => {
           </div>
           <h2 id="baseline" class="content-el">Save Grandma, Save the Earth !</h2>
         </div>
+        <RoundButton id="menu-button" class="content-el" :icon="'menu'" :click="toggleMenu" />
         <button id="start-button" class="content-el" @click="start">Start Experience</button>
-        <!-- <CustomButton id="start-button" class="content-el" :click="start">Start Experience</CustomButton> -->
       </div>
-      <!-- <div class="credits">
-        <img src="/images/gobelins_logo.png" alt="Gobelins logo">
-        <p>Ambroise Nicolao - Danut Miculas - Ludwig Pilicer - Evan Martin - Antoine Tardivel - Timon Idrissi</p>
-        <img src="/images/cci_logo.png" alt="CCI logo">
-      </div> -->
     </div>
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
     <Maintenance v-if="isMaintenanceOn" />

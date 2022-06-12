@@ -221,21 +221,6 @@ main,
       }
     }
   }
-
-  .credits {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-
-    img {
-      height: 50px;
-    }
-
-    p {
-      font-size: 15px;
-    }
-  }
 }
 
 @media (max-width: 1000px) {
@@ -253,4 +238,10 @@ main,
 #app {
   font-family: "Mikado";
   color: #0D1C51;
+}
+
+#menu-button {
+  position: absolute;
+  top: 50px;
+  right: 50px;
 }
