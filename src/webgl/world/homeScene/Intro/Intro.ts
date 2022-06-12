@@ -101,7 +101,8 @@ export default class Intro {
     this.isIntroRunning = true;
     this.startTime = this.time.elapsed;
 
-    this.experience.sound?.play(["button", "camera-intro", "ambient-home"]);
+    const sounds = this.experience.sound?.playMany(["button", "camera-intro"]);
+    if (sounds) sounds[1].sound.on('end', () => this.experience.sound?.play("ambient-home"));
   }
 
   stop() {

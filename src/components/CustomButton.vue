@@ -1,14 +1,20 @@
 <script setup>
+import signal from 'signal-js';
+
 const props = defineProps({
   click: {
     type: Function,
     required: true
   }
 })
+
+const clickSound = () => {
+  signal.emit("play_sound", "button");
+}
 </script>
 
 <template>
-<button @click="props.click">
+<button @click="props.click(); clickSound();">
   <div class="shadow">
     <div class="clip">
       <slot />

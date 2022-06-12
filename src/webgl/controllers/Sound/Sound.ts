@@ -1,5 +1,6 @@
 import type { SoundSource } from "@/models/webgl/sound.model";
 import { Howl } from "howler";
+import signal from 'signal-js';
 
 interface Sprite {
   name: string;
@@ -7,12 +8,16 @@ interface Sprite {
 }
 
 export default class Sound {
+  static isOn: boolean = true;
+
   private sources: SoundSource[] = [];
   private sounds: Sprite[] = [];
 
   constructor(sources: SoundSource[]) {
     this.sources = sources;
     this.setSounds();
+    signal.on("toggle_sound", this.toggleSound);
+    signal.on("play_sound", (name: string) => this.play(name));
   }
 
   setSounds() {
@@ -22,30 +27,33 @@ export default class Sound {
     });
   }
 
-  play(name: string | string[]): Howl | Sprite[] | undefined {
-    let result: Howl | Sprite[] | undefined;
+  toggleSound() {
+    Sound.isOn = !Sound.isOn;
+    const volume = Sound.isOn ? 1 : 0;
+    Howler.volume(volume);
+  }
 
-    if (name instanceof Array) {
+  play(name: string): Howl | undefined {
+    let result: Howl | undefined;
 
-      const sounds: Sprite[] = [];
-      name.forEach((childName) => {
-        const sound = this.play(childName);
-        sounds.push({ name: childName, sound: sound as Howl });
-      });
-
-      result = sounds;
-
-    } else {
-
-      const search = this.sounds.find((el) => el.name === name);
-      if (search) {
-        search.sound.play();
-      }
-
-      result = search?.sound ? search.sound : undefined;
-      
+    const search = this.sounds.find((el) => el.name === name);
+    if (search) {
+      search.sound.play();
     }
 
+    result = search?.sound ? search.sound : undefined;
+
     return result;
+  }
+
+  playMany(names: string[]): Sprite[] {
+    const sounds: Sprite[] = [];
+
+    names.forEach((childName) => {
+      const sound = this.play(childName);
+      sounds.push({ name: childName, sound: sound as Howl });
+    });
+
+    return sounds;
   }
 }

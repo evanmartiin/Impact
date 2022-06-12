@@ -1,4 +1,6 @@
 <script setup>
+import signal from 'signal-js';
+
 const props = defineProps({
   click: {
     type: Function,
@@ -9,10 +11,14 @@ const props = defineProps({
     required: true
   }
 })
+
+const clickSound = () => {
+  signal.emit("play_sound", "button");
+}
 </script>
 
 <template>
-<button @click="props.click">
+<button @click="props.click(); clickSound();">
   <div class="inner">
     <img :src="'/images/buttons/' + props.icon + '.png'" alt="Icône">
   </div>
