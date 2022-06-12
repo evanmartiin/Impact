@@ -20,6 +20,8 @@ import SeedGame from "./SeedGame/SeedGame";
 import fragment from "./Shaders/Map/fragment.glsl?raw";
 import vertex from "./Shaders/Map/vertex.glsl?raw";
 import PhysicCtrl from "./SeedGame/Controllers/Physic/PhysicCtrl";
+import Clouds from "./Clouds/Clouds";
+import Plane from "./Plane/Plane";
 
 export default class HomeScene {
   private experience: Experience = new Experience();
@@ -38,6 +40,8 @@ export default class HomeScene {
   public camera: Camera = new Camera(this.cameraPos, this.scene);
   private physicCtrl = new PhysicCtrl(this.scene);
   private billy: Billy | null = null;
+  private clouds: Clouds | null = null;
+  private plane: Plane | null = null;
 
   constructor() {
     this.setFloor();
@@ -45,6 +49,9 @@ export default class HomeScene {
     this.setGame();
     this.setDebug();
     this.setSkybox();
+
+    // this.clouds = new Clouds(this.scene);
+    this.plane = new Plane(this.scene);
   }
 
   setGame() {
@@ -108,6 +115,7 @@ export default class HomeScene {
       this.game.update();
       this.billy?.update();
     }
+    this.plane?.update();
   }
 
   enterGameView() {

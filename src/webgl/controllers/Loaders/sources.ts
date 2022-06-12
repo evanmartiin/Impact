@@ -244,6 +244,29 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/poppingtrees-seed.jpg",
   },
+  // NUAGE
+  {
+    name: "cloud-model",
+    type: "gltfModel",
+    path: "/models/nuage.glb",
+  },
+  // OISEAU
+  {
+    name: "bird-model",
+    type: "gltfModel",
+    path: "/models/Oiseaux.glb",
+  },
+  // AVION
+  {
+    name: "plane-model",
+    type: "gltfModel",
+    path: "/models/Avion.glb",
+  },
+  {
+    name: "plane-texture",
+    type: "texture",
+    path: "/textures/matcap-plane.png",
+  },
 ];
 
 export default Sources;

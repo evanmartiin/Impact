@@ -188,9 +188,9 @@ const endLoading = () => {
             <img class="impact-logo" src="/images/impact_logo/c.png" alt="Impact logo C">
             <img class="impact-logo" src="/images/impact_logo/t.png" alt="Impact logo T">
           </div>
-          <h2 id="baseline" class="content-el">Save Grandma, Save the Earth!</h2>
+          <h2 id="baseline" class="content-el">Save Grandma, Save the Earth !</h2>
         </div>
-        <button id="start-button" class="content-el" :click="start">Start Experience</button>
+        <button id="start-button" class="content-el" @click="start">Start Experience</button>
         <!-- <CustomButton id="start-button" class="content-el" :click="start">Start Experience</CustomButton> -->
       </div>
       <!-- <div class="credits">
