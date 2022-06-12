@@ -24,7 +24,7 @@
 *::after {
   user-select: none;
   box-sizing: border-box;
-  // cursor: none; // si cursor custom
+  cursor: none; // si cursor custom
 }
 
 ::-webkit-scrollbar {
@@ -98,6 +98,9 @@ select {
   margin: 0;
   padding: 0;
   // overflow: hidden;
+
+  cursor: url("/images/cursor.png") 5 5, auto;
+  cursor: url("/images/cursor.png") 5 5, pointer;
 }
 
 ::-webkit-scrollbar {
@@ -191,11 +194,6 @@ main,
         transform: translateY(-5px);
       }
     }
-    @keyframes no-bounce {
-      to {
-        transform: translateY(0px);
-      }
-    }
 
     #start-button {
       opacity: 0;
@@ -211,8 +209,6 @@ main,
       }
 
       &:hover {
-        cursor: pointer;
-        
         .start-el {
           animation: bounce .3s ease alternate infinite;
 
