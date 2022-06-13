@@ -98,7 +98,7 @@ const closeControls = () => {
   left: 0;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  background-color: rgba(13, 28, 81, 0.5);
+  background-color: rgba(13, 28, 81, 0);
   display: flex;
   flex-direction: column;
   align-items: center;

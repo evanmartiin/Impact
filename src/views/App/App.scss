@@ -218,9 +218,23 @@ main,
       background-color: transparent;
       border: none;
       padding: 0 10px;
+      position: relative;
 
       .start-el {
         display: inline-block;
+      }
+
+      &:after {
+        position: absolute;
+        content: '';
+        height: 2px;
+        bottom: -2px;
+        width: 0%;
+        background: white;
+        transition: .5s;
+        margin: 0;
+        left: 5%;
+        right: 5%;
       }
 
       &:hover {
@@ -232,6 +246,10 @@ main,
               animation-delay: #{$i * 0.03}s;
             }
           }
+        }
+
+        &:after {
+          width: 90%;
         }
       }
     }
