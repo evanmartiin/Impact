@@ -1,3 +1,4 @@
+import signal from "signal-js";
 import type Camera from "@/webgl/world/Camera";
 import {
   BoxGeometry,
@@ -8,18 +9,26 @@ import {
   Matrix4,
   Line3,
   Box3,
+  Group,
+  ArrowHelper,
 } from "three";
 import type { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import PhysicCtrl from "../Controllers/Physic/PhysicCtrl";
 import type { ICollider } from "../Controllers/Physic/PhysicCtrl";
-import physicSettings from "../Controllers/Physic/PhysicSettings";
 import lamberjackSettings from "./LumberjackSettings";
+import getRandomFloatBetween from "@/utils/getRandomFloatBetween";
+import SeedGame from "../SeedGame";
+import type Tree from "../Tree/Tree";
+
+type TLumberjackAction = "walkToTree" | "cuting" | "idle";
 
 export default class Lumberjack {
-  private physicCtrl: PhysicCtrl | null = null;
+  private lumberjacks: Lumberjack[] = [];
+  private game: SeedGame = new SeedGame();
+  static physicCtrl: PhysicCtrl | null = null;
   private controls: OrbitControls | null = null;
-  private geometry: BoxGeometry | null = null;
-  private material: MeshBasicMaterial | null = null;
+  static geometry: BoxGeometry | null = null;
+  static material: MeshBasicMaterial | null = null;
   private instance: Mesh | null = null;
   private scene: Scene | null;
   private playerVelocity = new Vector3();
@@ -36,20 +45,105 @@ export default class Lumberjack {
   private bkdPressed = false;
   private lftPressed = false;
   private rgtPressed = false;
+  private targetedTree: Tree | null = null;
+  private moveDirection: Vector3 | null = null;
+  private action: TLumberjackAction = "idle";
+
   constructor(scene: Scene, camera: Camera) {
-    this.physicCtrl = new PhysicCtrl(scene);
-    console.log(this.physicCtrl.colliders);
-    this.floor = this.physicCtrl.floorMesh;
-    this.colliders = this.physicCtrl.colliders;
+    this.lumberjacks.push(this);
+    if (!Lumberjack.physicCtrl) Lumberjack.physicCtrl = new PhysicCtrl(scene);
+    this.floor = Lumberjack.physicCtrl.floorMesh;
+    this.colliders = Lumberjack.physicCtrl.colliders;
     this.scene = scene;
     this.controls = camera.controls;
+    this.set();
+    signal.on("updateLumberjackTarget", () => this.getNearestTree());
+    this.setAction("idle");
   }
+
+  getNearestTree() {
+    if (!this.targetedTree && this.game.trees.length > 0) {
+      let nearestTree: Tree | null = null;
+      let minDistance: number | null = null;
+      this.game.trees.map((t) => {
+        let tempDis = (t.instance as Group).position.distanceTo(
+          this.instance?.position as Vector3
+        );
+        if (!t.isTargeted) {
+          if (minDistance === null) {
+            minDistance = tempDis;
+            nearestTree = t;
+          } else if (tempDis < minDistance) {
+            minDistance = tempDis;
+            nearestTree = t;
+          }
+        }
+      });
+      if (nearestTree) {
+        (nearestTree as Tree).isTargeted = true;
+        this.targetedTree = nearestTree;
+        this.setAction("walkToTree");
+      }
+    }
+    // this.getTreeDirection();
+  }
+
+  getTreeDirection() {
+    const newDirection = new Vector3();
+    if (this.instance && this.targetedTree?.instance?.position)
+      newDirection
+        .subVectors(
+          (this.instance as Mesh).position,
+          this.targetedTree.instance.position
+        )
+        .normalize()
+        .setLength(0.2);
+    const origin = this.instance?.position;
+    const length = 0.2;
+    const hex = 0xff0000;
+    const arrowHelper = new ArrowHelper(newDirection, origin, length, hex);
+    this.scene?.add(arrowHelper);
+    this.moveDirection = newDirection;
+  }
+
+  setAction(action: TLumberjackAction) {
+    switch (action) {
+      case "idle":
+        this.setColor(0x00ffff);
+        break;
+      case "walkToTree":
+        this.setColor(0xffff00);
+        break;
+      case "cuting":
+        this.setColor(0xff0000);
+        break;
+    }
+  }
+
+  setColor(color: number) {
+    if (Array.isArray(this.instance?.material)) {
+      this.instance?.material.map((m) => {
+        (m as MeshBasicMaterial).color.setHex(color);
+      });
+    } else {
+      (this.instance?.material as MeshBasicMaterial).color.setHex(color);
+    }
+  }
+
   set() {
     if (!this.instance) {
-      this.geometry = new BoxGeometry(0.02, 0.02, 0.02);
-      this.material = new MeshBasicMaterial({ color: 0x00ff00 });
-      this.instance = new Mesh(this.geometry, this.material);
+      if (!Lumberjack.geometry)
+        Lumberjack.geometry = new BoxGeometry(0.02, 0.02, 0.02);
+      if (!Lumberjack.material)
+        Lumberjack.material = new MeshBasicMaterial({ color: 0x00ff00 });
+      this.instance = new Mesh(Lumberjack.geometry, Lumberjack.material);
       this.instance.position.copy(lamberjackSettings.basePosition);
+      const randomBoolean = Math.random() < 0.5;
+      if (randomBoolean) {
+        this.instance.position.x += getRandomFloatBetween(0, 0.1, 2);
+      } else {
+        this.instance.position.x -= getRandomFloatBetween(0, 0.1, 2);
+      }
       (this.instance as any).capsuleInfo = {
         radius: 0.02,
         segment: new Line3(new Vector3(), new Vector3(0, 0.02, 0.0)),
@@ -115,11 +209,45 @@ export default class Lumberjack {
 
     const angle = this.controls?.getAzimuthalAngle() || 0;
 
+    const offsetMove = lamberjackSettings.speed * delta * 0.01;
+    if (this.targetedTree && this.instance && this.targetedTree.instance) {
+      if (
+        this.instance?.position.distanceTo(
+          this.targetedTree?.instance?.position
+        ) >
+        lamberjackSettings.maxDistanceBetweenLJAndTree * 0.001
+      ) {
+        if (
+          this.instance?.position.x > this.targetedTree?.instance?.position.x
+        ) {
+          this.instance.position.x -= offsetMove;
+        }
+        if (
+          this.instance?.position.x < this.targetedTree?.instance?.position.x
+        ) {
+          this.instance.position.x += offsetMove;
+        }
+
+        if (
+          this.instance?.position.z > this.targetedTree?.instance?.position.z
+        ) {
+          this.instance.position.z -= offsetMove;
+        }
+        if (
+          this.instance?.position.z < this.targetedTree?.instance?.position.z
+        ) {
+          this.instance.position.z += offsetMove;
+        }
+      } else {
+        this.setAction("cuting");
+      }
+    }
+
     if (this.fwdPressed) {
       this.tempVector.set(0, 0, -0.2).applyAxisAngle(this.upVector, angle);
       this.instance?.position.addScaledVector(
         this.tempVector,
-        lamberjackSettings.playerSpeed * delta
+        lamberjackSettings.speed * delta
       );
     }
 
@@ -127,7 +255,7 @@ export default class Lumberjack {
       this.tempVector.set(0, 0, 0.2).applyAxisAngle(this.upVector, angle);
       this.instance?.position.addScaledVector(
         this.tempVector,
-        lamberjackSettings.playerSpeed * delta
+        lamberjackSettings.speed * delta
       );
     }
 
@@ -135,7 +263,7 @@ export default class Lumberjack {
       this.tempVector.set(-0.2, 0, 0).applyAxisAngle(this.upVector, angle);
       this.instance?.position.addScaledVector(
         this.tempVector,
-        lamberjackSettings.playerSpeed * delta
+        lamberjackSettings.speed * delta
       );
     }
 
@@ -143,7 +271,7 @@ export default class Lumberjack {
       this.tempVector.set(0.2, 0, 0).applyAxisAngle(this.upVector, angle);
       this.instance?.position.addScaledVector(
         this.tempVector,
-        lamberjackSettings.playerSpeed * delta
+        lamberjackSettings.speed * delta
       );
     }
 

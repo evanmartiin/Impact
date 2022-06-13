@@ -1,3 +1,4 @@
+import { webglStore } from "./../../../../../../stores/webglStore";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
 import { isLocked, setLockMouseMode } from "@/utils/lockMouseMode";
 import { Euler, Vector3, PerspectiveCamera } from "three";
@@ -6,7 +7,7 @@ import type World from "@/webgl/world/World";
 import type Mouse from "@/webgl/controllers/Mouse";
 import Experience from "@/webgl/Experience";
 import type Renderer from "@/webgl/Renderer";
-import signal from 'signal-js';
+import signal from "signal-js";
 import gameCamSettings from "./GameCamSettings";
 
 export class GameCamCtrl {
@@ -18,13 +19,14 @@ export class GameCamCtrl {
   private _euler = new Euler(0, 0, 0, "YXZ");
   private _PI_2 = Math.PI / 2;
   private pointerSpeed = 1.0;
-  private minPolarAngle = 1.4;
-  private maxPolarAngle = Math.PI - 1.3;
+  private minPolarAngle = 1.6;
+  private maxPolarAngle = Math.PI - 0.9;
   private prevCamPos = new Vector3(0, 0, 0);
   private gameControls: PointerLockControls | null = null;
   private distanceLookAt = -30;
   private heightLookAt = 0;
   private isFirstMove = false;
+  private isMouseLocked = false;
 
   private defaultCenterPos = new Vector3(
     this.distanceLookAt,
@@ -33,17 +35,43 @@ export class GameCamCtrl {
   );
 
   constructor(camera: Camera) {
+    document.addEventListener(
+      "pointerlockerror",
+      this.errorCallback.bind(this),
+      false
+    );
+    document.addEventListener(
+      "mozpointerlockerror",
+      this.errorCallback.bind(this),
+      false
+    );
+    document.addEventListener(
+      "webkitpointerlockerror",
+      this.errorCallback.bind(this),
+      false
+    );
+
     this.camera = camera;
     this.world = this.experience.world;
     this.gameControls = new PointerLockControls(
       camera.instance as PerspectiveCamera,
       this.renderer.canvas
     );
+    this.gameControls?.addEventListener(
+      "unlock",
+      this.lockChangeEvent.bind(this)
+    );
+    signal.on("resume_game", this.lockMouse.bind(this));
+  }
+  errorCallback() {
+    setTimeout(() => {
+      this.lockMouse();
+    }, 500);
   }
 
   private lockMouse() {
-    // Desactive orbit control
     if (this.world) {
+      // Desactive orbit control
       this.world.PARAMS.isCtrlActive = false;
     }
     if (this.experience.world?.controls)
@@ -56,6 +84,16 @@ export class GameCamCtrl {
     this.gameControls?.lock();
     this.gameControls?.connect();
     this.isFirstMove = true;
+    this.isMouseLocked = true;
+    signal.emit("set_target_cursor", false);
+  }
+
+  private lockChangeEvent() {
+    if (this.gameControls?.isLocked) {
+      this.isMouseLocked = false;
+      signal.emit("set_target_cursor", true);
+      signal.emit("open_menu", "seedGameMode");
+    }
   }
 
   private unlockMouse() {
@@ -70,6 +108,8 @@ export class GameCamCtrl {
     }
     this.gameControls?.unlock();
     this.gameControls?.disconnect();
+    this.isMouseLocked = false;
+    
   }
 
   setCamGameMode() {
@@ -92,7 +132,7 @@ export class GameCamCtrl {
   }
 
   private moveCamera() {
-    if (this.mouse.mouseMoveEvent) {
+    if (this.mouse.mouseMoveEvent && this.isMouseLocked) {
       const movementX =
         this.mouse.mouseMoveEvent.movementX ||
         (this.mouse.mouseMoveEvent as any).mozMovementX ||
@@ -107,18 +147,21 @@ export class GameCamCtrl {
       if (this.camera?.instance)
         this._euler.setFromQuaternion(this.camera.instance.quaternion);
 
-      this._euler.y -= movementX * 0.002 * this.pointerSpeed;
-      this._euler.x -= movementY * 0.002 * this.pointerSpeed;
+      this._euler.y -= movementX * 0.0002 * this.pointerSpeed;
+      this._euler.x -= movementY * 0.0002 * this.pointerSpeed;
 
       this._euler.x = Math.max(
         this._PI_2 - this.maxPolarAngle,
         Math.min(this._PI_2 - this.minPolarAngle, this._euler.x)
       );
+
       if (this._euler.y > 0) {
+        // Max Rigth
         if (this._euler.y < 2.635) {
           this._euler.y = 2.635;
         }
       } else {
+        // Max left
         if (this._euler.y > -2.633) {
           this._euler.y = -2.633;
         }

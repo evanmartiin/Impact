@@ -5,6 +5,10 @@ const props = defineProps({
   click: {
     type: Function,
     required: true
+  },
+  disabled: {
+    type: Boolean,
+    required: true
   }
 })
 
@@ -14,7 +18,7 @@ const clickSound = () => {
 </script>
 
 <template>
-<button @click="props.click(); clickSound();">
+<button @click="props.click(); clickSound();" :disabled="props.disabled">
   <div class="shadow">
     <div class="clip">
       <slot />
@@ -33,14 +37,9 @@ button {
   width: 170px;
   font-size: 18px;
   text-transform: uppercase;
-  
-  &:hover {
-    cursor: pointer;
-  }
 
   .shadow {
     box-shadow: 1px 1px 2px rgba(13, 28, 81, .1);
-
     .clip {
       clip-path: polygon(1% 5%, 53% 0, 99% 5%, 100% 54%, 99% 97%, 49% 100%, 1% 97%, 0 51%);
       background-image: url("/images/paper-min.png");

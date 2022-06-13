@@ -19,12 +19,15 @@
   src: url("/fonts/MikadoBold.otf") format("opentype");
 }
 
+$pointer: url("/images/cursors/pointer.png");
+$cursor: url("/images/cursors/cursor.png");
+
 *,
 *::before,
 *::after {
   user-select: none;
   box-sizing: border-box;
-  cursor: none; // si cursor custom
+  // cursor: none; // si cursor custom
 }
 
 ::-webkit-scrollbar {
@@ -99,8 +102,16 @@ select {
   padding: 0;
   // overflow: hidden;
 
-  cursor: url("/images/cursor.png") 5 5, pointer;
-  cursor: url("/images/cursor.png") 5 5, auto;
+  cursor: $pointer 5 5, pointer;
+  cursor: $cursor 5 5, auto;
+}
+
+a *,
+button * {
+  cursor: $cursor 5 5, auto;
+  &:hover {
+    cursor: $pointer 5 5, pointer;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -145,14 +156,18 @@ main,
     #earth {
       width: 200px;
     }
-  
+
     #progress-bar {
       bottom: 30%;
       height: 10px;
       width: 200px;
       border: 2px solid white;
       border-radius: 50px;
-      background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 0%);
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 1) 0%,
+        rgba(255, 255, 255, 0) 0%
+      );
     }
   }
 
@@ -172,7 +187,7 @@ main,
         .impact-logo {
           height: 130px;
           margin: 0 2px;
-  
+
           &.letter-A {
             margin: 0 -22px 0 -35px;
           }
@@ -224,11 +239,11 @@ main,
 
       &:hover {
         .start-el {
-          animation: bounce .3s ease alternate 2;
+          animation: bounce 0.3s ease alternate 2;
 
           @for $i from 1 through 16 {
             &:nth-of-type(#{$i}) {
-              animation-delay: #{$i * .03}s;
+              animation-delay: #{$i * 0.03}s;
             }
           }
         }
@@ -255,7 +270,7 @@ main,
 
 #app {
   font-family: "Mikado";
-  color: #0D1C51;
+  color: #0d1c51;
 }
 
 #menu-button {

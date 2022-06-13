@@ -1,11 +1,9 @@
 import type Camera from "@/webgl/world/Camera";
 import { Group } from "three";
-import Cursor from "./Cursor/Cursor";
 
 export default class FollowGameCam {
   private instance = new Group();
   private camera: Camera | null = null;
-  private cursor: Cursor = new Cursor(this.instance);
   private isFollowing = false;
 
   constructor(camera: Camera) {
@@ -18,18 +16,15 @@ export default class FollowGameCam {
   }
 
   display() {
-    this.cursor.display();
     this.isFollowing = true;
   }
 
   hide() {
-    this.cursor.hide();
     this.isFollowing = false;
   }
 
   update() {
     if (this.isFollowing) {
-      this.cursor.update();
     }
   }
 }
