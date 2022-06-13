@@ -6,8 +6,6 @@ import {
   Spherical,
   Object3D,
   CatmullRomCurve3,
-  MeshNormalMaterial,
-  Mesh,
 } from "three";
 import signal from "signal-js";
 import type Sizes from "../../../controllers/Sizes";
@@ -28,7 +26,7 @@ export default class Intro {
   private nextCamPos: Vector3 = new Vector3();
 
   constructor() {
-    signal.on("start_experience", () => this.start());
+    signal.on("start_experience", () => this.stop());
     // FIXME: pass to start
 
     this.setCamera();

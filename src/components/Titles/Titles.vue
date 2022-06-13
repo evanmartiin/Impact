@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import signal from 'signal-js';
-import CustomButton from '@/components/CustomButton.vue'
 import anime from 'animejs';
 import { onMounted, ref } from 'vue';
 import { splitLetters } from 'textsplitter';

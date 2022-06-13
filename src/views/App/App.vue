@@ -182,7 +182,7 @@ const startExperience = () => {
     },
     0
   );
-  setTimeout(() => signal.emit("subtitles_on"), 3000);
+  // setTimeout(() => signal.emit("subtitles_on"), 3000);
 }
 
 const openMenu = () => {
@@ -217,7 +217,7 @@ const openMenu = () => {
     <TargetCursor />
     <GameStartCounter />
     <Menu />
-    <Titles :subtitles="TitlesSources" :callback="() => signal.emit('open_controls')" :timeout="1000" />
+    <Titles :subtitles="TitlesSources" :callback="() => signal.emit('open_controls')" :timeout="500" />
     <Controls />
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
     <Maintenance v-if="isMaintenanceOn" />

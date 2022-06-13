@@ -203,7 +203,7 @@ export default class Earth {
     const loader = new CubeTextureLoader();
     loader.setPath('textures/skybox/earth/');
 
-    const textureCube = loader.load(['px.jpg', 'px.jpg', 'py.jpg', 'py.jpg', 'px.jpg', 'px.jpg']);
+    const textureCube = loader.load(["px.jpg", "px.jpg", "py.jpg", "ny.jpg", "px.jpg", "px.jpg"]);
     textureCube.encoding = sRGBEncoding;
     this.scene.background = textureCube;
   }
