@@ -47,6 +47,7 @@ const openMenu = () => {
       update: () => {
         const menu = document.getElementsByClassName('menu')[0];
         menu.style.backdropFilter = `blur(${blur.value}px)`;
+        menu.style.webkitBackdropFilter = `blur(${blur.value}px)`;
       },
     },
     0
@@ -77,6 +78,7 @@ const closeMenu = () => {
       update: () => {
         const menu = document.getElementsByClassName('menu')[0];
         menu.style.backdropFilter = `blur(${blur.value}px)`;
+        menu.style.webkitBackdropFilter = `blur(${blur.value}px)`;
       },
       complete: () => {
         isMenuOpened.value = false;
@@ -95,7 +97,7 @@ const closeMenu = () => {
     <CustomButton class="menu-el" :click="click">Restart</CustomButton>
     <CustomButton class="menu-el" :click="click">Main menu</CustomButton>
     <RoundButton class="menu-el" :icon="soundIcon" :click="toggleSound" />
-    <CustomButton class="menu-el" :click="click">Crédits</CustomButton>
+    <CustomButton class="menu-el" :click="click">Credits</CustomButton>
   </div>
   <RoundButton class="menu-el" id="close-menu" :icon="'close'" :click="closeMenu" />
 </div>
@@ -109,6 +111,7 @@ const closeMenu = () => {
   top: 0;
   left: 0;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
   align-items: center;

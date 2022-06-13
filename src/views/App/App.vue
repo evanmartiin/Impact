@@ -7,6 +7,7 @@ import RoundButton from '@/components/RoundButton.vue'
 import Maintenance from '@/components/Maintenance.vue'
 import Home from '@/components/Home.vue'
 import Menu from '@/components/Menu.vue'
+import Controls from '@/components/Controls.vue'
 import signal from 'signal-js';
 import anime from "animejs";
 import { splitLetters } from 'textsplitter';
@@ -20,25 +21,6 @@ const loadingPct = ref(0);
 const cameraReady = ref(false);
 const score = ref(0);
 const experienceStarted = ref(false);
-
-const start = () => {
-  signal.emit("start_experience");
-  const tl = anime.timeline({});
-  tl.add(
-    {
-      targets: '.content-el',
-      opacity: [1, 0],
-      translateY: [0, 50],
-      duration: 1000,
-      delay: anime.stagger(100, { direction: 'reverse' }),
-      easing: 'easeOutBack',
-      complete: () => {
-        experienceStarted.value = true;
-      }
-    },
-    0
-  );
-}
 
 onMounted(() => {
   signal.on("change_scene", () => {
@@ -90,11 +72,11 @@ onMounted(() => {
     );
   })
 
-  animLogo();
+  startLoading();
 });
 
 
-const animLogo = () => {
+const startLoading = () => {
   const tl = anime.timeline({});
   tl.add(
     {
@@ -180,6 +162,25 @@ const endLoading = () => {
   );
 }
 
+const startExperience = () => {
+  signal.emit("start_experience");
+  const tl = anime.timeline({});
+  tl.add(
+    {
+      targets: '.content-el',
+      opacity: [1, 0],
+      translateY: [0, 50],
+      duration: 1000,
+      delay: anime.stagger(100, { direction: 'reverse' }),
+      easing: 'easeOutBack',
+      complete: () => {
+        experienceStarted.value = true;
+      }
+    },
+    0
+  );
+}
+
 const openMenu = () => {
   signal.emit("open_menu");
 }
@@ -206,10 +207,11 @@ const openMenu = () => {
           <h2 id="baseline" class="content-el">Save Grandma, Save the Earth !</h2>
         </div>
         <RoundButton id="menu-button" class="content-el" :icon="'menu'" :click="openMenu" />
-        <button id="start-button" class="content-el" @click="start">Start Experience</button>
+        <button id="start-button" class="content-el" @click="startExperience">Start Experience</button>
       </div>
     </div>
     <Menu />
+    <Controls />
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
     <Maintenance v-if="isMaintenanceOn" />
     <Home v-if="isMaintenanceOn" />
