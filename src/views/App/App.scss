@@ -105,7 +105,8 @@ select {
   cursor: $pointer 5 5, pointer;
   cursor: $cursor 5 5, auto;
 }
-
+button,
+a,
 a *,
 button * {
   cursor: $cursor 5 5, auto;
@@ -226,12 +227,12 @@ main,
 
       &:after {
         position: absolute;
-        content: '';
+        content: "";
         height: 2px;
         bottom: -2px;
         width: 0%;
         background: white;
-        transition: .5s;
+        transition: 0.5s;
         margin: 0;
         left: 5%;
         right: 5%;
