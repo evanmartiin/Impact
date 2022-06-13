@@ -4,8 +4,9 @@
     "env.d.ts",
     "src/**/*",
     "src/**/*.vue"
-  ],
+, "src/models/.model.ts"  ],
   "compilerOptions": {
+    "moduleResolution": "node",
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {

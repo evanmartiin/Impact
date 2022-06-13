@@ -3,13 +3,18 @@ import Experience from "@/webgl/Experience";
 import { onMounted, ref } from "vue";
 import { webglStore } from '@/stores/webglStore'
 import DistrictCard from '@/components/DistrictCard.vue'
-import CustomButton from '@/components/CustomButton.vue'
+import RoundButton from '@/components/RoundButton.vue'
 import Maintenance from '@/components/Maintenance.vue'
 import Home from '@/components/Home.vue'
+import Menu from '@/components/Menu.vue'
+import TargetCursor from '@/components/TargetCursor.vue'
+import GameStartCounter from '@/components/GameStartCounter.vue'
+import Controls from '@/components/Controls.vue'
+import Titles from '@/components/Titles/Titles.vue'
 import signal from 'signal-js';
 import anime from "animejs";
 import { splitLetters } from 'textsplitter';
-
+import TitlesSources from "@/components/Titles/sources";
 
 const selectedDistrict = ref('');
 const showScoreboard = ref(false);
@@ -20,25 +25,6 @@ const loadingPct = ref(0);
 const cameraReady = ref(false);
 const score = ref(0);
 const experienceStarted = ref(false);
-
-const start = () => {
-  signal.emit("start_experience");
-  const tl = anime.timeline({});
-  tl.add(
-    {
-      targets: '.content-el',
-      opacity: [1, 0],
-      translateY: [0, 50],
-      duration: 1000,
-      delay: anime.stagger(100, { direction: 'reverse' }),
-      easing: 'easeOutBack',
-      complete: () => {
-        experienceStarted.value = true;
-      }
-    },
-    0
-  );
-}
 
 onMounted(() => {
   signal.on("change_scene", () => {
@@ -90,11 +76,10 @@ onMounted(() => {
     );
   })
 
-  animLogo();
+  startLoading();
 });
 
-
-const animLogo = () => {
+const startLoading = () => {
   const tl = anime.timeline({});
   tl.add(
     {
@@ -111,6 +96,7 @@ const animLogo = () => {
     0
   );
   splitLetters(document.getElementById("baseline") as HTMLElement, "<span class='baseline-el' style='display: inline-block'>", "</span>");
+  splitLetters(document.getElementById("start-button") as HTMLElement, "<span class='start-el' style='display: inline-block'>", "</span>");
 }
 
 const endLoading = () => {
@@ -166,6 +152,41 @@ const endLoading = () => {
     },
     0
   );
+  tl.add(
+    {
+      targets: '#menu-button',
+      opacity: [0, 1],
+      translateY: [-100, 0],
+      duration: 500,
+      delay: 3000,
+      easing: 'easeOutBack'
+    },
+    0
+  );
+}
+
+const startExperience = () => {
+  signal.emit("start_experience");
+  const tl = anime.timeline({});
+  tl.add(
+    {
+      targets: '.content-el',
+      opacity: [1, 0],
+      translateY: [0, 50],
+      duration: 1000,
+      delay: anime.stagger(100, { direction: 'reverse' }),
+      easing: 'easeOutBack',
+      complete: () => {
+        experienceStarted.value = true;
+      }
+    },
+    0
+  );
+  setTimeout(() => signal.emit("subtitles_on"), 3000);
+}
+
+const openMenu = () => {
+  signal.emit("open_menu");
 }
 </script>
 
@@ -174,7 +195,7 @@ const endLoading = () => {
     <canvas id="webgl" v-show="!loading"></canvas>
     <div id="intro" v-show="!experienceStarted">
       <div class="loading" v-if="showLoading">
-        <img id="earth" class="loading-el" src="/images/earth.png" alt="Earth">
+        <img id="earth" class="loading-el" src="/images/loader.gif" alt="Earth">
         <div id="progress-bar" class="loading-el"></div>
       </div>
       <div class="content" v-show="!showLoading">
@@ -187,16 +208,17 @@ const endLoading = () => {
             <img class="impact-logo" src="/images/impact_logo/c.png" alt="Impact logo C">
             <img class="impact-logo" src="/images/impact_logo/t.png" alt="Impact logo T">
           </div>
-          <h2 id="baseline" class="content-el">Save Grandma, Save the Earth!</h2>
+          <h2 id="baseline" class="content-el">Save Grandma, Save the Earth !</h2>
         </div>
-        <CustomButton id="start-button" class="content-el" :click="start">Start Experience</CustomButton>
+        <RoundButton id="menu-button" class="content-el" :icon="'menu'" :click="openMenu" />
+        <button id="start-button" class="content-el" @click="startExperience">Start Experience</button>
       </div>
-      <!-- <div class="credits">
-        <img src="/images/gobelins_logo.png" alt="Gobelins logo">
-        <p>Ambroise Nicolao - Danut Miculas - Ludwig Pilicer - Evan Martin - Antoine Tardivel - Timon Idrissi</p>
-        <img src="/images/cci_logo.png" alt="CCI logo">
-      </div> -->
     </div>
+    <TargetCursor />
+    <GameStartCounter />
+    <Menu />
+    <Titles :subtitles="TitlesSources" :callback="() => signal.emit('open_controls')" :timeout="1000" />
+    <Controls />
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
     <Maintenance v-if="isMaintenanceOn" />
     <Home v-if="isMaintenanceOn" />

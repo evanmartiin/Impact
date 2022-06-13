@@ -7,6 +7,7 @@ import {
   Group,
   Mesh,
   MeshBasicMaterial,
+  SkeletonHelper,
   sRGBEncoding,
   Texture,
   type Scene,
@@ -17,6 +18,7 @@ import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi } from "tweakpane";
 import fragment from "./Shaders/fragment.glsl?raw";
 import vertex from "./Shaders/vertex.glsl?raw";
+// import { SkeletonUtils } from "three/examples/jsm/utils/SkeletonUtils";
 
 interface IAnimation {
   mixer: AnimationMixer | null;
@@ -71,17 +73,23 @@ export default class Billy {
         uTexture: { value: this.texture },
       },
     });
+
     // this.model.scene.traverse((child) => {
     //   if (child instanceof Mesh && this.texture) {
     //     child.material = this.material;
+    //     if (Array.isArray(child.material)) {
+    //       child.material.map((m) => {
+    //         m = this.material;
+    //       });
+    //     } else {
+    //       child.material = this.material;
+    //     }
     //   }
     // });
-    // console.log(this.model);
 
     this.instance = this.model.scene;
-    this.instance.rotateX(-Math.PI * 0.5);
     this.instance.scale.set(1, 1, 1);
-    this.instance.position.set(0, 0, 0.1);
+    this.instance.position.set(-0.02, 0, 0.093);
     this.scene?.add(this.instance);
     this.setAnimation();
 

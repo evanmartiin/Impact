@@ -195,23 +195,17 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/HouseScene/bakedHouse.jpg",
   },
-  // CURSOR
-  {
-    name: "cursor-texture",
-    type: "texture",
-    path: "/textures/cursor.png",
-  },
   // BILLY
   {
     name: "billy-model",
     type: "gltfModel",
     path: "/models/Characters/Billy/billyModel.glb",
   },
-  {
-    name: "billy-model-test",
-    type: "gltfModel",
-    path: "/models/character.glb",
-  },
+  // {
+  //   name: "billy-model",
+  //   type: "gltfModel",
+  //   path: "/models/Characters/Lumberjack/lumberjack.glb",
+  // },
   {
     name: "billy-texture",
     type: "texture",
@@ -243,6 +237,29 @@ const Sources: ISource[] = [
     name: "poppingtrees-seed-texture",
     type: "texture",
     path: "/textures/poppingtrees-seed.jpg",
+  },
+  // NUAGE
+  {
+    name: "cloud-model",
+    type: "gltfModel",
+    path: "/models/nuage.glb",
+  },
+  // OISEAU
+  {
+    name: "bird-model",
+    type: "gltfModel",
+    path: "/models/Oiseaux.glb",
+  },
+  // AVION
+  {
+    name: "plane-model",
+    type: "gltfModel",
+    path: "/models/Avion.glb",
+  },
+  {
+    name: "plane-texture",
+    type: "texture",
+    path: "/textures/matcap-plane.png",
   },
 ];
 
