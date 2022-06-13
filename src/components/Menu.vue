@@ -7,9 +7,12 @@ import { onMounted, ref } from 'vue';
 
 const isMenuOpened = ref(false);
 const isSoundOn = ref(true);
+const menuMode = ref('basic');
+const isMoving = ref(false);
 
 const click = () => {
-  
+  if(!isMoving.value){
+  }
 }
 
 onMounted(() => {
@@ -18,74 +21,91 @@ onMounted(() => {
 });
 
 const toggleSound = () => {
-  isSoundOn.value = !isSoundOn.value;
-  signal.emit("toggle_sound");
+  if(!isMoving.value){
+    isSoundOn.value = !isSoundOn.value;
+    signal.emit("toggle_sound");
+  }
 }
 
-const openMenu = () => {
-  isMenuOpened.value = true;
-  let blur = { value: 0 };
-  
-  const tl = anime.timeline({});
-  tl.add(
-    {
-      targets: '.menu-el',
-      opacity: [0, 1],
-      translateY: [100, 0],
-      duration: 500,
-      delay: anime.stagger(50),
-      easing: 'easeOutBack'
-    },
-    0
-  );
-  tl.add(
-    {
-      targets: blur,
-      value: 10,
-      duration: 1000,
-      easing: 'easeOutBack',
-      update: () => {
-        const menu = document.getElementsByClassName('menu')[0];
-        menu.style.backdropFilter = `blur(${blur.value}px)`;
-        menu.style.webkitBackdropFilter = `blur(${blur.value}px)`;
+const openMenu = (e) => {
+  if(!isMoving.value){
+    isMoving.value = true;
+    isMenuOpened.value = true
+    menuMode.value = e;
+    let blur = { value: 0 };
+    
+    const tl = anime.timeline({});
+    tl.add(
+      {
+        targets: '.menu-el',
+        opacity: [0, 1],
+        translateY: [100, 0],
+        duration: 500,
+        delay: anime.stagger(50),
+        easing: 'easeOutBack'
       },
-    },
-    0
-  );
+      0
+    );
+    tl.add(
+      {
+        targets: blur,
+        value: 10,
+        duration: 1000,
+        easing: 'easeOutBack',
+        update: () => {
+          const menu = document.getElementsByClassName('menu')[0];
+          menu.style.backdropFilter = `blur(${blur.value}px)`;
+          menu.style.webkitBackdropFilter = `blur(${blur.value}px)`;
+        },
+        complete: () =>{
+          isMoving.value = false;
+        }
+      },
+      0
+    );
+  }
 }
 
 const closeMenu = () => {
-  let blur = { value: 10 };
-  
-  const tl = anime.timeline({});
-  tl.add(
-    {
-      targets: '.menu-el',
-      opacity: [1, 0],
-      translateY: [0, 100],
-      duration: 500,
-      delay: anime.stagger(50, { direction: 'reverse' }),
-      easing: 'easeOutBack'
-    },
-    0
-  );
-  tl.add(
-    {
-      targets: blur,
-      value: 0,
-      duration: 1000,
-      easing: 'easeOutBack',
-      update: () => {
-        const menu = document.getElementsByClassName('menu')[0];
-        menu.style.backdropFilter = `blur(${blur.value}px)`;
-        menu.style.webkitBackdropFilter = `blur(${blur.value}px)`;
+  if(!isMoving.value){
+    isMoving.value = true;
+    if(menuMode.value === 'seedGameMode'){
+      signal.emit('resume_game')
+      menuMode.value = 'basic'
+    }
+    let blur = { value: 10 };
+    
+    const tl = anime.timeline({});
+    tl.add(
+      {
+        targets: '.menu-el',
+        opacity: [1, 0],
+        translateY: [0, 100],
+        duration: 500,
+        delay: anime.stagger(50, { direction: 'reverse' }),
+        easing: 'easeOutBack',
       },
-      complete: () => {
-        isMenuOpened.value = false;
-      }
-    },
-    0
-  );
+      0
+    );
+    tl.add(
+      {
+        targets: blur,
+        value: 0,
+        duration: 1000,
+        easing: 'easeOutBack',
+        update: () => {
+          const menu = document.getElementsByClassName('menu')[0];
+          menu.style.backdropFilter = `blur(${blur.value}px)`;
+          menu.style.webkitBackdropFilter = `blur(${blur.value}px)`;
+        },
+        complete: () => {
+          isMenuOpened.value = false;
+          isMoving.value = false;
+        }
+      },
+      0
+    );
+  }
 }
 </script>
 
@@ -93,13 +113,13 @@ const closeMenu = () => {
 <div class="menu" v-show="isMenuOpened">
   <h1 class="menu-el">Menu</h1>
   <div class="buttons">
-    <CustomButton class="menu-el" :click="closeMenu">Resume</CustomButton>
-    <CustomButton class="menu-el" :click="click">Restart</CustomButton>
-    <CustomButton class="menu-el" :click="click">Main menu</CustomButton>
-    <CustomButton class="menu-el" :click="toggleSound" :disabled="!isSoundOn">Sound {{ isSoundOn ? 'On' : 'Off' }}</CustomButton>
-    <CustomButton class="menu-el" :click="click">Credits</CustomButton>
+    <CustomButton :disabled="isMoving" class="menu-el" :click="closeMenu">Resume</CustomButton>
+    <CustomButton :disabled="isMoving" class="menu-el" :click="click">Restart</CustomButton>
+    <CustomButton :disabled="isMoving" class="menu-el" :click="click">Main menu</CustomButton>
+    <CustomButton :disabled="isMoving" class="menu-el" :click="toggleSound" :off="!isSoundOn">Sound {{ isSoundOn ? 'On' : 'Off' }}</CustomButton>
+    <CustomButton :disabled="isMoving" class="menu-el" :click="click">Credits</CustomButton>
   </div>
-  <RoundButton class="menu-el" id="close-menu" :icon="'close'" :click="closeMenu" />
+  <RoundButton :disabled="isMoving" class="menu-el" id="close-menu" :icon="'close'" :click="closeMenu" />
 </div>
 </template>
 
@@ -122,6 +142,7 @@ const closeMenu = () => {
   h1 {
     text-transform: uppercase;
     font-size: 150px;
+    line-height: 114px;
     text-shadow: 4px 4px 4px rgba(13, 28, 81, 0.1);
   }
 

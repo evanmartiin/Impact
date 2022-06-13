@@ -7,6 +7,8 @@ import RoundButton from '@/components/RoundButton.vue'
 import Maintenance from '@/components/Maintenance.vue'
 import Home from '@/components/Home.vue'
 import Menu from '@/components/Menu.vue'
+import TargetCursor from '@/components/TargetCursor.vue'
+import GameStartCounter from '@/components/GameStartCounter.vue'
 import Controls from '@/components/Controls.vue'
 import Titles from '@/components/Titles/Titles.vue'
 import signal from 'signal-js';
@@ -212,6 +214,8 @@ const openMenu = () => {
         <button id="start-button" class="content-el" @click="startExperience">Start Experience</button>
       </div>
     </div>
+    <TargetCursor />
+    <GameStartCounter />
     <Menu />
     <Titles :subtitles="TitlesSources" :callback="() => signal.emit('open_controls')" :timeout="1000" />
     <Controls />

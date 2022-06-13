@@ -8,6 +8,9 @@ const props = defineProps({
   },
   disabled: {
     type: Boolean
+  },
+  off: {
+    type: Boolean
   }
 })
 
@@ -18,7 +21,7 @@ const clickSound = () => {
 
 <template>
 <div class="btn-container">
-  <button @click="props.click(); clickSound();" :class="{ disabled: props.disabled }">
+  <button @click="props.click(); clickSound();" :class="{ disabled: props.off }" :disabled="props.disabled">
     <div class="shadow">
       <div class="clip">
         <slot />
@@ -48,10 +51,6 @@ const clickSound = () => {
 
     &.disabled {
       color: #0D1C5188;
-    }
-    
-    &:hover, *:hover {
-      cursor: pointer;
     }
 
     &:hover {

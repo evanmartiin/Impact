@@ -29,6 +29,7 @@ export default class Intro {
 
   constructor() {
     signal.on("start_experience", () => this.start());
+    // FIXME: pass to start
 
     this.setCamera();
   }
@@ -41,26 +42,29 @@ export default class Intro {
 
       const dummy = new Object3D();
       dummy.position.set(x, y, z);
-      dummy.lookAt(0, .1, 0);
-      this.baseCameraSpherical = new Spherical().setFromVector3(dummy.position.clone());
+      dummy.lookAt(0, 0.1, 0);
+      this.baseCameraSpherical = new Spherical().setFromVector3(
+        dummy.position.clone()
+      );
 
       const targetY = { value: 0 };
       const tl = anime.timeline({});
       tl.add(
         {
           targets: targetY,
-          value: [500, .1],
+          value: [500, 0.1],
           duration: 5000,
-          easing: 'easeOutExpo',
+          easing: "easeOutExpo",
           change: () => {
             this.experience.activeCamera?.instance?.lookAt(0, targetY.value, 0);
           },
           complete: () => {
             signal.emit("camera_ready");
             this.verifCam = true;
-            this.nextCamPos = this.experience.activeCamera?.instance?.position.clone() as Vector3;
+            this.nextCamPos =
+              this.experience.activeCamera?.instance?.position.clone() as Vector3;
             this.handleMouse();
-          }
+          },
         },
         0
       );
@@ -69,12 +73,18 @@ export default class Intro {
 
   handleMouse() {
     signal.on("mouse_move", () => {
-      if (this.experience.mouse && this.experience.activeCamera?.instance && this.baseCameraSpherical) {
+      if (
+        this.experience.mouse &&
+        this.experience.activeCamera?.instance &&
+        this.baseCameraSpherical
+      ) {
         const shift = {
-          x: this.experience.mouse.xCenterBase / this.sizes.width * .03,
-          y: -this.experience.mouse.yCenterBase / this.sizes.height * .03
-        }
-        const spherical = new Spherical().setFromVector3(this.experience.activeCamera.instance.position);
+          x: (this.experience.mouse.xCenterBase / this.sizes.width) * 0.03,
+          y: (-this.experience.mouse.yCenterBase / this.sizes.height) * 0.03,
+        };
+        const spherical = new Spherical().setFromVector3(
+          this.experience.activeCamera.instance.position
+        );
         spherical.phi = this.baseCameraSpherical.phi + shift.y;
         spherical.theta = this.baseCameraSpherical.theta + shift.x;
         this.nextCamPos.setFromSpherical(spherical);
@@ -88,7 +98,7 @@ export default class Intro {
 
     const points = [
       this.experience.activeCamera?.instance?.position.clone() as Vector3,
-      ...introSettings.pipeSpline.slice(1)
+      ...introSettings.pipeSpline.slice(1),
     ];
 
     this.geometry = new TubeGeometry(
@@ -117,28 +127,39 @@ export default class Intro {
     if (this.isIntroRunning) {
       const looptime = 5000;
       const t = (this.time.elapsed - this.startTime) / looptime;
-      const easeInOut = t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
-      const easeBounce = (1 - (Math.cos(t * Math.PI * 2) * .5 + .5)) / 10;
+      const easeInOut =
+        t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
+      const easeBounce = (1 - (Math.cos(t * Math.PI * 2) * 0.5 + 0.5)) / 10;
       if (t <= 1) {
         this.geometry?.parameters.path.getPointAt(easeInOut, this.position);
         const { x, y, z } = this.position;
         this.experience.activeCamera?.instance?.position.set(x, y, z);
-        this.experience.activeCamera?.instance?.lookAt(0, .1 - easeInOut/10, 0);
-        this.experience.activeCamera?.instance?.rotateZ(Math.PI * easeBounce * easeInOut);
+        this.experience.activeCamera?.instance?.lookAt(
+          0,
+          0.1 - easeInOut / 10,
+          0
+        );
+        this.experience.activeCamera?.instance?.rotateZ(
+          Math.PI * easeBounce * easeInOut
+        );
       } else {
         this.stop();
       }
     }
 
-    const distance = this.experience.activeCamera?.instance?.position.distanceTo(this.nextCamPos) as number;
+    const distance =
+      this.experience.activeCamera?.instance?.position.distanceTo(
+        this.nextCamPos
+      ) as number;
     if (distance > 0.001 && this.verifCam) {
-      const { x, y, z } = this.experience.activeCamera?.instance?.position as Vector3;
+      const { x, y, z } = this.experience.activeCamera?.instance
+        ?.position as Vector3;
       this.experience.activeCamera?.instance?.position.set(
-        x + (this.nextCamPos.x - x) * .1,
-        y + (this.nextCamPos.y - y) * .1,
-        z + (this.nextCamPos.z - z) * .1
+        x + (this.nextCamPos.x - x) * 0.1,
+        y + (this.nextCamPos.y - y) * 0.1,
+        z + (this.nextCamPos.z - z) * 0.1
       );
-      this.experience.activeCamera?.instance?.lookAt(0, .1, 0);
+      this.experience.activeCamera?.instance?.lookAt(0, 0.1, 0);
     }
   }
 }

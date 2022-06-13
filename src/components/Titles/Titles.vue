@@ -138,7 +138,7 @@ const subtitlesOff = () => {
   position: absolute;
   width: 80vw;
   height: 100px;
-  bottom: 5vw;
+  bottom: 3vw;
   left: 10vw;
   display: flex;
   flex-direction: column;

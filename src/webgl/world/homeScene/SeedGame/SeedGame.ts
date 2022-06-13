@@ -1,3 +1,4 @@
+import anime from "animejs";
 import { GameCamCtrl } from "./Controllers/GameCam/GameCamCtrl";
 import type Camera from "@/webgl/world/Camera";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
@@ -15,8 +16,13 @@ import physicSettings from "./Controllers/Physic/PhysicSettings";
 import type Time from "@/webgl/controllers/Time";
 import FollowGameCam from "./FollowCam/FollowGameCam";
 import seedSettings from "./Seed/SeedSettings";
+import seedGameSettings from "./SeedGameSettings";
+import type Tree from "./Tree/Tree";
 
 export default class SeedGame {
+  static instance: SeedGame;
+
+  public trees: Tree[] = [];
   private experience: Experience = new Experience();
   private time: Time = this.experience.time as Time;
   private mouse: Mouse = this.experience.mouse as Mouse;
@@ -29,7 +35,7 @@ export default class SeedGame {
   private prevCamPos = new Vector3(0, 0, 0);
   private helper: Helper | null = null;
   private angleTarget = new Vector3();
-  private lumberjack: Lumberjack | null = null;
+  private lumberjack: Lumberjack[] = [];
   private followCameraGroup: FollowGameCam | null = null;
 
   private distanceLookAt = -30;
@@ -55,13 +61,22 @@ export default class SeedGame {
 
   private gameControls: PointerLockControls | null = null;
 
-  constructor(scene: Scene, camera: Camera) {
+  private lastSpawnTime = 0;
+
+  constructor(scene?: Scene, camera?: Camera) {
+    if (SeedGame.instance) {
+      return SeedGame.instance;
+    }
+    SeedGame.instance = this;
+
+    this.scene = scene as Scene;
+    this.camera = camera as Camera;
+
     this.gameControls = new PointerLockControls(
-      camera.instance as PerspectiveCamera,
+      camera?.instance as PerspectiveCamera,
       this.renderer.canvas
     );
-    this.scene = scene;
-    this.camera = camera;
+    signal.on("game:launch", this.enterGameView.bind(this));
   }
 
   private gameCamCtrl: GameCamCtrl | null = null;
@@ -72,7 +87,6 @@ export default class SeedGame {
     this.targetPoint = new Vector3();
     this.cameraLookAtPoint = new Vector3();
     this.scene?.add(this.instance);
-    this.setLumberjack();
     this.set();
     this.setDebug();
     this.helper = new Helper(this.scene as Scene);
@@ -88,7 +102,24 @@ export default class SeedGame {
 
     const physicsSteps = physicSettings.physicsSteps;
     for (let i = 0; i < physicsSteps; i++) {
-      this.lumberjack?.update((this.time.delta / physicsSteps) * 0.0001);
+      this.lumberjack?.map((l) => {
+        l.update((this.time.delta / physicsSteps) * 0.0001);
+      });
+    }
+
+    if (this.isStarted) {
+      this.gameLoop();
+    }
+  }
+
+  gameLoop() {
+    // SPAWN Lumberjack
+    if (
+      this.time.elapsed * 0.001 - this.lastSpawnTime * 0.001 >
+      seedGameSettings.deltaLumberjackSpawn
+    ) {
+      this.setLumberjack();
+      this.lastSpawnTime = this.time.elapsed;
     }
   }
 
@@ -112,11 +143,9 @@ export default class SeedGame {
   }
 
   setLumberjack() {
-    this.lumberjack = new Lumberjack(
-      this.scene as Scene,
-      this.camera as Camera
+    this.lumberjack.push(
+      new Lumberjack(this.scene as Scene, this.camera as Camera)
     );
-    this.lumberjack.set();
   }
 
   unset() {
@@ -127,8 +156,52 @@ export default class SeedGame {
     }
   }
 
+  setCounter() {
+    const counter = document.getElementById("counter") as HTMLElement;
+    const targetCursor = document.getElementById("targetCursor") as HTMLElement;
+    const tl = anime.timeline({
+      easing: "easeOutExpo",
+      duration: 750,
+    });
+    tl.add({
+      targets: ".counter",
+      display: "block",
+      duration: 1000,
+      begin: () => {
+        signal.emit("set_counter_number", "3");
+        counter.style.display = "block";
+        targetCursor.style.opacity = "0";
+      },
+    });
+    tl.add({
+      duration: 1000,
+      begin: () => {
+        signal.emit("set_counter_number", "2");
+      },
+    });
+    tl.add({
+      duration: 1000,
+      begin: () => {
+        signal.emit("set_counter_number", "1");
+      },
+    });
+    tl.add({
+      duration: 1000,
+      begin: () => {
+        signal.emit("set_counter_number", "GO");
+        this.start();
+      },
+      complete: () => {
+        counter.style.display = "none";
+        targetCursor.style.opacity = "1";
+      },
+    });
+  }
+
   start() {
     if (!this.isStarted) {
+      this.setLumberjack();
+      this.lastSpawnTime = this.time.elapsed;
       this.isStarted = true;
     }
   }
@@ -139,21 +212,13 @@ export default class SeedGame {
     }
   }
 
-  keyAction(e: any) {
-    const key = e.key;
-    switch (key) {
-      case "g":
-        break;
-    }
-  }
-
   enterGameView() {
+    this.setCounter();
     this.isGameView = true;
     this.set();
     this.gameCamCtrl?.setCamGameMode();
     this.instance.visible = true;
     this.followCameraGroup = new FollowGameCam(this.camera as Camera);
-    window.addEventListener("keydown", this.keyAction);
   }
 
   leaveGameView() {
@@ -162,8 +227,6 @@ export default class SeedGame {
     this.unsetDebug();
     this.instance.visible = false;
     this.followCameraGroup?.hide();
-
-    window.removeEventListener("keydown", this.keyAction);
     this.unset();
   }
 
@@ -173,27 +236,32 @@ export default class SeedGame {
     const startButton = this.debugTab?.addButton({
       title: "Start Game",
     }) as ButtonApi;
-    startButton.on("click", () => {
-      this.start();
-    });
+
+    // startButton.on("click", () => {
+    //   this.start();
+    // });
 
     const stopButton = this.debugTab?.addButton({
       title: "Stop Game",
     }) as ButtonApi;
-    stopButton.on("click", () => {
-      this.stop();
-    });
+
+    // stopButton.on("click", () => {
+    //   this.stop();
+    // });
+
     this.debugTab?.addInput(seedSettings, "gravity", {
       min: -10,
       max: 20,
       step: 0.1,
     });
+
     this.debugTab?.addInput(seedSettings, "speed", {
       min: -10,
       max: 20,
       step: 0.01,
     });
-  }
+
+  } 
 
   unsetDebug() {
     if (this.debugTab) this.debug.ui?.pages[2].remove(this.debugTab);
