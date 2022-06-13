@@ -20,9 +20,7 @@ import getRandomFloatBetween from "@/utils/getRandomFloatBetween";
 import SeedGame from "../SeedGame";
 import type Tree from "../Tree/Tree";
 
-interface state {
-  doing: 'walkToTree' | 'cuting' | 'idle';
-}
+type TLumberjackAction = "walkToTree" | "cuting" | "idle";
 
 export default class Lumberjack {
   private lumberjacks: Lumberjack[] = [];
@@ -49,9 +47,7 @@ export default class Lumberjack {
   private rgtPressed = false;
   private targetedTree: Tree | null = null;
   private moveDirection: Vector3 | null = null;
-  private state = {
-    doing: ''
-  }
+  private action: TLumberjackAction = "idle";
 
   constructor(scene: Scene, camera: Camera) {
     this.lumberjacks.push(this);
@@ -62,10 +58,10 @@ export default class Lumberjack {
     this.controls = camera.controls;
     this.set();
     signal.on("updateLumberjackTarget", () => this.getNearestTree());
+    this.setAction("idle");
   }
 
   getNearestTree() {
-    console.log("object");
     if (!this.targetedTree && this.game.trees.length > 0) {
       let nearestTree: Tree | null = null;
       let minDistance: number | null = null;
@@ -86,6 +82,7 @@ export default class Lumberjack {
       if (nearestTree) {
         (nearestTree as Tree).isTargeted = true;
         this.targetedTree = nearestTree;
+        this.setAction("walkToTree");
       }
     }
     // this.getTreeDirection();
@@ -107,6 +104,30 @@ export default class Lumberjack {
     const arrowHelper = new ArrowHelper(newDirection, origin, length, hex);
     this.scene?.add(arrowHelper);
     this.moveDirection = newDirection;
+  }
+
+  setAction(action: TLumberjackAction) {
+    switch (action) {
+      case "idle":
+        this.setColor(0x00ffff);
+        break;
+      case "walkToTree":
+        this.setColor(0xffff00);
+        break;
+      case "cuting":
+        this.setColor(0xff0000);
+        break;
+    }
+  }
+
+  setColor(color: number) {
+    if (Array.isArray(this.instance?.material)) {
+      this.instance?.material.map((m) => {
+        (m as MeshBasicMaterial).color.setHex(color);
+      });
+    } else {
+      (this.instance?.material as MeshBasicMaterial).color.setHex(color);
+    }
   }
 
   set() {
@@ -200,27 +221,25 @@ export default class Lumberjack {
           this.instance?.position.x > this.targetedTree?.instance?.position.x
         ) {
           this.instance.position.x -= offsetMove;
-          console.log("+x");
         }
         if (
           this.instance?.position.x < this.targetedTree?.instance?.position.x
         ) {
           this.instance.position.x += offsetMove;
-          console.log("-x");
         }
 
         if (
           this.instance?.position.z > this.targetedTree?.instance?.position.z
         ) {
           this.instance.position.z -= offsetMove;
-          console.log("+z");
         }
         if (
           this.instance?.position.z < this.targetedTree?.instance?.position.z
         ) {
           this.instance.position.z += offsetMove;
-          console.log("-z");
         }
+      } else {
+        this.setAction("cuting");
       }
     }
 

@@ -1,3 +1,4 @@
+import { webglStore } from "./../../../../../../stores/webglStore";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
 import { isLocked, setLockMouseMode } from "@/utils/lockMouseMode";
 import { Euler, Vector3, PerspectiveCamera } from "three";
@@ -6,7 +7,7 @@ import type World from "@/webgl/world/World";
 import type Mouse from "@/webgl/controllers/Mouse";
 import Experience from "@/webgl/Experience";
 import type Renderer from "@/webgl/Renderer";
-import signal from 'signal-js';
+import signal from "signal-js";
 import gameCamSettings from "./GameCamSettings";
 
 export class GameCamCtrl {
@@ -25,6 +26,7 @@ export class GameCamCtrl {
   private distanceLookAt = -30;
   private heightLookAt = 0;
   private isFirstMove = false;
+  private isMouseLocked = false;
 
   private defaultCenterPos = new Vector3(
     this.distanceLookAt,
@@ -33,43 +35,86 @@ export class GameCamCtrl {
   );
 
   constructor(camera: Camera) {
+    document.addEventListener(
+      "pointerlockerror",
+      this.errorCallback.bind(this),
+      false
+    );
+    document.addEventListener(
+      "mozpointerlockerror",
+      this.errorCallback.bind(this),
+      false
+    );
+    document.addEventListener(
+      "webkitpointerlockerror",
+      this.errorCallback.bind(this),
+      false
+    );
+
     this.camera = camera;
     this.world = this.experience.world;
     this.gameControls = new PointerLockControls(
       camera.instance as PerspectiveCamera,
       this.renderer.canvas
     );
+    this.gameControls?.addEventListener(
+      "unlock",
+      this.lockChangeEvent.bind(this)
+    );
+    signal.on("resume_game", this.lockMouse.bind(this));
+  }
+  errorCallback() {
+    setTimeout(() => {
+      this.lockMouse();
+    }, 500);
   }
 
   private lockMouse() {
-    // Desactive orbit control
-    if (this.world) {
-      this.world.PARAMS.isCtrlActive = false;
-    }
-    if (this.experience.world?.controls)
-      this.experience.world.controls.enabled = false;
+    try {
+      if (this.world) {
+        // Desactive orbit control
+        this.world.PARAMS.isCtrlActive = false;
+      }
+      if (this.experience.world?.controls)
+        this.experience.world.controls.enabled = false;
 
-    setLockMouseMode(this.experience.canvas as HTMLCanvasElement);
-    if (!isLocked(this.experience.canvas as HTMLCanvasElement)) {
-      this.experience.canvas?.requestPointerLock();
+      setLockMouseMode(this.experience.canvas as HTMLCanvasElement);
+      if (!isLocked(this.experience.canvas as HTMLCanvasElement)) {
+        this.experience.canvas?.requestPointerLock();
+      }
+      this.gameControls?.lock();
+      this.gameControls?.connect();
+      this.isFirstMove = true;
+      this.isMouseLocked = true;
+    } catch (error) {
+      console.log("error");
     }
-    this.gameControls?.lock();
-    this.gameControls?.connect();
-    this.isFirstMove = true;
+  }
+
+  private lockChangeEvent() {
+    if (this.gameControls?.isLocked) {
+      this.isMouseLocked = false;
+      signal.emit("open_menu", "seedGameMode");
+    }
   }
 
   private unlockMouse() {
-    // Active orbit control
-    if (this.world) {
-      this.world.PARAMS.isCtrlActive = true;
+    try {
+      // Active orbit control
+      if (this.world) {
+        this.world.PARAMS.isCtrlActive = true;
+      }
+      if (this.experience.world?.controls)
+        this.experience.world.controls.enabled = true;
+      if (isLocked(this.experience.canvas as HTMLCanvasElement)) {
+        (this.experience.canvas as any).exitPointerLock();
+      }
+      this.gameControls?.unlock();
+      this.gameControls?.disconnect();
+      this.isMouseLocked = false;
+    } catch (error) {
+      console.log("error");
     }
-    if (this.experience.world?.controls)
-      this.experience.world.controls.enabled = true;
-    if (isLocked(this.experience.canvas as HTMLCanvasElement)) {
-      (this.experience.canvas as any).exitPointerLock();
-    }
-    this.gameControls?.unlock();
-    this.gameControls?.disconnect();
   }
 
   setCamGameMode() {
@@ -92,7 +137,7 @@ export class GameCamCtrl {
   }
 
   private moveCamera() {
-    if (this.mouse.mouseMoveEvent) {
+    if (this.mouse.mouseMoveEvent && this.isMouseLocked) {
       const movementX =
         this.mouse.mouseMoveEvent.movementX ||
         (this.mouse.mouseMoveEvent as any).mozMovementX ||

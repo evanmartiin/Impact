@@ -5,6 +5,10 @@ const props = defineProps({
   click: {
     type: Function,
     required: true
+  },
+  disabled: {
+    type: Boolean,
+    required: true
   }
 })
 
@@ -14,7 +18,7 @@ const clickSound = () => {
 </script>
 
 <template>
-<button @click="props.click(); clickSound();">
+<button @click="props.click(); clickSound();" :disabled="props.disabled">
   <div class="shadow">
     <div class="clip">
       <slot />
