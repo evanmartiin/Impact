@@ -76,6 +76,7 @@ export default class SeedGame {
       camera?.instance as PerspectiveCamera,
       this.renderer.canvas
     );
+    signal.on("game:launch", this.enterGameView.bind(this));
   }
 
   private gameCamCtrl: GameCamCtrl | null = null;
@@ -235,27 +236,32 @@ export default class SeedGame {
     const startButton = this.debugTab?.addButton({
       title: "Start Game",
     }) as ButtonApi;
-    startButton.on("click", () => {
-      this.start();
-    });
+
+    // startButton.on("click", () => {
+    //   this.start();
+    // });
 
     const stopButton = this.debugTab?.addButton({
       title: "Stop Game",
     }) as ButtonApi;
-    stopButton.on("click", () => {
-      this.stop();
-    });
+
+    // stopButton.on("click", () => {
+    //   this.stop();
+    // });
+
     this.debugTab?.addInput(seedSettings, "gravity", {
       min: -10,
       max: 20,
       step: 0.1,
     });
+
     this.debugTab?.addInput(seedSettings, "speed", {
       min: -10,
       max: 20,
       step: 0.01,
     });
-  }
+
+  } 
 
   unsetDebug() {
     if (this.debugTab) this.debug.ui?.pages[2].remove(this.debugTab);

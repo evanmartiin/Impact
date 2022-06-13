@@ -74,6 +74,7 @@ const closeControls = () => {
       },
       complete: () => {
         isControlsOpened.value = false;
+        signal.emit('game:launch')
       }
     },
     0
