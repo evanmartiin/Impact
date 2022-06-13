@@ -131,17 +131,17 @@ const subtitlesOff = () => {
 <template>
 <div class="subtitles" v-show="isSubtitlesOn">
   <p class="subtitles-el" id="subtitles-content"></p>
-  <CustomButton class="subtitles-el" :click="subtitlesOff">Skip</CustomButton>
+  <button class="subtitles-el" @click="subtitlesOff">Skip</button>
 </div>
 </template>
 
 <style scoped lang="scss">
 .subtitles {
   position: absolute;
-  width: 90vw;
+  width: 80vw;
   height: 100px;
-  bottom: 0;
-  left: 5vw;
+  bottom: 5vw;
+  left: 10vw;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -157,6 +157,26 @@ const subtitlesOff = () => {
   button {
     position: absolute;
     right: 0;
+    background: transparent;
+    color: #FAF7F1;
+    border: none;
+
+    &:after {
+      position: absolute;
+      content: '';
+      height: 2px;
+      bottom: -2px;
+      width: 0%;
+      background: white;
+      transition: .5s;
+      margin: 0;
+      left: 5%;
+      right: 5%;
+    }
+
+    &:hover:after {
+      width: 90%;
+    }
   }
 }
 </style>
