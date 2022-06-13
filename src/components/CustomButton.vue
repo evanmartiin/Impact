@@ -14,16 +14,24 @@ const clickSound = () => {
 </script>
 
 <template>
-<button @click="props.click(); clickSound();">
-  <div class="shadow">
-    <div class="clip">
-      <slot />
+<div class="btn-container">
+  <button @click="props.click(); clickSound();">
+    <div class="shadow">
+      <div class="clip">
+        <slot />
+      </div>
     </div>
-  </div>
-</button>
+  </button>
+</div>
 </template>
 
 <style scoped lang="scss">
+.btn-container {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 button {
   background-color: #EBE7E0;
   color: #0D1C51;
@@ -33,17 +41,31 @@ button {
   width: 170px;
   font-size: 18px;
   text-transform: uppercase;
+  transition: .3s;
   
-  &:hover {
+  &:hover, *:hover {
     cursor: pointer;
   }
 
+  &:hover {
+    width: 180px;
+    padding: 8px;
+    font-size: 20px;
+  }
+
+  &:active {
+    width: 160px;
+    padding: 5px;
+    font-size: 16px;
+  }
+
   .shadow {
-    box-shadow: 1px 1px 2px rgba(13, 28, 81, .1);
+    filter: drop-shadow(1px 1px 2px rgba(13, 28, 81, .3));
 
     .clip {
       clip-path: polygon(1% 5%, 53% 0, 99% 5%, 100% 54%, 99% 97%, 49% 100%, 1% 97%, 0 51%);
       background-image: url("/images/paper-min.png");
+      // background: red;
       background-position: center;
       background-size: 110%;
       background-repeat: no-repeat;
