@@ -190,7 +190,7 @@ const openMenu = () => {
     <canvas id="webgl" v-show="!loading"></canvas>
     <div id="intro" v-show="!experienceStarted">
       <div class="loading" v-if="showLoading">
-        <img id="earth" class="loading-el" src="/images/earth.png" alt="Earth">
+        <img id="earth" class="loading-el" src="/images/loader.gif" alt="Earth">
         <div id="progress-bar" class="loading-el"></div>
       </div>
       <div class="content" v-show="!showLoading">
