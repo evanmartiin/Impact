@@ -8,9 +8,11 @@ import Maintenance from '@/components/Maintenance.vue'
 import Home from '@/components/Home.vue'
 import Menu from '@/components/Menu.vue'
 import Controls from '@/components/Controls.vue'
+import Titles from '@/components/Titles/Titles.vue'
 import signal from 'signal-js';
 import anime from "animejs";
 import { splitLetters } from 'textsplitter';
+import TitlesSources from "@/components/Titles/sources";
 
 const selectedDistrict = ref('');
 const showScoreboard = ref(false);
@@ -74,7 +76,6 @@ onMounted(() => {
 
   startLoading();
 });
-
 
 const startLoading = () => {
   const tl = anime.timeline({});
@@ -179,6 +180,7 @@ const startExperience = () => {
     },
     0
   );
+  setTimeout(() => signal.emit("subtitles_on"), 3000);
 }
 
 const openMenu = () => {
@@ -211,6 +213,7 @@ const openMenu = () => {
       </div>
     </div>
     <Menu />
+    <Titles :subtitles="TitlesSources" :callback="() => signal.emit('open_controls')" :timeout="1000" />
     <Controls />
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
     <Maintenance v-if="isMaintenanceOn" />
