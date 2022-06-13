@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Experience from "@/webgl/Experience";
-import { onMounted, ref } from "vue-demi";
+import { onMounted, ref } from "vue";
 import { webglStore } from '@/stores/webglStore'
 import DistrictCard from '@/components/DistrictCard.vue'
 import RoundButton from '@/components/RoundButton.vue'

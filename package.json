@@ -23,6 +23,7 @@
     "three-mesh-bvh": "^0.5.11",
     "tweakpane": "^3.0.7",
     "vue": "^3.2.31",
+    "vue-demi": "^0.13.1",
     "vue-router": "^4.0.12"
   },
   "devDependencies": {
