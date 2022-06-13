@@ -19,6 +19,8 @@ import TitlesSources from "@/components/Titles/sources";
 const selectedDistrict = ref('');
 const showScoreboard = ref(false);
 const isMaintenanceOn = ref(false);
+const isMenuOpened = ref(false);
+const menuDisabled = ref(false);
 const loading = ref(true);
 const showLoading = ref(true);
 const loadingPct = ref(0);
@@ -185,8 +187,11 @@ const startExperience = () => {
   // setTimeout(() => signal.emit("subtitles_on"), 3000);
 }
 
-const openMenu = () => {
-  signal.emit("open_menu");
+const toggleMenu = () => {
+  signal.emit(isMenuOpened.value ? "close_menu" : "open_menu");
+  isMenuOpened.value = !isMenuOpened.value;
+  menuDisabled.value = true;
+  setTimeout(() => menuDisabled.value = false, 1000);
 }
 </script>
 
@@ -210,7 +215,7 @@ const openMenu = () => {
           </div>
           <h2 id="baseline" class="content-el">Save Grandma, Save the Earth !</h2>
         </div>
-        <RoundButton id="menu-button" class="content-el" :icon="'menu'" :click="openMenu" />
+        <RoundButton id="menu-button" class="content-el" :icon="isMenuOpened ? 'close' : 'menu'" :click="toggleMenu" :disabled="menuDisabled" />
         <button id="start-button" class="content-el" @click="startExperience">Start Experience</button>
       </div>
     </div>

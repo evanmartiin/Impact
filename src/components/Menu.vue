@@ -1,7 +1,6 @@
 <script setup>
 import signal from 'signal-js';
 import CustomButton from '@/components/CustomButton.vue'
-import RoundButton from '@/components/RoundButton.vue'
 import anime from 'animejs';
 import { onMounted, ref } from 'vue';
 
@@ -119,7 +118,6 @@ const closeMenu = () => {
     <CustomButton :disabled="isMoving" class="menu-el" :click="toggleSound" :off="!isSoundOn">Sound {{ isSoundOn ? 'On' : 'Off' }}</CustomButton>
     <CustomButton :disabled="isMoving" class="menu-el" :click="click">Credits</CustomButton>
   </div>
-  <RoundButton :disabled="isMoving" class="menu-el" id="close-menu" :icon="'close'" :click="closeMenu" />
 </div>
 </template>
 
@@ -151,12 +149,6 @@ const closeMenu = () => {
     flex-direction: column;
     align-items: center;
     gap: 15px;
-  }
-
-  #close-menu {
-    position: absolute;
-    top: 50px;
-    right: 50px;
   }
 }
 </style>
