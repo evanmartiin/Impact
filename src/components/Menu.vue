@@ -6,7 +6,7 @@ import anime from 'animejs';
 import { onMounted, ref } from 'vue';
 
 const isMenuOpened = ref(false);
-const soundIcon = ref('sound-on');
+const isSoundOn = ref(true);
 
 const click = () => {
   
@@ -18,7 +18,7 @@ onMounted(() => {
 });
 
 const toggleSound = () => {
-  soundIcon.value = soundIcon.value === 'sound-on' ? 'sound-off' : 'sound-on';
+  isSoundOn.value = !isSoundOn.value;
   signal.emit("toggle_sound");
 }
 
@@ -96,7 +96,7 @@ const closeMenu = () => {
     <CustomButton class="menu-el" :click="closeMenu">Resume</CustomButton>
     <CustomButton class="menu-el" :click="click">Restart</CustomButton>
     <CustomButton class="menu-el" :click="click">Main menu</CustomButton>
-    <RoundButton class="menu-el" :icon="soundIcon" :click="toggleSound" />
+    <CustomButton class="menu-el" :click="toggleSound" :disabled="!isSoundOn">Sound {{ isSoundOn ? 'On' : 'Off' }}</CustomButton>
     <CustomButton class="menu-el" :click="click">Credits</CustomButton>
   </div>
   <RoundButton class="menu-el" id="close-menu" :icon="'close'" :click="closeMenu" />

@@ -30,18 +30,16 @@ onMounted(() => {
 const subtitlesOn = () => {
   isSubtitlesOn.value = true;
 
+  startTimeline();
   const tl = anime.timeline({});
   tl.add(
     {
-      targets: '.subtitles-el',
+      targets: '.subtitles button',
       opacity: [0, 1],
       translateY: [100, 0],
       duration: 500,
-      delay: anime.stagger(50),
-      easing: 'easeOutBack',
-      complete: () => {
-        startTimeline();
-      }
+      delay: 1000,
+      easing: 'easeOutBack'
     },
     0
   );
