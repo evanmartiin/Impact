@@ -48,7 +48,7 @@ export default class HomeScene {
   private clouds: Clouds | null = null;
 
   private wiggleShaderUniforms: { [uniform: string]: IUniform<any> } = {
-    uWiggleRatio: { value: .1 },
+    uWiggleRatio: { value: .2 },
   };
 
   constructor() {

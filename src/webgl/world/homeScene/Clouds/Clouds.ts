@@ -38,6 +38,9 @@ export default class Clouds {
       cloud.position.copy(cloudParams.pos);
       cloud.rotateOnWorldAxis(new Vector3(0, 1, 0), cloudParams.rotateY);
       cloud.rotateOnWorldAxis(new Vector3(0, 0, 1), cloudParams.rotateZ);
+      cloudParams.rotateY = cloud.rotation.y;
+      cloudParams.rotateZ = cloud.rotation.z;
+      cloud.name = cloudParams.name;
       this.sceneClouds.add(cloud);
     })
     
@@ -45,13 +48,19 @@ export default class Clouds {
   }
 
   update() {
-    let index = 0;
     this.sceneClouds.traverse((child) => {
       if (child instanceof Mesh) {
-        child.position.x = cloudsSettings[index].pos.x + Math.sin(this.time.elapsed * .001 * cloudsSettings[index].speed) * .005;
-        child.position.y = cloudsSettings[index].pos.y + Math.sin(this.time.elapsed * .001 * cloudsSettings[index].speed) * .005;
-        child.position.z = cloudsSettings[index].pos.z + Math.cos(this.time.elapsed * .001 * cloudsSettings[index].speed) * .005;
-        index++;
+        const params = cloudsSettings.find((el) => el.name === child.name);
+        if (params) {
+          child.position.x = params.pos.x + Math.sin(this.time.elapsed * .001 * params.speed) * .005;
+          child.position.y = params.pos.y + Math.sin(this.time.elapsed * .001 * params.speed) * .005;
+          child.position.z = params.pos.z + Math.cos(this.time.elapsed * .001 * params.speed) * .005;
+
+          const rotateY = params.rotateY + Math.cos(this.time.elapsed * .001 * params.speed) * .05;
+          child.rotation.y = rotateY;
+          const rotateZ = params.rotateZ + Math.sin(this.time.elapsed * .001 * params.speed) * .05;
+          child.rotation.z = rotateZ;
+        }
       }
     })
   }
