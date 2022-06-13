@@ -6,6 +6,7 @@
     "src/**/*.vue"
   ],
   "compilerOptions": {
+    "moduleResolution": "node",
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {

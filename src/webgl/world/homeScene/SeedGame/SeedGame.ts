@@ -15,8 +15,13 @@ import physicSettings from "./Controllers/Physic/PhysicSettings";
 import type Time from "@/webgl/controllers/Time";
 import FollowGameCam from "./FollowCam/FollowGameCam";
 import seedSettings from "./Seed/SeedSettings";
+import seedGameSettings from "./SeedGameSettings";
+import type Tree from "./Tree/Tree";
 
 export default class SeedGame {
+  static instance: SeedGame;
+
+  public trees: Tree[] = [];
   private experience: Experience = new Experience();
   private time: Time = this.experience.time as Time;
   private mouse: Mouse = this.experience.mouse as Mouse;
@@ -29,7 +34,7 @@ export default class SeedGame {
   private prevCamPos = new Vector3(0, 0, 0);
   private helper: Helper | null = null;
   private angleTarget = new Vector3();
-  private lumberjack: Lumberjack | null = null;
+  private lumberjack: Lumberjack[] = [];
   private followCameraGroup: FollowGameCam | null = null;
 
   private distanceLookAt = -30;
@@ -55,13 +60,21 @@ export default class SeedGame {
 
   private gameControls: PointerLockControls | null = null;
 
-  constructor(scene: Scene, camera: Camera) {
+  private lastSpawnTime = 0;
+
+  constructor(scene?: Scene, camera?: Camera) {
+    if (SeedGame.instance) {
+      return SeedGame.instance;
+    }
+    SeedGame.instance = this;
+
+    this.scene = scene as Scene;
+    this.camera = camera as Camera;
+
     this.gameControls = new PointerLockControls(
-      camera.instance as PerspectiveCamera,
+      camera?.instance as PerspectiveCamera,
       this.renderer.canvas
     );
-    this.scene = scene;
-    this.camera = camera;
   }
 
   private gameCamCtrl: GameCamCtrl | null = null;
@@ -72,7 +85,6 @@ export default class SeedGame {
     this.targetPoint = new Vector3();
     this.cameraLookAtPoint = new Vector3();
     this.scene?.add(this.instance);
-    this.setLumberjack();
     this.set();
     this.setDebug();
     this.helper = new Helper(this.scene as Scene);
@@ -88,7 +100,24 @@ export default class SeedGame {
 
     const physicsSteps = physicSettings.physicsSteps;
     for (let i = 0; i < physicsSteps; i++) {
-      this.lumberjack?.update((this.time.delta / physicsSteps) * 0.0001);
+      this.lumberjack?.map((l) => {
+        l.update((this.time.delta / physicsSteps) * 0.0001);
+      });
+    }
+
+    if (this.isStarted) {
+      this.gameLoop();
+    }
+  }
+
+  gameLoop() {
+    // SPAWN Lumberjack
+    if (
+      this.time.elapsed * 0.001 - this.lastSpawnTime * 0.001 >
+      seedGameSettings.deltaLumberjackSpawn
+    ) {
+      this.setLumberjack();
+      this.lastSpawnTime = this.time.elapsed;
     }
   }
 
@@ -112,11 +141,9 @@ export default class SeedGame {
   }
 
   setLumberjack() {
-    this.lumberjack = new Lumberjack(
-      this.scene as Scene,
-      this.camera as Camera
+    this.lumberjack.push(
+      new Lumberjack(this.scene as Scene, this.camera as Camera)
     );
-    this.lumberjack.set();
   }
 
   unset() {
@@ -129,6 +156,8 @@ export default class SeedGame {
 
   start() {
     if (!this.isStarted) {
+      this.setLumberjack();
+      this.lastSpawnTime = this.time.elapsed;
       this.isStarted = true;
     }
   }
@@ -139,21 +168,12 @@ export default class SeedGame {
     }
   }
 
-  keyAction(e: any) {
-    const key = e.key;
-    switch (key) {
-      case "g":
-        break;
-    }
-  }
-
   enterGameView() {
     this.isGameView = true;
     this.set();
     this.gameCamCtrl?.setCamGameMode();
     this.instance.visible = true;
     this.followCameraGroup = new FollowGameCam(this.camera as Camera);
-    window.addEventListener("keydown", this.keyAction);
   }
 
   leaveGameView() {
@@ -162,8 +182,6 @@ export default class SeedGame {
     this.unsetDebug();
     this.instance.visible = false;
     this.followCameraGroup?.hide();
-
-    window.removeEventListener("keydown", this.keyAction);
     this.unset();
   }
 

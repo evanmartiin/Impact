@@ -18,8 +18,8 @@ export class GameCamCtrl {
   private _euler = new Euler(0, 0, 0, "YXZ");
   private _PI_2 = Math.PI / 2;
   private pointerSpeed = 1.0;
-  private minPolarAngle = 1.4;
-  private maxPolarAngle = Math.PI - 1.3;
+  private minPolarAngle = 1.6;
+  private maxPolarAngle = Math.PI - 0.9;
   private prevCamPos = new Vector3(0, 0, 0);
   private gameControls: PointerLockControls | null = null;
   private distanceLookAt = -30;
@@ -107,18 +107,21 @@ export class GameCamCtrl {
       if (this.camera?.instance)
         this._euler.setFromQuaternion(this.camera.instance.quaternion);
 
-      this._euler.y -= movementX * 0.002 * this.pointerSpeed;
-      this._euler.x -= movementY * 0.002 * this.pointerSpeed;
+      this._euler.y -= movementX * 0.0002 * this.pointerSpeed;
+      this._euler.x -= movementY * 0.0002 * this.pointerSpeed;
 
       this._euler.x = Math.max(
         this._PI_2 - this.maxPolarAngle,
         Math.min(this._PI_2 - this.minPolarAngle, this._euler.x)
       );
+
       if (this._euler.y > 0) {
+        // Max Rigth
         if (this._euler.y < 2.635) {
           this._euler.y = 2.635;
         }
       } else {
+        // Max left
         if (this._euler.y > -2.633) {
           this._euler.y = -2.633;
         }

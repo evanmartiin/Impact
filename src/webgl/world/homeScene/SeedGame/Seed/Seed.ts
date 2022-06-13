@@ -78,17 +78,15 @@ export default class Seed {
       }
     });
     this.model.scene.position.setScalar(0);
-    console.log(this.model.scene);
-    this.scene?.add(this.model.scene);
   }
 
   createSeed() {
     if (this.model?.scene) {
-      const seedMesh = this.model.scene;
+      const seedMesh = this.model.scene.clone();
       this.scene?.add(seedMesh);
 
       const radius = 0.5 * seedSettings.sphereSize;
-      seedMesh.scale.setScalar(radius);
+      // seedMesh.scale.setScalar(radius);
       (seedMesh as any).collider = new Sphere(seedMesh.position, radius);
       (seedMesh as any).velocity = new Vector3(0, 0, 0);
       (seedMesh as any).mass = (Math.pow(radius, 3) * Math.PI * 4) / 3;
@@ -162,7 +160,7 @@ export default class Seed {
               this.tempSphere.center.addScaledVector(this.deltaVec, depth);
 
               collided = true;
-              if (this.scene) new Tree(this.scene, "big", seed.position);
+              if (this.scene) new Tree(this.scene, "small", seed.position);
             }
           },
 

@@ -1,3 +1,4 @@
+import signal from "signal-js";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
@@ -8,9 +9,10 @@ import {
   Group,
   type Scene,
   type Texture,
-  type Vector3,
+  Vector3,
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
+import SeedGame from "../SeedGame";
 import fragment from "./Shaders/fragment.glsl?raw";
 import vertex from "./Shaders/vertex.glsl?raw";
 import treeSettings from "./treeSettings";
@@ -18,6 +20,7 @@ import treeSettings from "./treeSettings";
 type TTreeSize = "big" | "medium" | "small";
 
 export default class Tree {
+  private game: SeedGame = new SeedGame();
   private experience: Experience = new Experience();
   private loaders: Loaders = this.experience.loaders as Loaders;
   private scene: Scene | null = null;
@@ -26,19 +29,24 @@ export default class Tree {
   static mediumModel: GLTF | null = null;
   static smallModel: GLTF | null = null;
 
-  private model: Group | null = null;
+  public instance: Group | null = null;
   private texture: Texture | null = null;
   private material: ShaderBaseMaterial | null = null;
 
-  static trees: Tree[];
+  public life = 2;
+  public isTargeted = false;
+
+  private position = new Vector3();
 
   constructor(scene: Scene, type: TTreeSize, position: Vector3) {
     this.scene = scene;
+    this.position.copy(position);
     this.setMaterials();
     this.setModels(type);
     this.setMesh(position);
     this.animate(type);
-    // Tree.trees.push(this);
+    this.game.trees.push(this);
+    signal.emit("updateLumberjackTarget");
   }
 
   setMaterials() {
@@ -67,13 +75,13 @@ export default class Tree {
       Tree.smallModel = this.loaders.items["small-tree-model"] as GLTF;
     }
     if (Tree[`${type}Model`]) {
-      this.model = Tree[`${type}Model`]!.scene.clone();
-      this.model.scale.setScalar(0);
+      this.instance = Tree[`${type}Model`]!.scene.clone();
+      this.instance.scale.setScalar(0);
     }
   }
 
   setMesh(position: Vector3) {
-    this.model?.traverse((child) => {
+    this.instance?.traverse((child) => {
       if (child instanceof Mesh && this.texture) {
         if (Array.isArray(child.material)) {
           child.material.map((m) => {
@@ -84,15 +92,15 @@ export default class Tree {
         }
       }
     });
-    if (this.model) {
-      this.model.position.set(position.x, position.y, position.z);
-      this.scene?.add(this.model);
+    if (this.instance) {
+      this.instance.position.set(position.x, position.y, position.z);
+      this.scene?.add(this.instance);
     }
   }
 
   animate(type: TTreeSize) {
     anime({
-      targets: this.model?.scale,
+      targets: this.instance?.scale,
       x: treeSettings[type].scale,
       y: treeSettings[type].scale,
       z: treeSettings[type].scale,
