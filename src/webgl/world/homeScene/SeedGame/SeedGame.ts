@@ -1,3 +1,4 @@
+import anime from "animejs";
 import { GameCamCtrl } from "./Controllers/GameCam/GameCamCtrl";
 import type Camera from "@/webgl/world/Camera";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
@@ -154,6 +155,48 @@ export default class SeedGame {
     }
   }
 
+  setCounter() {
+    const counter = document.getElementById("counter") as HTMLElement;
+    const targetCursor = document.getElementById("targetCursor") as HTMLElement;
+    const tl = anime.timeline({
+      easing: "easeOutExpo",
+      duration: 750,
+    });
+    tl.add({
+      targets: ".counter",
+      display: "block",
+      duration: 1000,
+      begin: () => {
+        signal.emit("set_counter_number", "3");
+        counter.style.display = "block";
+        targetCursor.style.opacity = "0";
+      },
+    });
+    tl.add({
+      duration: 1000,
+      begin: () => {
+        signal.emit("set_counter_number", "2");
+      },
+    });
+    tl.add({
+      duration: 1000,
+      begin: () => {
+        signal.emit("set_counter_number", "1");
+      },
+    });
+    tl.add({
+      duration: 1000,
+      begin: () => {
+        signal.emit("set_counter_number", "GO");
+        this.start();
+      },
+      complete: () => {
+        counter.style.display = "none";
+        targetCursor.style.opacity = "1";
+      },
+    });
+  }
+
   start() {
     if (!this.isStarted) {
       this.setLumberjack();
@@ -169,6 +212,7 @@ export default class SeedGame {
   }
 
   enterGameView() {
+    this.setCounter();
     this.isGameView = true;
     this.set();
     this.gameCamCtrl?.setCamGameMode();

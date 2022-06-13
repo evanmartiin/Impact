@@ -6,7 +6,7 @@ const lamberjackSettings = {
   displayBVH: true,
   visualizeDepth: 10,
   gravity: -250,
-  speed: 10,
+  speed: 20,
   physicsSteps: 10,
   maxDistanceBetweenLJAndTree: 35,
   basePosition: new Vector3(0, 0.1, 1),

@@ -13,7 +13,6 @@ import {
   Mesh,
   CubeTextureLoader,
   type IUniform,
-  Vector2,
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
@@ -26,6 +25,7 @@ import Plane from "./Plane/Plane";
 
 import wiggleVertex from "./Shaders/wiggle/vertex.glsl?raw";
 import wiggleFragment from "./Shaders/wiggle/fragment.glsl?raw";
+import Clouds from "./Clouds/Clouds";
 
 export default class HomeScene {
   private experience: Experience = new Experience();
@@ -45,27 +45,25 @@ export default class HomeScene {
   private physicCtrl = new PhysicCtrl(this.scene);
   private billy: Billy | null = null;
   private plane: Plane | null = null;
+  private clouds: Clouds | null = null;
 
   private wiggleShaderUniforms: { [uniform: string]: IUniform<any> } = {
-    uWiggleRatio: { value: .1 },
+    uWiggleRatio: { value: .2 },
   };
 
   constructor() {
     this.setFloor();
-    this.setBilly();
     this.setGame();
     this.setDebug();
     this.setSkybox();
 
+    this.billy = new Billy(this.scene);
     this.plane = new Plane(this.scene);
+    this.clouds = new Clouds(this.scene);
   }
 
   setGame() {
     if (this.camera.instance) this.game = new SeedGame(this.scene, this.camera);
-  }
-
-  setBilly() {
-    this.billy = new Billy(this.scene);
   }
 
   applyWiggle(texture: Texture) {
@@ -139,6 +137,7 @@ export default class HomeScene {
       this.billy?.update();
     }
     this.plane?.update();
+    this.clouds?.update();
   }
 
   enterGameView() {

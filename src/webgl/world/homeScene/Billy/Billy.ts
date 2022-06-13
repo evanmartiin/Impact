@@ -74,18 +74,18 @@ export default class Billy {
       },
     });
 
-    this.model.scene.traverse((child) => {
-      if (child instanceof Mesh && this.texture) {
-        // child.material = this.material;
-        // if (Array.isArray(child.material)) {
-        //   child.material.map((m) => {
-        //     m = this.material;
-        //   });
-        // } else {
-        //   child.material = this.material;
-        // }
-      }
-    });
+    // this.model.scene.traverse((child) => {
+    //   if (child instanceof Mesh && this.texture) {
+    //     child.material = this.material;
+    //     if (Array.isArray(child.material)) {
+    //       child.material.map((m) => {
+    //         m = this.material;
+    //       });
+    //     } else {
+    //       child.material = this.material;
+    //     }
+    //   }
+    // });
 
     this.instance = this.model.scene;
     this.instance.scale.set(1, 1, 1);

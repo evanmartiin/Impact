@@ -55,6 +55,7 @@ const openMenu = (e) => {
         update: () => {
           const menu = document.getElementsByClassName('menu')[0];
           menu.style.backdropFilter = `blur(${blur.value}px)`;
+          menu.style.webkitBackdropFilter = `blur(${blur.value}px)`;
         },
         complete: () =>{
           isMoving.value = false;
@@ -95,6 +96,7 @@ const closeMenu = () => {
         update: () => {
           const menu = document.getElementsByClassName('menu')[0];
           menu.style.backdropFilter = `blur(${blur.value}px)`;
+          menu.style.webkitBackdropFilter = `blur(${blur.value}px)`;
         },
         complete: () => {
           isMenuOpened.value = false;
@@ -129,6 +131,7 @@ const closeMenu = () => {
   top: 0;
   left: 0;
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -139,6 +142,7 @@ const closeMenu = () => {
   h1 {
     text-transform: uppercase;
     font-size: 150px;
+    line-height: 114px;
     text-shadow: 4px 4px 4px rgba(13, 28, 81, 0.1);
   }
 

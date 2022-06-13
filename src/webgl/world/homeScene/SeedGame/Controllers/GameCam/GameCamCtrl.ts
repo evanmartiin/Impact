@@ -70,51 +70,46 @@ export class GameCamCtrl {
   }
 
   private lockMouse() {
-    try {
-      if (this.world) {
-        // Desactive orbit control
-        this.world.PARAMS.isCtrlActive = false;
-      }
-      if (this.experience.world?.controls)
-        this.experience.world.controls.enabled = false;
-
-      setLockMouseMode(this.experience.canvas as HTMLCanvasElement);
-      if (!isLocked(this.experience.canvas as HTMLCanvasElement)) {
-        this.experience.canvas?.requestPointerLock();
-      }
-      this.gameControls?.lock();
-      this.gameControls?.connect();
-      this.isFirstMove = true;
-      this.isMouseLocked = true;
-    } catch (error) {
-      console.log("error");
+    if (this.world) {
+      // Desactive orbit control
+      this.world.PARAMS.isCtrlActive = false;
     }
+    if (this.experience.world?.controls)
+      this.experience.world.controls.enabled = false;
+
+    setLockMouseMode(this.experience.canvas as HTMLCanvasElement);
+    if (!isLocked(this.experience.canvas as HTMLCanvasElement)) {
+      this.experience.canvas?.requestPointerLock();
+    }
+    this.gameControls?.lock();
+    this.gameControls?.connect();
+    this.isFirstMove = true;
+    this.isMouseLocked = true;
+    signal.emit("set_target_cursor", false);
   }
 
   private lockChangeEvent() {
     if (this.gameControls?.isLocked) {
       this.isMouseLocked = false;
+      signal.emit("set_target_cursor", true);
       signal.emit("open_menu", "seedGameMode");
     }
   }
 
   private unlockMouse() {
-    try {
-      // Active orbit control
-      if (this.world) {
-        this.world.PARAMS.isCtrlActive = true;
-      }
-      if (this.experience.world?.controls)
-        this.experience.world.controls.enabled = true;
-      if (isLocked(this.experience.canvas as HTMLCanvasElement)) {
-        (this.experience.canvas as any).exitPointerLock();
-      }
-      this.gameControls?.unlock();
-      this.gameControls?.disconnect();
-      this.isMouseLocked = false;
-    } catch (error) {
-      console.log("error");
+    // Active orbit control
+    if (this.world) {
+      this.world.PARAMS.isCtrlActive = true;
     }
+    if (this.experience.world?.controls)
+      this.experience.world.controls.enabled = true;
+    if (isLocked(this.experience.canvas as HTMLCanvasElement)) {
+      (this.experience.canvas as any).exitPointerLock();
+    }
+    this.gameControls?.unlock();
+    this.gameControls?.disconnect();
+    this.isMouseLocked = false;
+    
   }
 
   setCamGameMode() {
