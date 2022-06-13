@@ -196,16 +196,16 @@ const Sources: ISource[] = [
     path: "/textures/HouseScene/bakedHouse.jpg",
   },
   // BILLY
-  // {
-  //   name: "billy-model",
-  //   type: "gltfModel",
-  //   path: "/models/Characters/Billy/billyModel.glb",
-  // },
   {
     name: "billy-model",
     type: "gltfModel",
-    path: "/models/Characters/Lumberjack/lumberjack.glb",
+    path: "/models/Characters/Billy/billyModel.glb",
   },
+  // {
+  //   name: "billy-model",
+  //   type: "gltfModel",
+  //   path: "/models/Characters/Lumberjack/lumberjack.glb",
+  // },
   {
     name: "billy-texture",
     type: "texture",
