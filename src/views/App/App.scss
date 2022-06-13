@@ -24,7 +24,7 @@
 *::after {
   user-select: none;
   box-sizing: border-box;
-  // cursor: none; // si cursor custom
+  cursor: none; // si cursor custom
 }
 
 ::-webkit-scrollbar {
@@ -98,6 +98,9 @@ select {
   margin: 0;
   padding: 0;
   // overflow: hidden;
+
+  cursor: url("/images/cursor.png") 5 5, pointer;
+  cursor: url("/images/cursor.png") 5 5, auto;
 }
 
 ::-webkit-scrollbar {
@@ -183,25 +186,39 @@ main,
       }
     }
 
+    @keyframes bounce {
+      from {
+        transform: translateY(0px);
+      }
+      to {
+        transform: translateY(-5px);
+      }
+    }
+
     #start-button {
       opacity: 0;
       transform: translateY(100);
       pointer-events: none;
-    }
-  }
+      color: #ffffff;
+      background-color: transparent;
+      border: none;
+      padding: 0 10px;
 
-  .credits {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
+      .start-el {
+        display: inline-block;
+      }
 
-    img {
-      height: 50px;
-    }
+      &:hover {
+        .start-el {
+          animation: bounce .3s ease alternate 2;
 
-    p {
-      font-size: 15px;
+          @for $i from 1 through 16 {
+            &:nth-of-type(#{$i}) {
+              animation-delay: #{$i * .03}s;
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -221,4 +238,10 @@ main,
 #app {
   font-family: "Mikado";
   color: #0D1C51;
+}
+
+#menu-button {
+  position: absolute;
+  top: 50px;
+  right: 50px;
 }
