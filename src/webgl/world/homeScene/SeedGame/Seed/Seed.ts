@@ -19,6 +19,7 @@ import {
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import PhysicCtrl from "../Controllers/Physic/PhysicCtrl";
+import SeedGame from "../SeedGame";
 import Tree from "../Tree/Tree";
 import seedSettings from "./SeedSettings";
 import fragment from "./Shaders/fragment.glsl?raw";
@@ -29,6 +30,7 @@ export default class Seed {
   private loaders: Loaders = this.experience.loaders as Loaders;
   private camera: PerspectiveCamera = this.experience.world?.homeScene?.camera
     .instance as PerspectiveCamera;
+  private game: SeedGame = new SeedGame();
   private physicCtrl: PhysicCtrl | null = null;
   private time: Time = this.experience.time as Time;
   private cameraDirection: Vector3 = new Vector3();
@@ -138,7 +140,7 @@ export default class Seed {
       // get the sphere position in world space
       this.tempSphere.copy((seed as any).collider);
 
-      let collided = false;
+      let floorCollided = false;
       if (this.physicCtrl?.floorMesh?.geometry.boundsTree)
         this.physicCtrl?.floorMesh?.geometry.boundsTree.shapecast({
           intersectsBounds: (box: any) => {
@@ -159,7 +161,7 @@ export default class Seed {
               this.deltaVec.multiplyScalar(1 / distance);
               this.tempSphere.center.addScaledVector(this.deltaVec, depth);
 
-              collided = true;
+              floorCollided = true;
               if (this.scene) new Tree(this.scene, "small", seed.position);
             }
           },
@@ -171,7 +173,13 @@ export default class Seed {
             );
           },
         });
-      if (collided) {
+      this.game.lumberjacks.forEach((l) => {
+        const collided = l.isInHitBox(seed.position);
+        if (collided) {
+          console.log(collided);
+        }
+      });
+      if (floorCollided) {
         this.seeds.splice(i, 1);
         i--;
         l--;
@@ -188,7 +196,7 @@ export default class Seed {
         continue;
       }
 
-      // if (collided) {
+      // if (floorCollided) {
       //   // get the delta direction and reflect the velocity across it
       //   this.deltaVec
       //     .subVectors(this.tempSphere.center, sphereCollider.center)
@@ -207,7 +215,7 @@ export default class Seed {
       //   this.tempVec
       //     .copy(this.tempSphere.center)
       //     .addScaledVector(this.deltaVec, -this.tempSphere.radius);
-      //   this.onCollide(seed, null, this.tempVec, this.deltaVec, dot, 0.05);
+      //   this.onFloorCollide(seed, null, this.tempVec, this.deltaVec, dot, 0.05);
       // }
     }
 
@@ -283,14 +291,14 @@ export default class Seed {
     //       this.tempVec
     //         .copy(c1.center)
     //         .addScaledVector(this.deltaVec, -c1.radius);
-    //       this.onCollide(s1, s2, this.tempVec, this.deltaVec, velDiff, 0);
+    //       this.onFloorCollide(s1, s2, this.tempVec, this.deltaVec, velDiff, 0);
     //     }
     //   }
 
     //   s1.position.copy(c1.center);
     // }
   }
-  onCollide(
+  onFloorCollide(
     object1: Mesh,
     object2: Mesh | null,
     point: Vector3,

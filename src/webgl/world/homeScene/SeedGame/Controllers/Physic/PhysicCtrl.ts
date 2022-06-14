@@ -28,12 +28,13 @@ export default class PhysicCtrl {
   private lastId = 0;
 
   constructor(scene: Scene) {
-    this.scene = scene;
+    
     if (PhysicCtrl.instance) {
       return PhysicCtrl.instance;
     }
     PhysicCtrl.instance = this;
 
+    this.scene = scene;
     // Global access
     window.physicCtrl = this;
   }

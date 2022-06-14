@@ -16,8 +16,6 @@ import {
   ArrowHelper,
   AnimationMixer,
   SkeletonHelper,
-  Object3D,
-  CylinderGeometry,
 } from "three";
 import type { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import PhysicCtrl from "../Controllers/Physic/PhysicCtrl";
@@ -31,6 +29,8 @@ import type Debug from "@/webgl/controllers/Debug";
 import type Time from "@/webgl/controllers/Time";
 import type IAnimation from "@/models/animation";
 import type { FolderApi } from "tweakpane";
+import { MeshBVH, MeshBVHVisualizer } from "three-mesh-bvh";
+import physicSettings from "../Controllers/Physic/PhysicSettings";
 
 type TLumberjackAction = "walkToTree" | "cuting" | "idle";
 type TAnimationName =
@@ -53,9 +53,11 @@ export default class Lumberjack {
   private game: SeedGame = new SeedGame();
   static physicCtrl: PhysicCtrl | null = null;
   private controls: OrbitControls | null = null;
-  static geometry: BoxGeometry | null = null;
+  private geometry: BoxGeometry | null = null;
   static material: MeshBasicMaterial | null = null;
   private instance: Group | null = null;
+  private hitboxGeometry: Mesh | null = null;
+  private hitbox: Box3 = new Box3();
   private scene: Scene | null;
   private playerVelocity = new Vector3();
   private playerIsOnGround = false;
@@ -76,7 +78,7 @@ export default class Lumberjack {
   private action: TLumberjackAction = "idle";
   static gltf: GLTF | null = null;
   private model: Group | null = null;
-  private currentAnim: TAnimationName = "cut";
+  private currentAnim: TAnimationName = "walk";
   private animation: IAnimation = {
     mixer: null,
     actions: {},
@@ -137,6 +139,7 @@ export default class Lumberjack {
     this.scene?.add(arrowHelper);
     this.moveDirection = newDirection;
   }
+
   setDebug() {
     this.debugFolder = this.debug.ui?.pages[2].addFolder({
       title: "Character",
@@ -160,14 +163,17 @@ export default class Lumberjack {
       this.animation.actions["hit"] = this.animation.mixer.clipAction(
         Lumberjack.gltf.animations[3]
       );
-      this.animation.actions["rage cut"] = this.animation.mixer.clipAction(
+      this.animation.actions["idle"] = this.animation.mixer.clipAction(
         Lumberjack.gltf.animations[4]
       );
-      this.animation.actions["taunt"] = this.animation.mixer.clipAction(
+      this.animation.actions["rage cut"] = this.animation.mixer.clipAction(
         Lumberjack.gltf.animations[5]
       );
-      this.animation.actions["walk"] = this.animation.mixer.clipAction(
+      this.animation.actions["taunt"] = this.animation.mixer.clipAction(
         Lumberjack.gltf.animations[6]
+      );
+      this.animation.actions["walk"] = this.animation.mixer.clipAction(
+        Lumberjack.gltf.animations[7]
       );
 
       this.animation.actions["current"] =
@@ -231,10 +237,14 @@ export default class Lumberjack {
 
   set() {
     if (!this.instance) {
-      if (!Lumberjack.geometry)
-        Lumberjack.geometry = new BoxGeometry(0.02, 0.02, 0.02);
+      if (!this.geometry)
+        // this.geometry = new CylinderGeometry(0.04, 0.04, 0.12, 16);
+        this.geometry = new BoxGeometry(0.08, 0.12, 0.08);
       if (!Lumberjack.material)
-        Lumberjack.material = new MeshBasicMaterial({ color: 0x00ff00 });
+        Lumberjack.material = new MeshBasicMaterial({
+          color: 0x00ff,
+          wireframe: true,
+        });
 
       if (!Lumberjack.gltf) {
         Lumberjack.gltf = this.loaders.items["lumberjack-model"] as GLTF;
@@ -244,17 +254,22 @@ export default class Lumberjack {
       if (this.model) {
         this.instance = this.model;
         this.instance?.position.copy(lamberjackSettings.basePosition);
+        this.instance.rotation.y += Math.PI;
         this.instance.scale.setScalar(0.5);
-        const geometry = new CylinderGeometry(0.04, 0.04, 0.04, 32);
-        const material = new MeshBasicMaterial({ color: 0xffff00 });
-        const cylinder = new Mesh(geometry, material);
-        this.instance.add(cylinder);
-        const helper = new SkeletonHelper(this.instance);
-        this.scene?.add(helper);
+        const skeletonHelper = new SkeletonHelper(this.instance);
+        this.scene?.add(skeletonHelper);
+        if (this.geometry) {
+          this.hitboxGeometry = new Mesh(this.geometry, Lumberjack.material);
+          this.hitboxGeometry?.geometry.computeBoundingBox();
+          this.hitbox
+            .copy(this.hitboxGeometry?.geometry.boundingBox as Box3)
+            .applyMatrix4(this.hitboxGeometry?.matrixWorld as Matrix4);
+
+          this.instance.add(this.hitboxGeometry);
+          this.hitboxGeometry.position.y += 0.05;
+        }
       }
 
-      // this.instance = new Mesh(Lumberjack.geometry, Lumberjack.material);
-      // this.instance.position.copy(lamberjackSettings.basePosition);
       const randomBoolean = Math.random() < 0.5;
 
       if (randomBoolean && this.instance) {
@@ -263,8 +278,9 @@ export default class Lumberjack {
         this.instance.position.x -= getRandomFloatBetween(0, 0.1, 2);
       }
       (this.instance as any).capsuleInfo = {
-        radius: 0.04,
-        segment: new Line3(new Vector3(), new Vector3(0, 0.01, 0.0)),
+        radius: 0.08,
+        floorDistance: 0.01,
+        segment: new Line3(new Vector3(), new Vector3(0, 0.02, 0.0)),
       };
 
       if (this.instance) this.scene?.add(this.instance);
@@ -322,6 +338,10 @@ export default class Lumberjack {
   }
 
   update(delta: number) {
+    this.hitbox
+      .copy(this.hitboxGeometry?.geometry.boundingBox as Box3)
+      .applyMatrix4(this.hitboxGeometry?.matrixWorld as Matrix4);
+
     this.animation.mixer?.update(this.time.delta * 0.0001);
 
     this.playerVelocity.y += this.playerIsOnGround
@@ -434,8 +454,8 @@ export default class Lumberjack {
           triPoint,
           capsulePoint
         );
-        if (distance < capsuleInfo.radius) {
-          const depth = capsuleInfo.radius - distance;
+        if (distance < capsuleInfo.floorDistance) {
+          const depth = capsuleInfo.floorDistance - distance;
           const direction = capsulePoint.sub(triPoint).normalize();
 
           this.tempSegment.start.addScaledVector(direction, depth);
@@ -509,6 +529,10 @@ export default class Lumberjack {
     if (this.instance && this.instance.position.y < -0.2) {
       this.resetPos();
     }
+  }
+
+  isInHitBox(point: Vector3) {
+    return this.hitbox.containsPoint(point);
   }
 
   resetPos() {

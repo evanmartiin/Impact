@@ -35,7 +35,7 @@ export default class SeedGame {
   private prevCamPos = new Vector3(0, 0, 0);
   private helper: Helper | null = null;
   private angleTarget = new Vector3();
-  private lumberjack: Lumberjack[] = [];
+  public lumberjacks: Lumberjack[] = [];
   private followCameraGroup: FollowGameCam | null = null;
 
   private distanceLookAt = -30;
@@ -102,7 +102,7 @@ export default class SeedGame {
 
     const physicsSteps = physicSettings.physicsSteps;
     for (let i = 0; i < physicsSteps; i++) {
-      this.lumberjack?.map((l) => {
+      this.lumberjacks?.map((l) => {
         l.update((this.time.delta / physicsSteps) * 0.0001);
       });
     }
@@ -143,7 +143,7 @@ export default class SeedGame {
   }
 
   setLumberjack() {
-    this.lumberjack.push(
+    this.lumberjacks.push(
       new Lumberjack(this.scene as Scene, this.camera as Camera)
     );
   }
