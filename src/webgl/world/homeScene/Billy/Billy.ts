@@ -1,3 +1,4 @@
+import type IAnimation from "@/models/animation";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
@@ -20,11 +21,6 @@ import fragment from "./Shaders/fragment.glsl?raw";
 import vertex from "./Shaders/vertex.glsl?raw";
 // import { SkeletonUtils } from "three/examples/jsm/utils/SkeletonUtils";
 
-interface IAnimation {
-  mixer: AnimationMixer | null;
-  actions: { [key: string]: AnimationAction };
-  play: null | ((name: string) => void);
-}
 type TAnimationName =
   | "aimtodown"
   | "downtoaim"

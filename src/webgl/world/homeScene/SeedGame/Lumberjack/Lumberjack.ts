@@ -1,3 +1,6 @@
+import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils";
+import type Loaders from "@/webgl/controllers/Loaders/Loaders";
+import Experience from "@/webgl/Experience";
 import signal from "signal-js";
 import type Camera from "@/webgl/world/Camera";
 import {
@@ -11,6 +14,10 @@ import {
   Box3,
   Group,
   ArrowHelper,
+  AnimationMixer,
+  SkeletonHelper,
+  Object3D,
+  CylinderGeometry,
 } from "three";
 import type { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import PhysicCtrl from "../Controllers/Physic/PhysicCtrl";
@@ -19,17 +26,36 @@ import lamberjackSettings from "./LumberjackSettings";
 import getRandomFloatBetween from "@/utils/getRandomFloatBetween";
 import SeedGame from "../SeedGame";
 import type Tree from "../Tree/Tree";
+import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
+import type Debug from "@/webgl/controllers/Debug";
+import type Time from "@/webgl/controllers/Time";
+import type IAnimation from "@/models/animation";
+import type { FolderApi } from "tweakpane";
 
 type TLumberjackAction = "walkToTree" | "cuting" | "idle";
+type TAnimationName =
+  | "cut"
+  | "dance"
+  | "fail"
+  | "hit"
+  | "rage cut"
+  | "taunt"
+  | "walk";
 
 export default class Lumberjack {
   private lumberjacks: Lumberjack[] = [];
+  private experience: Experience = new Experience();
+  private loaders: Loaders = this.experience.loaders as Loaders;
+  protected time: Time = this.experience.time as Time;
+  private debug: Debug = this.experience.debug as Debug;
+  private debugFolder: FolderApi | undefined = undefined;
+
   private game: SeedGame = new SeedGame();
   static physicCtrl: PhysicCtrl | null = null;
   private controls: OrbitControls | null = null;
   static geometry: BoxGeometry | null = null;
   static material: MeshBasicMaterial | null = null;
-  private instance: Mesh | null = null;
+  private instance: Group | null = null;
   private scene: Scene | null;
   private playerVelocity = new Vector3();
   private playerIsOnGround = false;
@@ -48,6 +74,14 @@ export default class Lumberjack {
   private targetedTree: Tree | null = null;
   private moveDirection: Vector3 | null = null;
   private action: TLumberjackAction = "idle";
+  static gltf: GLTF | null = null;
+  private model: Group | null = null;
+  private currentAnim: TAnimationName = "cut";
+  private animation: IAnimation = {
+    mixer: null,
+    actions: {},
+    play: null,
+  };
 
   constructor(scene: Scene, camera: Camera) {
     this.lumberjacks.push(this);
@@ -57,8 +91,9 @@ export default class Lumberjack {
     this.scene = scene;
     this.controls = camera.controls;
     this.set();
-    signal.on("updateLumberjackTarget", () => this.getNearestTree());
+    this.setAnimation();
     this.setAction("idle");
+    signal.on("updateLumberjackTarget", () => this.getNearestTree());
   }
 
   getNearestTree() {
@@ -92,10 +127,7 @@ export default class Lumberjack {
     const newDirection = new Vector3();
     if (this.instance && this.targetedTree?.instance?.position)
       newDirection
-        .subVectors(
-          (this.instance as Mesh).position,
-          this.targetedTree.instance.position
-        )
+        .subVectors(this.instance.position, this.targetedTree.instance.position)
         .normalize()
         .setLength(0.2);
     const origin = this.instance?.position;
@@ -104,6 +136,73 @@ export default class Lumberjack {
     const arrowHelper = new ArrowHelper(newDirection, origin, length, hex);
     this.scene?.add(arrowHelper);
     this.moveDirection = newDirection;
+  }
+  setDebug() {
+    this.debugFolder = this.debug.ui?.pages[2].addFolder({
+      title: "Character",
+    });
+  }
+  setAnimation() {
+    this.animation.mixer = new AnimationMixer(this.instance as Group);
+
+    // Actions
+    this.animation.actions = {};
+    if (Lumberjack.gltf && this.animation) {
+      this.animation.actions["cut"] = this.animation.mixer.clipAction(
+        Lumberjack.gltf.animations[0]
+      );
+      this.animation.actions["dance"] = this.animation.mixer.clipAction(
+        Lumberjack.gltf.animations[1]
+      );
+      this.animation.actions["fail"] = this.animation.mixer.clipAction(
+        Lumberjack.gltf.animations[2]
+      );
+      this.animation.actions["hit"] = this.animation.mixer.clipAction(
+        Lumberjack.gltf.animations[3]
+      );
+      this.animation.actions["rage cut"] = this.animation.mixer.clipAction(
+        Lumberjack.gltf.animations[4]
+      );
+      this.animation.actions["taunt"] = this.animation.mixer.clipAction(
+        Lumberjack.gltf.animations[5]
+      );
+      this.animation.actions["walk"] = this.animation.mixer.clipAction(
+        Lumberjack.gltf.animations[6]
+      );
+
+      this.animation.actions["current"] =
+        this.animation.actions[this.currentAnim];
+      this.animation.actions.current.play();
+
+      // Play the action
+      this.animation.play = (name) => {
+        const newAction = this.animation.actions[name];
+        const oldAction = this.animation.actions.current;
+        newAction.reset();
+        newAction.play();
+        newAction.crossFadeFrom(oldAction, 1, false);
+        this.animation.actions.current = newAction;
+      };
+    }
+
+    // Debug
+    if (this.debug.active) {
+      const playCut = this.debugFolder?.addButton({
+        title: "Cut",
+      });
+      const playWalk = this.debugFolder?.addButton({
+        title: "Play walk",
+      });
+      playCut?.on("click", () => this.setAnim("cut"));
+      playWalk?.on("click", () => this.setAnim("walk"));
+    }
+  }
+
+  setAnim(animName: TAnimationName) {
+    if (this.animation?.play) {
+      this.animation.play(animName);
+      this.currentAnim = animName;
+    }
   }
 
   setAction(action: TLumberjackAction) {
@@ -121,13 +220,13 @@ export default class Lumberjack {
   }
 
   setColor(color: number) {
-    if (Array.isArray(this.instance?.material)) {
-      this.instance?.material.map((m) => {
-        (m as MeshBasicMaterial).color.setHex(color);
-      });
-    } else {
-      (this.instance?.material as MeshBasicMaterial).color.setHex(color);
-    }
+    // if (Array.isArray(this.instance?.material)) {
+    //   this.instance?.material.map((m) => {
+    //     (m as MeshBasicMaterial).color.setHex(color);
+    //   });
+    // } else {
+    //   (this.instance?.material as MeshBasicMaterial).color.setHex(color);
+    // }
   }
 
   set() {
@@ -136,19 +235,40 @@ export default class Lumberjack {
         Lumberjack.geometry = new BoxGeometry(0.02, 0.02, 0.02);
       if (!Lumberjack.material)
         Lumberjack.material = new MeshBasicMaterial({ color: 0x00ff00 });
-      this.instance = new Mesh(Lumberjack.geometry, Lumberjack.material);
-      this.instance.position.copy(lamberjackSettings.basePosition);
+
+      if (!Lumberjack.gltf) {
+        Lumberjack.gltf = this.loaders.items["lumberjack-model"] as GLTF;
+      }
+      this.model = (SkeletonUtils as any).clone(Lumberjack.gltf.scene);
+
+      if (this.model) {
+        this.instance = this.model;
+        this.instance?.position.copy(lamberjackSettings.basePosition);
+        this.instance.scale.setScalar(0.5);
+        const geometry = new CylinderGeometry(0.04, 0.04, 0.04, 32);
+        const material = new MeshBasicMaterial({ color: 0xffff00 });
+        const cylinder = new Mesh(geometry, material);
+        this.instance.add(cylinder);
+        const helper = new SkeletonHelper(this.instance);
+        this.scene?.add(helper);
+      }
+
+      // this.instance = new Mesh(Lumberjack.geometry, Lumberjack.material);
+      // this.instance.position.copy(lamberjackSettings.basePosition);
       const randomBoolean = Math.random() < 0.5;
-      if (randomBoolean) {
+
+      if (randomBoolean && this.instance) {
         this.instance.position.x += getRandomFloatBetween(0, 0.1, 2);
-      } else {
+      } else if (this.instance) {
         this.instance.position.x -= getRandomFloatBetween(0, 0.1, 2);
       }
       (this.instance as any).capsuleInfo = {
-        radius: 0.02,
-        segment: new Line3(new Vector3(), new Vector3(0, 0.02, 0.0)),
+        radius: 0.04,
+        segment: new Line3(new Vector3(), new Vector3(0, 0.01, 0.0)),
       };
-      this.scene?.add(this.instance);
+
+      if (this.instance) this.scene?.add(this.instance);
+      this.setAnimation();
       window.addEventListener("keydown", this.keyDown.bind(this));
       window.addEventListener("keyup", this.keyUp.bind(this));
     } else {
@@ -202,6 +322,8 @@ export default class Lumberjack {
   }
 
   update(delta: number) {
+    this.animation.mixer?.update(this.time.delta * 0.0001);
+
     this.playerVelocity.y += this.playerIsOnGround
       ? 0
       : delta * lamberjackSettings.gravity;
@@ -215,7 +337,7 @@ export default class Lumberjack {
         this.instance?.position.distanceTo(
           this.targetedTree?.instance?.position
         ) >
-        lamberjackSettings.maxDistanceBetweenLJAndTree * 0.001
+        lamberjackSettings.maxDistanceBetweenLJAndTree * 0.0001
       ) {
         if (
           this.instance?.position.x > this.targetedTree?.instance?.position.x
