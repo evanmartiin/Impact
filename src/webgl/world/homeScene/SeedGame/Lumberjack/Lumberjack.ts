@@ -50,6 +50,9 @@ export default class Lumberjack {
   private debug: Debug = this.experience.debug as Debug;
   private debugFolder: FolderApi | undefined = undefined;
 
+  private alreadyHit = false;
+  private hitDirection: Vector3 | null = null;
+
   private game: SeedGame = new SeedGame();
   static physicCtrl: PhysicCtrl | null = null;
   private controls: OrbitControls | null = null;
@@ -342,7 +345,7 @@ export default class Lumberjack {
       .copy(this.hitboxGeometry?.geometry.boundingBox as Box3)
       .applyMatrix4(this.hitboxGeometry?.matrixWorld as Matrix4);
 
-    this.animation.mixer?.update(this.time.delta * 0.0001);
+    this.animation.mixer?.update(this.time.delta * 0.001);
 
     this.playerVelocity.y += this.playerIsOnGround
       ? 0
@@ -415,6 +418,11 @@ export default class Lumberjack {
         this.tempVector,
         lamberjackSettings.speed * delta
       );
+    }
+    if (this.alreadyHit && this.hitDirection) {
+      console.log(this.hitDirection.length());
+      this.hitDirection.setLength(this.hitDirection.length() + 0.2);
+      this.instance?.position.add(this.hitDirection?.multiplyScalar(0.01));
     }
 
     this.instance?.updateMatrixWorld();
@@ -527,7 +535,11 @@ export default class Lumberjack {
 
     // if the player has fallen too far below the level reset their position to the start
     if (this.instance && this.instance.position.y < -0.2) {
-      this.resetPos();
+      if (!this.alreadyHit) {
+        this.resetPos();
+      } else {
+        this.destroyOneLumberjack();
+      }
     }
   }
 
@@ -535,8 +547,27 @@ export default class Lumberjack {
     return this.hitbox.containsPoint(point);
   }
 
+  setSeedHit(position: Vector3, seedDirection: Vector3) {
+    this.hitDirection = seedDirection;
+    console.log("hittt");
+
+    this.alreadyHit = true;
+
+    if (this.targetedTree) {
+      this.targetedTree.isTargeted = false;
+      this.targetedTree = null;
+    }
+    this.instance?.position.add(this.hitDirection.multiplyScalar(1));
+    // const deltaVec = new Vector3();
+    // if (this.instance) {
+    //   deltaVec.subVectors(this.instance?.position, position).normalize();
+    //   this.instance?.position.copy(position);
+    // }
+  }
+
   resetPos() {
     this.playerVelocity.set(0, 0, 0);
     this.instance?.position.copy(lamberjackSettings.basePosition);
   }
+  destroyOneLumberjack() {}
 }

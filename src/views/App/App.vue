@@ -182,8 +182,8 @@ const startExperience = () => {
     },
     0
   );
-  // setTimeout(() => signal.emit("subtitles_on"), 3000);
-  signal.emit('game:launch')
+  setTimeout(() => signal.emit("subtitles_on"), 3000);
+  // signal.emit('game:launch')
   // FIXME: uncomment and remove launch
 }
 

@@ -261,7 +261,7 @@ export default class SeedGame {
       step: 0.01,
     });
 
-  } 
+  }
 
   unsetDebug() {
     if (this.debugTab) this.debug.ui?.pages[2].remove(this.debugTab);
