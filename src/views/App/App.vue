@@ -10,6 +10,7 @@ import Menu from '@/components/Menu.vue'
 import TargetCursor from '@/components/TargetCursor.vue'
 import GameStartCounter from '@/components/GameStartCounter.vue'
 import Controls from '@/components/Controls.vue'
+import Outro from '@/components/Outro.vue'
 import Titles from '@/components/Titles/Titles.vue'
 import signal from 'signal-js';
 import anime from "animejs";
@@ -184,7 +185,8 @@ const startExperience = () => {
     },
     0
   );
-  // setTimeout(() => signal.emit("subtitles_on"), 3000);
+  setTimeout(() => signal.emit("subtitles_on"), 3000);
+  // FIXME: uncomment
 }
 
 const toggleMenu = () => {
@@ -227,6 +229,7 @@ const toggleMenu = () => {
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
     <Maintenance v-if="isMaintenanceOn" />
     <Home v-if="isMaintenanceOn" />
+    <Outro :score="185" />
   </main>
 </template>
 

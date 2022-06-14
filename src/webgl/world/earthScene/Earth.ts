@@ -32,6 +32,7 @@ import anime from "animejs";
 import calcPosFromGPS from "@/utils/calcPosFromGPS";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import signal from 'signal-js';
+import Ashes from "./Ashes/Ashes";
 
 export default class Earth {
   private experience: Experience = new Experience();
@@ -71,6 +72,7 @@ export default class Earth {
   public fire: Fire | null = null;
   public ISS: ISS | null = null;
   public stars: Stars | null = null;
+  // public ashes: Ashes | null = null;
   public clouds: Clouds | null = null;
 
   private hoveredDistrict = this.experience.renderer?.hoveredScene;
@@ -109,7 +111,8 @@ export default class Earth {
     this.fire = new Fire(this.scene);
     this.ISS = new ISS(this.scene);
     this.stars = new Stars(this.scene);
-    this.clouds = new Clouds(3, this.scene);
+    // this.ashes = new Ashes(this.scene);
+    this.clouds = new Clouds(6, this.scene);
 
     this.setDebug();
   }
@@ -162,8 +165,7 @@ export default class Earth {
               child.material = wiggleMaterial;
             } else {
               const bakedMaterial = new MeshBasicMaterial({
-                map: this.textures[index],
-                transparent: true,
+                map: this.textures[index]
               });
               child.material = bakedMaterial;
             }
@@ -416,10 +418,10 @@ export default class Earth {
       this.debugTab?.addInput(this.brazierShaderUniforms.uBrazierThreshold, "value", { min: -1.5, max: 2.5, label: "brazier Y" });
       this.debugTab?.addInput(this.brazierShaderUniforms.uBrazierRange, "value", { min: 0, max: 2, label: "brazier range" });
       this.debugTab?.addInput(this.brazierShaderUniforms.uBrazierRandomRatio, "value", { min: 0, max: 20, label: "brazier random" });
-      // const changeSceneBtn = this.debugTab?.addButton({ title: "Change scene" });
-      // changeSceneBtn?.on("click", () => {
-      //   this.experience.renderer?.changeScene(this.experience.world?.districts?.scene as Scene);
-      // })
+      const outroBtn = this.debugTab?.addButton({ title: "Start Outro" });
+      outroBtn?.on("click", () => {
+        signal.emit("outro:start");
+      })
     }
   }
 

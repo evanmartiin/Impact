@@ -3,8 +3,7 @@ import signal from 'signal-js';
 
 const props = defineProps({
   click: {
-    type: Function,
-    required: true
+    type: Function
   },
   disabled: {
     type: Boolean

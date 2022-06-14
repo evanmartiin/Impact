@@ -107,7 +107,7 @@ select {
 }
 
 a *,
-button * {
+button *, input:not(:disabled) {
   cursor: $cursor 5 5, auto;
   &:hover {
     cursor: $pointer 5 5, pointer;

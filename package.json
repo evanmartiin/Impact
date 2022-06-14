@@ -14,6 +14,7 @@
     "@types/howler": "^2.2.7",
     "@types/three": "^0.137.0",
     "animejs": "^3.2.1",
+    "firebase": "^9.8.3",
     "howler": "^2.2.3",
     "pinia": "^2.0.11",
     "sass": "^1.49.9",

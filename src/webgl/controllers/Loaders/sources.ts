@@ -261,6 +261,12 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/matcap-plane.png",
   },
+  // CENDRE
+  {
+    name: "ash-texture",
+    type: "texture",
+    path: "/textures/ash.png",
+  },
 ];
 
 export default Sources;
