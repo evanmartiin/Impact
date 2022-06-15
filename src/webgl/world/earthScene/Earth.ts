@@ -208,7 +208,7 @@ export default class Earth {
     up.encoding = sRGBEncoding;
     dn.encoding = sRGBEncoding;
     ft.encoding = sRGBEncoding;
-    const geometry = new BoxBufferGeometry(100, 100, 100);
+    const geometry = new BoxBufferGeometry(600, 600, 600);
     const materialArray = [];
     materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
     materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
