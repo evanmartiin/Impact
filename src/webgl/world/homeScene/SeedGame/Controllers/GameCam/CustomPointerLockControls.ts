@@ -44,12 +44,12 @@ export default class CustomPointerLockControls {
     signal.emit("set_target_cursor", true);
     signal.off("GameCamCtrl:outView", this.outGameView.bind(this));
     console.log(this.world.PARAMS.isCtrlActive);
-    if (this.world) {
-      this.world.PARAMS.isCtrlActive = true;
-    }
-    console.log(this.experience.world?.controls);
-    if (this.experience.world?.controls)
-      this.experience.world.controls.enabled = true;
+    // if (this.world) {
+    //   this.world.PARAMS.isCtrlActive = true;
+    // }
+    // console.log(this.experience.world?.controls);
+    // if (this.experience.world?.controls)
+    //   this.experience.world.controls.enabled = true;
   }
 
   setPointerSpeed(newSpeed: number) {
