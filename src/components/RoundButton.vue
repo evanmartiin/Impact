@@ -55,4 +55,20 @@ button {
     }
   }
 }
+
+@media (max-width: 500px) {
+  button {
+    width: 50px;
+    height: 50px;
+
+    .inner {
+      width: 40px;
+      height: 40px;
+
+      img {
+        width: 25px;
+      }
+    }
+  }
+}
 </style>

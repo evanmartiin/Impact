@@ -283,8 +283,8 @@ const submitName = () => {
       <input type="text" id="nameInput_ex" placeholder="Your name" maxlength="12" style="display: none">
     </div>
     <div class="buttons">
-      <CustomButton class="scoreboard-el" :disabled="true">Explore</CustomButton>
       <CustomButton class="scoreboard-el" :click="isWriting ? submitName : null">{{ isWriting ? 'Submit' : 'Restart' }}</CustomButton>
+      <CustomButton class="scoreboard-el" :disabled="true">Explore</CustomButton>
       <CustomButton class="scoreboard-el" :disabled="isMoving" id="credits-btn" :click="() => { signal.emit('outro:credits'); transition(1, 'back', 2, 'back') }">Credits</CustomButton>
     </div>
   </div>
@@ -464,4 +464,102 @@ const submitName = () => {
     }
   }
 }
+
+@media (max-width: 500px) {
+  .outro {
+
+    // CONGRATS
+    .congrat {
+      height: auto;
+
+      .congrat-el {
+        width: 30px;
+
+        @for $i from 1 through 7 {
+          &:nth-of-type(#{$i}) {
+            padding-bottom: #{(math.cos((math.div(calc($i - 1), 3) - 1) * 1.5707)) * 10}px;
+          }
+        }
+
+        &:nth-of-type(2) {
+          margin: 0 0 7px -5px;
+        }
+        &:nth-of-type(3) {
+          margin: 0 0 12px 0;
+        }
+        &:nth-of-type(4) {
+          margin: 0 0 12px 0;
+        }
+        &:nth-of-type(5) {
+          margin: 0 0 12px 3px;
+        }
+        &:nth-of-type(6) {
+          margin: 0 0 7px -2px;
+        }
+        &:nth-of-type(7) {
+          margin: 0 0 5px 2px;
+        }
+      }
+    }
+
+    .congrat-img {
+      width: 250px;
+    }
+
+    // SCOREBOARD
+    h2 {
+      font-size: 25px;
+    }
+
+    h1 {
+      font-size: 80px;
+    }
+
+    #scoreboard {
+      margin: 20px 0;
+      
+      &:deep(.row) {
+        width: 250px;
+        grid-template-columns: 50px 150px 50px;
+        margin: 5px 0;
+
+        p {
+          font-size: 20px;
+
+          #nameInput {
+            width: 150px;
+          }
+        }
+      }
+    }
+
+    .buttons {
+      flex-direction: column;
+      gap: 5px;
+
+      #credits-btn {
+        position: static;
+      }
+    }
+
+    // CREDITS
+    #credits-title {
+      margin-top: 30vh;
+    }
+
+    #credits {
+      margin: 20px 0;
+      
+      .row {
+        width: 250px;
+        gap: 20px;
+        margin: 15px 0 15px 30px;
+
+        p {
+          font-size: 13px;
+        }
+      }
+    }
+  }
+} 
 </style>

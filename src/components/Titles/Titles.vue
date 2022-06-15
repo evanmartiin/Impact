@@ -176,4 +176,16 @@ const subtitlesOff = () => {
     }
   }
 }
+
+@media (max-width: 500px) {
+  .subtitles {
+    button {
+      bottom: 17vh;
+
+      &:after {
+        width: 90%;
+      }
+    }
+  }
+}
 </style>

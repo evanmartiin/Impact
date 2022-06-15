@@ -151,4 +151,15 @@ const closeMenu = () => {
     gap: 15px;
   }
 }
+
+@media (max-width: 500px) {
+  .menu {
+
+    h1 {
+      font-size: 80px;
+      line-height: 50px;
+      margin-top: 100px;
+    }
+  }
+}
 </style>
