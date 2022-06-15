@@ -51,6 +51,8 @@ export default class SeedGame {
   private lumberjackDebugFolder: FolderApi | null = null;
   private followCameraGroup: FollowGameCam | null = null;
 
+  public score: number = 0;
+
   private distanceLookAt = -30;
   private cameraHeight = 0.5;
   private heightLookAt = 0;
@@ -145,7 +147,7 @@ export default class SeedGame {
 
   closeGame() {
     this.world.changeScene("earth");
-    setTimeout(() => signal.emit('outro:start'), 2000);
+    setTimeout(() => signal.emit('outro:start', this.score), 2000);
     setTimeout(() => {
       this.trees.forEach((t, index) => {
         t.destroy();
@@ -351,6 +353,7 @@ export default class SeedGame {
 
   start() {
     if (!this.isStarted) {
+      this.score = 0;
       this.setLumberjack();
       this.lastSpawnTime = this.time.elapsed;
       this.isStarted = true;

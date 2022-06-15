@@ -588,7 +588,11 @@ export default class Lumberjack {
   setSeedHit(position: Vector3, seedDirection: Vector3) {
     this.hitDirection = seedDirection;
 
+    if(!this.alreadyHit) {
+      this.game.score++;
+    }
     this.alreadyHit = true;
+    
 
     if (this.targetedTree) {
       this.targetedTree.isTargeted = false;

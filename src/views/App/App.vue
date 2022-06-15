@@ -230,7 +230,7 @@ const toggleMenu = () => {
     <DistrictCard v-if="selectedDistrict.length > 0" :name="selectedDistrict" />
     <Maintenance v-if="isMaintenanceOn" />
     <Home v-if="isMaintenanceOn" />
-    <Outro :score="185" />
+    <Outro />
   </main>
 </template>
 
