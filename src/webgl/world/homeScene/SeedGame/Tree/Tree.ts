@@ -64,6 +64,19 @@ export default class Tree {
       },
     });
   }
+  cut() {
+    anime({
+      targets: this.instance?.scale,
+      x: 0,
+      y: 0,
+      z: 0,
+      easing: "easeOutElastic(.5, .5)",
+      duration: 700,
+      complete: () => {
+        this.destroy();
+      },
+    });
+  }
 
   setModels(type: TTreeSize) {
     if (Tree.bigModel === null) {
@@ -122,6 +135,8 @@ export default class Tree {
         }
         child.geometry.dispose();
       }
+      const index = this.game.trees.indexOf(this);
+      this.game.trees.slice(index, 1);
       this.scene?.remove(this.instance as Group);
     });
   }

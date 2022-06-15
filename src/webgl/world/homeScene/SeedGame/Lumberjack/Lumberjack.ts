@@ -30,7 +30,7 @@ import type Time from "@/webgl/controllers/Time";
 import type IAnimation from "@/models/animation";
 import type { FolderApi } from "tweakpane";
 
-type TLumberjackAction = "walkToTree" | "cuting" | "idle" | "dance";
+type TLumberjackAction = "walkToTree" | "cuting" | "idle" | "dance" | "basic";
 type TAnimationName =
   | "cut"
   | "dance"
@@ -112,7 +112,6 @@ export default class Lumberjack {
   }
 
   getNearestTree() {
-    console.log("check");
     if (this.action === "cuting") {
       return;
     }
@@ -120,6 +119,7 @@ export default class Lumberjack {
 
     let nearestTree: Tree | null = null;
     let minDistance: number | null = null;
+    console.log("passs here");
     this.game.trees.forEach((t) => {
       if (t.isTargeted) return;
       if (
@@ -235,6 +235,12 @@ export default class Lumberjack {
         break;
       case "cuting":
         this.setAnim("cut");
+        setTimeout(() => {
+          this.targetedTree?.cut();
+          this.action = "basic";
+          this.targetedTree = null;
+          this.getNearestTree();
+        }, 1000);
         break;
       case "dance":
         this.instance?.traverse((child) => {
