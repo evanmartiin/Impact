@@ -3,14 +3,11 @@ import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import type Time from "@/webgl/controllers/Time";
 import Experience from "@/webgl/Experience";
 import {
-  MeshStandardMaterial,
   PerspectiveCamera,
   Vector3,
   Scene,
   Mesh,
   MeshBasicMaterial,
-  SphereBufferGeometry,
-  Color,
   Sphere,
   RingBufferGeometry,
   Texture,
@@ -19,6 +16,7 @@ import {
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import PhysicCtrl from "../Controllers/Physic/PhysicCtrl";
+import SeedGame from "../SeedGame";
 import Tree from "../Tree/Tree";
 import seedSettings from "./SeedSettings";
 import fragment from "./Shaders/fragment.glsl?raw";
@@ -29,6 +27,7 @@ export default class Seed {
   private loaders: Loaders = this.experience.loaders as Loaders;
   private camera: PerspectiveCamera = this.experience.world?.homeScene?.camera
     .instance as PerspectiveCamera;
+  private game: SeedGame = new SeedGame();
   private physicCtrl: PhysicCtrl | null = null;
   private time: Time = this.experience.time as Time;
   private cameraDirection: Vector3 = new Vector3();
@@ -69,7 +68,7 @@ export default class Seed {
     this.model?.scene.traverse((child) => {
       if (child instanceof Mesh && this.texture) {
         if (Array.isArray(child.material)) {
-          child.material.map((m) => {
+          child.material.forEach((m) => {
             m = this.material;
           });
         } else {
@@ -119,26 +118,17 @@ export default class Seed {
 
       // remove the spheres if they've left the world
       if (sphereCollider.center.y < -10) {
-        this.seeds.splice(i, 1);
+        this.destroySeed(i);
         i--;
         l--;
-        // if (Array.isArray(seed.material)) {
-        //   seed.material.map((m) => {
-        //     m.dispose();
-        //   });
-        // } else {
-        //   seed.material.dispose();
-        // }
-        // seed.geometry.dispose();
-        //FIXME: dispose all
-        this.scene?.remove(seed);
         continue;
       }
 
       // get the sphere position in world space
       this.tempSphere.copy((seed as any).collider);
 
-      let collided = false;
+      let floorCollided = false;
+      let lumberjackCollided = false;
       if (this.physicCtrl?.floorMesh?.geometry.boundsTree)
         this.physicCtrl?.floorMesh?.geometry.boundsTree.shapecast({
           intersectsBounds: (box: any) => {
@@ -159,8 +149,8 @@ export default class Seed {
               this.deltaVec.multiplyScalar(1 / distance);
               this.tempSphere.center.addScaledVector(this.deltaVec, depth);
 
-              collided = true;
-              if (this.scene) new Tree(this.scene, "small", seed.position);
+              floorCollided = true;
+              if (this.scene) new Tree(this.scene, "medium", seed.position);
             }
           },
 
@@ -171,24 +161,24 @@ export default class Seed {
             );
           },
         });
-      if (collided) {
-        this.seeds.splice(i, 1);
+      this.game.lumberjacks.forEach((l) => {
+        lumberjackCollided = l.isInHitBox(seed.position);
+        if (lumberjackCollided) {
+          const direction = new Vector3().copy(this.cameraDirection);
+          direction.y =0
+          direction.setLength(0.01);
+          l.setSeedHit(seed.position, direction);
+        }
+      });
+
+      if (lumberjackCollided || floorCollided) {
+        this.destroySeed(i);
         i--;
         l--;
-        // if (Array.isArray(seed.material)) {
-        //   seed.material.map((m) => {
-        //     m.dispose();
-        //   });
-        // } else {
-        //   seed.material.dispose();
-        // }
-        // seed.geometry.dispose();
-        //FIXME: dispose all
-        this.scene?.remove(seed);
         continue;
       }
-
-      // if (collided) {
+      // --------------------------------------
+      // if (floorCollided) {
       //   // get the delta direction and reflect the velocity across it
       //   this.deltaVec
       //     .subVectors(this.tempSphere.center, sphereCollider.center)
@@ -196,7 +186,7 @@ export default class Seed {
       //   (seed as any).velocity.reflect(this.deltaVec);
 
       //   // dampen the velocity and apply some drag
-      //   const dot = (seed as any).velocity.dot(this.deltaVec);
+      //   const dot = ((seed as any).velocity as Vector3).dot(this.deltaVec);
       //   (seed as any).velocity.addScaledVector(this.deltaVec, -dot * 0.5);
       //   (seed as any).velocity.multiplyScalar(Math.max(1.0 - deltaTime, 0));
 
@@ -207,11 +197,12 @@ export default class Seed {
       //   this.tempVec
       //     .copy(this.tempSphere.center)
       //     .addScaledVector(this.deltaVec, -this.tempSphere.radius);
-      //   this.onCollide(seed, null, this.tempVec, this.deltaVec, dot, 0.05);
+      //   this.onFloorCollide(seed, null, this.tempVec, this.deltaVec, dot, 0.05);
       // }
+      //-----------------------------------------------
     }
-
-    // Handle sphere collisions
+    // --------------------------------------
+    // // Handle sphere collisions
     // for (let i = 0, l = this.seeds.length; i < l; i++) {
     //   const s1 = this.seeds[i];
     //   const c1 = (s1 as any).collider;
@@ -283,14 +274,15 @@ export default class Seed {
     //       this.tempVec
     //         .copy(c1.center)
     //         .addScaledVector(this.deltaVec, -c1.radius);
-    //       this.onCollide(s1, s2, this.tempVec, this.deltaVec, velDiff, 0);
+    //       this.onFloorCollide(s1, s2, this.tempVec, this.deltaVec, velDiff, 0);
     //     }
     //   }
 
     //   s1.position.copy(c1.center);
     // }
+    // --------------------------------------
   }
-  onCollide(
+  onFloorCollide(
     object1: Mesh,
     object2: Mesh | null,
     point: Vector3,
@@ -351,7 +343,7 @@ export default class Seed {
       scale = 1.0 - Math.pow(1.0 - scale, 2);
       hit.scale.setScalar(scale * (hit as any).maxScale);
       if (Array.isArray(hit.material)) {
-        hit.material.map((m) => {
+        hit.material.forEach((m) => {
           m.opacity = 1.0 - Math.sin((ratio * 2 * Math.PI) / 4);
         });
       } else {
@@ -363,7 +355,7 @@ export default class Seed {
         (hit as any).parent.remove(hit);
         hit.geometry.dispose();
         if (Array.isArray(hit.material)) {
-          hit.material.map((m) => {
+          hit.material.forEach((m) => {
             m.dispose();
           });
         } else {
@@ -373,5 +365,23 @@ export default class Seed {
         l--;
       }
     }
+  }
+
+  destroySeed(index: number) {
+    const seed = this.seeds[index];
+    seed.traverse((child) => {
+      if (child instanceof Mesh) {
+        if (Array.isArray(child.material)) {
+          child.material.forEach((m) => {
+            m.dispose();
+          });
+        } else {
+          child.material.dispose();
+        }
+        child.geometry.dispose();
+      }
+    });
+    this.scene?.remove(seed);
+    this.seeds.splice(index, 1);
   }
 }

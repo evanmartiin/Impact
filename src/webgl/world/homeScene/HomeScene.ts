@@ -1,3 +1,4 @@
+import signal from "signal-js";
 import type Time from "@/webgl/controllers/Time";
 import Billy from "./Billy/Billy";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
@@ -28,10 +29,12 @@ import Plane from "./Plane/Plane";
 import wiggleVertex from "./Shaders/wiggle/vertex.glsl?raw";
 import wiggleFragment from "./Shaders/wiggle/fragment.glsl?raw";
 import Clouds from "./Clouds/Clouds";
+import type World from "../World";
 
 export default class HomeScene {
   private experience: Experience = new Experience();
   private loaders: Loaders = this.experience.loaders as Loaders;
+  private world: World = this.experience.world as World;
   private debugTab: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
   private time: Time = this.experience.time as Time;
@@ -49,8 +52,9 @@ export default class HomeScene {
   private plane: Plane | null = null;
   private clouds: Clouds | null = null;
 
+
   private wiggleShaderUniforms: { [uniform: string]: IUniform<any> } = {
-    uWiggleRatio: { value: .2 },
+    uWiggleRatio: { value: 0.2 },
   };
 
   constructor() {
@@ -199,7 +203,7 @@ export default class HomeScene {
     debugTab2?.addInput(this.wiggleShaderUniforms.uWiggleRatio, "value", {
       min: 0,
       max: 3,
-      label: "Ratio"
+      label: "Ratio",
     });
   }
 }

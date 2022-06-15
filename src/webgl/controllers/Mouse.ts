@@ -1,7 +1,7 @@
 import type Sizes from "@/webgl/controllers/Sizes";
 import Experience from "@/webgl/Experience";
 import { Vector2 } from "three";
-import signal from 'signal-js';
+import signal from "signal-js";
 
 export default class Mouse {
   private experience = new Experience();

@@ -1,3 +1,4 @@
+import type IAnimation from "@/models/animation";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
@@ -20,11 +21,6 @@ import fragment from "./Shaders/fragment.glsl?raw";
 import vertex from "./Shaders/vertex.glsl?raw";
 // import { SkeletonUtils } from "three/examples/jsm/utils/SkeletonUtils";
 
-interface IAnimation {
-  mixer: AnimationMixer | null;
-  actions: { [key: string]: AnimationAction };
-  play: null | ((name: string) => void);
-}
 type TAnimationName =
   | "aimtodown"
   | "downtoaim"
@@ -73,19 +69,6 @@ export default class Billy {
         uTexture: { value: this.texture },
       },
     });
-
-    // this.model.scene.traverse((child) => {
-    //   if (child instanceof Mesh && this.texture) {
-    //     child.material = this.material;
-    //     if (Array.isArray(child.material)) {
-    //       child.material.map((m) => {
-    //         m = this.material;
-    //       });
-    //     } else {
-    //       child.material = this.material;
-    //     }
-    //   }
-    // });
 
     this.instance = this.model.scene;
     this.instance.scale.set(1, 1, 1);

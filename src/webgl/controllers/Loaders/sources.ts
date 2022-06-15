@@ -201,15 +201,16 @@ const Sources: ISource[] = [
     type: "gltfModel",
     path: "/models/Characters/Billy/billyModel.glb",
   },
-  // {
-  //   name: "billy-model",
-  //   type: "gltfModel",
-  //   path: "/models/Characters/Lumberjack/lumberjack.glb",
-  // },
   {
     name: "billy-texture",
     type: "texture",
     path: "/textures/Characters/Billy/billyTextureV2.jpg",
+  },
+  // LUMBERJACK
+  {
+    name: "lumberjack-model",
+    type: "gltfModel",
+    path: "/models/Characters/Lumberjack/lumberjack.glb",
   },
   // TREES
   {

@@ -186,7 +186,8 @@ const startExperience = () => {
     0
   );
   setTimeout(() => signal.emit("subtitles_on"), 3000);
-  // FIXME: uncomment
+  // signal.emit('game:launch')
+  // FIXME: uncomment and remove launch
 }
 
 const toggleMenu = () => {
