@@ -2,7 +2,9 @@ import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import Camera from "@/webgl/world/Camera";
 import type Renderer from "@/webgl/Renderer";
-import { Group, MeshBasicMaterial, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, type IUniform, Vector2, Color, type Shader, PlaneBufferGeometry, Vector3, CubeTextureLoader } from "three";
+import { Group, MeshBasicMaterial, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, type IUniform, Vector2, Color, type Shader, PlaneBufferGeometry, Vector3, 
+  // CubeTextureLoader 
+} from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Time from "@/webgl/controllers/Time";
 import Fire from "./Fire/Fire";
@@ -106,7 +108,7 @@ export default class Earth {
     this.setMesh();
     this.setHalo();
     this.setEvents();
-    this.setSkybox();
+    // this.setSkybox();
     
     this.fire = new Fire(this.scene);
     this.ISS = new ISS(this.scene);
@@ -201,14 +203,14 @@ export default class Earth {
     // signal.on("start_experience", () => this.appear());    
   }
 
-  setSkybox() {
-    const loader = new CubeTextureLoader();
-    loader.setPath('textures/skybox/earth/');
+  // setSkybox() {
+  //   const loader = new CubeTextureLoader();
+  //   loader.setPath('textures/skybox/earth/');
 
-    const textureCube = loader.load(["px.jpg", "px.jpg", "py.jpg", "ny.jpg", "px.jpg", "px.jpg"]);
-    textureCube.encoding = sRGBEncoding;
-    this.scene.background = textureCube;
-  }
+  //   const textureCube = loader.load(["px.jpg", "px.jpg", "py.jpg", "ny.jpg", "px.jpg", "px.jpg"]);
+  //   textureCube.encoding = sRGBEncoding;
+  //   this.scene.background = textureCube;
+  // }
 
   appear() {
     const tl = anime.timeline({});

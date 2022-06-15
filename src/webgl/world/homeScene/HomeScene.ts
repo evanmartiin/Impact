@@ -11,7 +11,7 @@ import {
   Texture,
   sRGBEncoding,
   Mesh,
-  CubeTextureLoader,
+  // CubeTextureLoader,
   type IUniform,
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
@@ -55,7 +55,7 @@ export default class HomeScene {
     this.setFloor();
     this.setGame();
     this.setDebug();
-    this.setSkybox();
+    // this.setSkybox();
 
     this.billy = new Billy(this.scene);
     this.plane = new Plane(this.scene);
@@ -119,17 +119,17 @@ export default class HomeScene {
     });
   }
 
-  setSkybox() {
-    const loader = new CubeTextureLoader();
-    loader.setPath("textures/skybox/home/");
-    loader.load(
-      ["px.jpg", "px.jpg", "py.jpg", "ny.jpg", "px.jpg", "px.jpg"],
-      (textureCube) => {
-        textureCube.encoding = sRGBEncoding;
-        this.scene.background = textureCube;
-      }
-    );
-  }
+  // setSkybox() {
+  //   const loader = new CubeTextureLoader();
+  //   loader.setPath("textures/skybox/home/");
+  //   loader.load(
+  //     ["px.jpg", "px.jpg", "py.jpg", "ny.jpg", "px.jpg", "px.jpg"],
+  //     (textureCube) => {
+  //       textureCube.encoding = sRGBEncoding;
+  //       this.scene.background = textureCube;
+  //     }
+  //   );
+  // }
 
   update() {
     if (this.game) {
