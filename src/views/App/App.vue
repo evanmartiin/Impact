@@ -185,7 +185,7 @@ const startExperience = () => {
     },
     0
   );
-  setTimeout(() => signal.emit("subtitles_on"), 3000);
+  // setTimeout(() => signal.emit("subtitles_on"), 3000);
   // FIXME: uncomment
 }
 

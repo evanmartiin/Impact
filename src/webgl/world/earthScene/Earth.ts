@@ -2,9 +2,7 @@ import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import Camera from "@/webgl/world/Camera";
 import type Renderer from "@/webgl/Renderer";
-import { Group, MeshBasicMaterial, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, type IUniform, Vector2, Color, type Shader, PlaneBufferGeometry, Vector3, 
-  // CubeTextureLoader 
-} from "three";
+import { Group, MeshBasicMaterial, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, type IUniform, Vector2, Color, type Shader, PlaneBufferGeometry, Vector3, BoxBufferGeometry, BackSide } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Time from "@/webgl/controllers/Time";
 import Fire from "./Fire/Fire";
@@ -108,7 +106,7 @@ export default class Earth {
     this.setMesh();
     this.setHalo();
     this.setEvents();
-    // this.setSkybox();
+    this.setSkybox();
     
     this.fire = new Fire(this.scene);
     this.ISS = new ISS(this.scene);
@@ -203,14 +201,24 @@ export default class Earth {
     // signal.on("start_experience", () => this.appear());    
   }
 
-  // setSkybox() {
-  //   const loader = new CubeTextureLoader();
-  //   loader.setPath('textures/skybox/earth/');
-
-  //   const textureCube = loader.load(["px.jpg", "px.jpg", "py.jpg", "ny.jpg", "px.jpg", "px.jpg"]);
-  //   textureCube.encoding = sRGBEncoding;
-  //   this.scene.background = textureCube;
-  // }
+  setSkybox() {
+    const up = this.loaders.items["sky-earth-up"] as Texture;
+    const dn = this.loaders.items["sky-earth-dn"] as Texture;
+    const ft = this.loaders.items["sky-earth-ft"] as Texture;
+    up.encoding = sRGBEncoding;
+    dn.encoding = sRGBEncoding;
+    ft.encoding = sRGBEncoding;
+    const geometry = new BoxBufferGeometry(100, 100, 100);
+    const materialArray = [];
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: up }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: dn }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    const skybox = new Mesh(geometry, materialArray);
+    this.scene.add(skybox);
+  }
 
   appear() {
     const tl = anime.timeline({});
