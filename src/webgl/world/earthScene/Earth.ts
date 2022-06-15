@@ -37,7 +37,7 @@ import Ashes from "./Ashes/Ashes";
 export default class Earth {
   private experience: Experience = new Experience();
   public scene: Scene = new Scene();
-  public cameraPos: Vector3 = new Vector3(0, 0, 6);
+  public cameraPos: Vector3 = new Vector3(500, 0, 0);
   private time: Time = this.experience.time as Time;
   public camera: Camera = new Camera(this.cameraPos, this.scene);
   private renderer: Renderer = this.experience.renderer as Renderer;

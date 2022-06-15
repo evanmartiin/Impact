@@ -29,7 +29,7 @@ export default class World {
   private debugTab: FolderApi | undefined = undefined;
   private debugTab2: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
-  public currentScene: district = "earth";
+  public currentScene: district = "maison";
   public controls: OrbitControls | null = null;
   public PARAMS = {
     "isMaintenanceOn": false,

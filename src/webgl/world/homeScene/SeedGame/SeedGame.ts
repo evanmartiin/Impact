@@ -82,6 +82,8 @@ export default class SeedGame {
   private dangertZone: Mesh | null = null;
   public isGameEnded = false;
 
+  private endedOnce: boolean = false;
+
   constructor(scene?: Scene, camera?: Camera) {
     if (SeedGame.instance) {
       return SeedGame.instance;
@@ -130,21 +132,29 @@ export default class SeedGame {
   }
 
   endGame() {
-    this.isGameEnded = true;
-    this.lumberjacks.forEach((l, index) => {
-      l.setAction("dance");
-    });
-    //TODO: end ui here
+    if (!this.endedOnce) {
+      this.isGameEnded = true;
+      this.lumberjacks.forEach((l, index) => {
+        l.setAction("dance");
+      });
+      setTimeout(() => signal.emit('game:close'), 2000);
+      //TODO: end ui here
+      this.endedOnce = true
+    }
   }
 
   closeGame() {
-    this.trees.forEach((t, index) => {
-      t.destroy();
-      this.trees.splice(index, 1);
-    });
-    this.lumberjacks.forEach((l, index) => {
-      l.destroyOneLumberjack();
-    });
+    this.world.changeScene("earth");
+    setTimeout(() => signal.emit('outro:start'), 2000);
+    setTimeout(() => {
+      this.trees.forEach((t, index) => {
+        t.destroy();
+        this.trees.splice(index, 1);
+      });
+      this.lumberjacks.forEach((l, index) => {
+        l.destroyOneLumberjack();
+      });
+    }, 4000);
   }
 
   update() {
