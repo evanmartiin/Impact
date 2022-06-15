@@ -385,7 +385,22 @@ export default class Lumberjack {
     //     lamberjackSettings.maxDistanceBetweenLJAndTree * 0.001
     // ) {
     if (!this.isTargetingDangerZone) {
-      if (this.targetedTree && this.instance && this.targetedTree.instance) {
+      if (
+        this.instance &&
+        this.targetedTree?.instance &&
+        this.instance.position.distanceTo(
+          this.targetedTree?.instance?.position as Vector3
+        ) < (this.instance as any).capsuleInfo.radius
+      ) {
+        if (this.action != "cuting") {
+          this.action = "cuting";
+          this.setAction("cuting");
+        }
+      } else if (
+        this.targetedTree &&
+        this.instance &&
+        this.targetedTree.instance
+      ) {
         if (
           this.instance?.position.x > this.targetedTree?.instance?.position.x
         ) {
@@ -425,13 +440,6 @@ export default class Lumberjack {
         }
       }
     }
-    // }
-    // else {
-    //   if (this.action != "cuting") {
-    //     this.action = "cuting";
-    //     this.setAction("cuting");
-    //   }
-    // }
 
     if (this.fwdPressed) {
       this.tempVector.set(0, 0, -0.2).applyAxisAngle(this.upVector, angle);
@@ -594,6 +602,9 @@ export default class Lumberjack {
   setSeedHit(position: Vector3, seedDirection: Vector3) {
     this.hitDirection = seedDirection;
 
+    if (!this.alreadyHit) {
+      this.game.score++;
+    }
     this.alreadyHit = true;
 
     if (this.targetedTree) {

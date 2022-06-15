@@ -82,6 +82,8 @@ export default class SeedGame {
   private dangertZone: Mesh | null = null;
   public isGameEnded = false;
 
+  public score: number = 0;
+
   constructor(scene?: Scene, camera?: Camera) {
     if (SeedGame.instance) {
       return SeedGame.instance;
@@ -125,7 +127,6 @@ export default class SeedGame {
     this.dangertZone = new Mesh(this.dangertZoneGeo, this.dangertZoneMat);
     this.dangertZone.position.y = 0.009;
     this.dangertZone.rotation.x = Math.PI / 2;
-    console.log("initttt");
     this.scene?.add(this.dangertZone);
   }
 
@@ -135,6 +136,7 @@ export default class SeedGame {
       this.lumberjacks.forEach((l, index) => {
         l.setAction("dance");
       });
+      setTimeout(() => signal.emit('game:close'), 2000);
       setTimeout(() => {
         this.leaveGameView();
       }, 3000);
@@ -143,13 +145,19 @@ export default class SeedGame {
   }
 
   closeGame() {
-    this.trees.forEach((t, index) => {
-      t.destroy();
-      this.trees.splice(index, 1);
-    });
-    this.lumberjacks.forEach((l, index) => {
-      l.destroyOneLumberjack();
-    });
+    this.world.changeScene('earth');
+    setTimeout(() => {
+      signal.emit("outro:start", this.score);
+    }, 2000);
+    setTimeout(() => {
+      this.trees.forEach((t, index) => {
+        t.destroy();
+        this.trees.splice(index, 1);
+      });
+      this.lumberjacks.forEach((l, index) => {
+        l.destroyOneLumberjack();
+      });
+    }, 4000);
   }
 
   update() {
@@ -346,6 +354,7 @@ export default class SeedGame {
 
   start() {
     if (!this.isStarted) {
+      this.score = 0;
       this.setLumberjack();
       this.lastSpawnTime = this.time.elapsed;
       this.isStarted = true;
@@ -380,25 +389,25 @@ export default class SeedGame {
     this.setLumberjackDebug();
     this.debugTab = this.debug.ui?.pages[2].addFolder({ title: "Game board" });
 
-    const freeMode = this.debugTab?.addButton({
-      title: "Free mode",
-    }) as ButtonApi;
+    // const freeMode = this.debugTab?.addButton({
+    //   title: "Free mode",
+    // }) as ButtonApi;
 
-    freeMode.on("click", () => {
-      if (this.world) {
-        this.world.PARAMS.isCtrlActive = true;
-      }
-      if (this.experience.world?.controls)
-        this.experience.world.controls.enabled = true;
-      setTimeout(() => {
-        signal.emit("close_menu");
-        if (this.world) {
-          this.world.PARAMS.isCtrlActive = true;
-        }
-        if (this.experience.world?.controls)
-          this.experience.world.controls.enabled = true;
-      }, 2000);
-    });
+    // freeMode.on("click", () => {
+    //   if (this.world) {
+    //     this.world.PARAMS.isCtrlActive = true;
+    //   }
+    //   if (this.experience.world?.controls)
+    //     this.experience.world.controls.enabled = true;
+    //   setTimeout(() => {
+    //     signal.emit("close_menu");
+    //     if (this.world) {
+    //       this.world.PARAMS.isCtrlActive = true;
+    //     }
+    //     if (this.experience.world?.controls)
+    //       this.experience.world.controls.enabled = true;
+    //   }, 2000);
+    // });
 
     // const stopButton = this.debugTab?.addButton({
     //   title: "Stop Game",

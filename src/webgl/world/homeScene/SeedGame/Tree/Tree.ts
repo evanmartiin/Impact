@@ -47,6 +47,7 @@ export default class Tree {
     this.animate(type);
     this.game.trees.push(this);
     signal.emit("updateLumberjackTarget");
+    this.game.score++;
   }
 
   setMaterials() {

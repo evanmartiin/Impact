@@ -26,6 +26,7 @@ const scores = ref([]);
 const nearScores = ref([]);
 const startRank = ref(undefined);
 const isWriting = ref(false);
+const playerScore = ref(0);
 
 const props = defineProps({
   score: {
@@ -37,31 +38,35 @@ const props = defineProps({
 onMounted(() => {
   signal.on('outro:ending', ending);
 
-  getScores()
-  .then((res) => {
-    res.forEach((doc) => scores.value.push(doc.data()));
-    scores.value.push({ name: '', score: props.score, player: true });
-  })
-  .then(() => {
-    scores.value.sort((a, b) => a.name.localeCompare(b.name));
-    scores.value.sort((a, b) => b.score - a.score);
+  signal.on('outro:start', (score) => {
+    playerScore.value = score;
 
-    const playerIndex = scores.value.findIndex((el) => el.player);
-    
-    const shift = playerIndex === 0 ? 2 :
-                  playerIndex === 1 ? 1 :
-                  playerIndex === (scores.value.length - 2) ? -1 :
-                  playerIndex === (scores.value.length - 1) ? -2 : 0;
+    getScores()
+    .then((res) => {
+      res.forEach((doc) => scores.value.push(doc.data()));
+      scores.value.push({ name: '', score: playerScore.value, player: true });
+    })
+    .then(() => {
+      scores.value.sort((a, b) => a.name.localeCompare(b.name));
+      scores.value.sort((a, b) => b.score - a.score);
 
-    for (let i = 0; i < 5; i++) {
-      const offset = i - 2 + shift;
-      if (startRank.value === undefined) startRank.value = playerIndex + offset;
-      const line = scores.value[playerIndex + offset];
-      if (offset === 0) line.name = 'New';
-      nearScores.value.push(line);
-    }
-  })
-  .then(setScoreBoard);
+      const playerIndex = scores.value.findIndex((el) => el.player);
+      
+      const shift = playerIndex === 0 ? 2 :
+                    playerIndex === 1 ? 1 :
+                    playerIndex === (scores.value.length - 2) ? -1 :
+                    playerIndex === (scores.value.length - 1) ? -2 : 0;
+
+      for (let i = 0; i < 5; i++) {
+        const offset = i - 2 + shift;
+        if (startRank.value === undefined) startRank.value = playerIndex + offset;
+        const line = scores.value[playerIndex + offset];
+        if (offset === 0) line.name = 'New';
+        nearScores.value.push(line);
+      }
+    })
+    .then(setScoreBoard);
+    })
 })
 
 const anim = (targets, direction, type, callback) => {
@@ -257,7 +262,7 @@ const writing = (e) => {
 const submitName = () => {
   document.getElementById("nameInput").disabled = true;
   isWriting.value = false;
-  addDoc(collection(database, "scores"), { name: document.getElementById("nameInput").value, score: props.score });
+  addDoc(collection(database, "scores"), { name: document.getElementById("nameInput").value, score: playerScore.value });
 }
 </script>
 
@@ -278,7 +283,7 @@ const submitName = () => {
 
   <div class="outro-ui" v-show="step === 1">
     <h2 class="scoreboard-el">YOUR SCORE</h2>
-    <h1 class="scoreboard-el">{{ props.score }}</h1>
+    <h1 class="scoreboard-el">{{ playerScore }}</h1>
     <div id="scoreboard">
       <input type="text" id="nameInput_ex" placeholder="Your name" maxlength="12" style="display: none">
     </div>
