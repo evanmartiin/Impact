@@ -141,7 +141,6 @@ export default class SeedGame {
         this.leaveGameView();
       }, 3000);
     }
-    //TODO: end ui here
   }
 
   closeGame() {
