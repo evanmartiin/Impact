@@ -237,7 +237,13 @@ export default class Lumberjack {
         this.setAnim("cut");
         break;
       case "dance":
+        this.instance?.traverse((child) => {
+          if (child.name === "axe") {
+            child.visible = false;
+          }
+        });
         this.setAnim("dance");
+        7;
         break;
     }
   }

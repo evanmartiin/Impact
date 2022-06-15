@@ -46,6 +46,7 @@ export class GameCamCtrl {
   }
 
   private lockMouse() {
+    console.log("unlock");
     // Desactive orbit control
     if (this.world) {
       this.world.PARAMS.isCtrlActive = false;
@@ -99,10 +100,7 @@ export class GameCamCtrl {
   }
 
   openMenu() {
-    // const _euler = new Euler(0, 0, 0, "YXZ");
-    // _euler.y = Math.PI;
-    // this.camera?.instance?.quaternion.setFromEuler(_euler);
-    // this.camera?.instance?.lookAt(0, 2, 50);
-    signal.emit("open_menu", "seedGameMode");
+    if (this.pointerControls?.isLocked)
+      signal.emit("open_menu", "seedGameMode");
   }
 }

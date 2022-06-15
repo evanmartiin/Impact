@@ -130,10 +130,15 @@ export default class SeedGame {
   }
 
   endGame() {
-    this.isGameEnded = true;
-    this.lumberjacks.forEach((l, index) => {
-      l.setAction("dance");
-    });
+    if (!this.isGameEnded) {
+      this.isGameEnded = true;
+      this.lumberjacks.forEach((l, index) => {
+        l.setAction("dance");
+      });
+      setTimeout(() => {
+        this.leaveGameView();
+      }, 3000);
+    }
     //TODO: end ui here
   }
 
@@ -188,7 +193,7 @@ export default class SeedGame {
   }
 
   mouseClick() {
-    if (!this.isCounting) {
+    if (!this.isCounting && !this.isGameEnded) {
       if (this.cameraLookAtPoint) {
         this.angleTarget = this.angleTarget.copy(this.cameraLookAtPoint);
       } else {
@@ -364,11 +369,11 @@ export default class SeedGame {
 
   leaveGameView() {
     this.isGameView = false;
-    this.gameCamCtrl?.unsetCamGameMode();
     this.unsetDebug();
     this.instance.visible = false;
     this.followCameraGroup?.hide();
     this.unset();
+    signal.emit("GameCamCtrl:outView");
   }
 
   setDebug() {
