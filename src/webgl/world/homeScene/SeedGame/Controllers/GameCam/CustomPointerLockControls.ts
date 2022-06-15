@@ -1,3 +1,5 @@
+import Experience from "@/webgl/Experience";
+import type World from "@/webgl/world/World";
 import signal from "signal-js";
 import { Euler, type Camera } from "three";
 
@@ -5,6 +7,8 @@ const _euler = new Euler(0, 0, 0, "YXZ");
 const _PI_2 = Math.PI / 2;
 
 export default class CustomPointerLockControls {
+  private experience: Experience = new Experience();
+  private world: World = this.experience.world as World;
   public pointerSpeed = 2;
   public domElement;
   public camera;
@@ -30,6 +34,22 @@ export default class CustomPointerLockControls {
 
     document.exitPointerLock =
       document.exitPointerLock || (document as any).mozExitPointerLock;
+
+    signal.on("GameCamCtrl:outView", this.outGameView.bind(this));
+  }
+
+  outGameView() {
+    this.disconnect();
+    this.unlock();
+    signal.emit("set_target_cursor", true);
+    signal.off("GameCamCtrl:outView", this.outGameView.bind(this));
+    console.log(this.world.PARAMS.isCtrlActive);
+    if (this.world) {
+      this.world.PARAMS.isCtrlActive = true;
+    }
+    console.log(this.experience.world?.controls);
+    if (this.experience.world?.controls)
+      this.experience.world.controls.enabled = true;
   }
 
   setPointerSpeed(newSpeed: number) {
@@ -57,6 +77,7 @@ export default class CustomPointerLockControls {
   }
 
   disconnect() {
+    this.isLocked = false;
     this.isMouseMove = false;
     console.log("disconnect");
     document.removeEventListener("mousemove", this.onMouseMove.bind(this));
@@ -151,6 +172,7 @@ export default class CustomPointerLockControls {
   unlock() {
     if ((this.domElement as any).exitPointerLock)
       (this.domElement as any).exitPointerLock();
+    if (document.exitPointerLock) document.exitPointerLock();
     this.isLocked = false;
   }
 }
