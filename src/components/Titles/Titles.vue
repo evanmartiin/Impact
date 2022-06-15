@@ -18,7 +18,7 @@ const props = defineProps({
   }
 })
 
-const isSubtitlesOn = ref(true);
+const isSubtitlesOn = ref(false);
 const titlesTimeline = anime.timeline({});
 
 onMounted(() => {
@@ -180,7 +180,7 @@ const subtitlesOff = () => {
 @media (max-width: 500px) {
   .subtitles {
     button {
-      bottom: 20vh;
+      bottom: 17vh;
 
       &:after {
         width: 90%;
