@@ -142,11 +142,6 @@ const Sources: ISource[] = [
     type: "gltfModel",
     path: "/models/zones.glb",
   },
-  {
-    name: "grandma-model",
-    type: "gltfModel",
-    path: "/models/grandma.glb",
-  },
 
   {
     name: "earth-map",
@@ -299,6 +294,27 @@ const Sources: ISource[] = [
     name: "sky-earth-ft",
     type: "texture",
     path: "/textures/skybox/earth/ft.jpg",
+  },
+  // GRANDMA
+  {
+    name: "grandma-house-model",
+    type: "gltfModel",
+    path: "/models/grandma-house.glb",
+  },
+  {
+    name: "grandma-sea-model",
+    type: "gltfModel",
+    path: "/models/grandma-sea.glb",
+  },
+  {
+    name: "grandma-house-texture",
+    type: "texture",
+    path: "/textures/grandma-house.jpg",
+  },
+  {
+    name: "grandma-sea-texture",
+    type: "texture",
+    path: "/textures/grandma-sea.jpg",
   },
 ];
 

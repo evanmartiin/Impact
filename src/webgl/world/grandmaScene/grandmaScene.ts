@@ -1,11 +1,14 @@
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
-import { Color, DirectionalLight, Mesh, MeshMatcapMaterial, Scene, Texture, Vector3 } from "three";
+import { Mesh, Scene, sRGBEncoding, Texture, Vector3 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Time from "@/webgl/controllers/Time";
 import type Debug from "@/webgl/controllers/Debug";
+import fragment from "./shaders/fragment.glsl?raw";
+import vertex from "./shaders/vertex.glsl?raw";
 import type { TabPageApi } from "tweakpane";
 import Camera from "../Camera";
+import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 
 export default class GrandmaDistrict {
   private experience: Experience = new Experience();
@@ -20,28 +23,36 @@ export default class GrandmaDistrict {
 
   constructor() {
     this.setModel();
-    this.setLight();
   }
 
   setModel() {
-    const districtModel = this.loaders.items["grandma-model"] as GLTF;
-    const districtMatcap = this.loaders.items["matcap-texture"] as Texture;
-    const districtMaterial = new MeshMatcapMaterial({ matcap: districtMatcap, color: 0x1b5f2f });
-    districtModel.scene.traverse((child) => {
-      if (child instanceof Mesh) {
-        child.material = districtMaterial;
+    const models = [
+      this.loaders.items["housev1model"] as GLTF,
+      this.loaders.items["grassv1model"] as GLTF,
+    ];
+    const textures = [
+      this.loaders.items["housev1texture"] as Texture,
+      this.loaders.items["grassv1texture"] as Texture,
+    ];
+    models.forEach((model, index) => {
+      if (textures && textures[index]) {
+        textures[index].flipY = false;
+        textures[index].encoding = sRGBEncoding;
+        model.scene.traverse((child) => {
+          if (child instanceof Mesh && textures) {
+            const bakedMaterial = new ShaderBaseMaterial({
+              transparent: true,
+              fragmentShader: fragment,
+              vertexShader: vertex,
+              uniforms: {
+                uBakedTexture: { value: textures[index] },
+              },
+            });
+            (child as Mesh).material = bakedMaterial;
+          }
+        });
+        this.scene?.add(model.scene);
       }
-    })
-    this.scene.add(districtModel.scene);
-  }
-
-  setLight() {
-    const sunLight = new DirectionalLight("#ffffff", 4);
-    sunLight.castShadow = true;
-    sunLight.shadow.camera.far = 15;
-    sunLight.shadow.mapSize.set(1024, 1024);
-    sunLight.shadow.normalBias = 0.05;
-    sunLight.position.set(200, 0, 200);
-    this.scene.add(sunLight);
+    });
   }
 }

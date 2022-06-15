@@ -147,7 +147,10 @@ export default class SeedGame {
 
   closeGame() {
     this.world.changeScene("earth");
-    setTimeout(() => signal.emit('outro:start', this.score), 2000);
+    setTimeout(() => {
+      signal.emit('outro:start', this.score);
+      document.exitPointerLock();
+    }, 2000);
     setTimeout(() => {
       this.trees.forEach((t, index) => {
         t.destroy();

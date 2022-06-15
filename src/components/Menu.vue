@@ -114,7 +114,7 @@ const closeMenu = () => {
   <div class="buttons">
     <CustomButton :disabled="isMoving" class="menu-el" :click="closeMenu">Resume</CustomButton>
     <CustomButton :disabled="isMoving" class="menu-el" :click="click">Restart</CustomButton>
-    <CustomButton :disabled="isMoving" class="menu-el" :click="click">Main menu</CustomButton>
+    <CustomButton :disabled="isMoving" class="menu-el" :click="click">Home</CustomButton>
     <CustomButton :disabled="isMoving" class="menu-el" :click="toggleSound" :off="!isSoundOn">Sound {{ isSoundOn ? 'On' : 'Off' }}</CustomButton>
     <CustomButton :disabled="isMoving" class="menu-el" :click="click">Credits</CustomButton>
   </div>
