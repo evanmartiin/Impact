@@ -1,13 +1,12 @@
 <script setup>
 import signal from 'signal-js';
 import CustomButton from '@/components/CustomButton.vue'
-import RoundButton from '@/components/RoundButton.vue'
 import anime from 'animejs';
 import { onMounted, ref } from 'vue';
 
 const isMenuOpened = ref(false);
+const isSoundOn = ref(true);
 const menuMode = ref('basic');
-const soundIcon = ref('sound-on');
 const isMoving = ref(false);
 
 const click = () => {
@@ -22,7 +21,7 @@ onMounted(() => {
 
 const toggleSound = () => {
   if(!isMoving.value){
-    soundIcon.value = soundIcon.value === 'sound-on' ? 'sound-off' : 'sound-on';
+    isSoundOn.value = !isSoundOn.value;
     signal.emit("toggle_sound");
   }
 }
@@ -113,13 +112,12 @@ const closeMenu = () => {
 <div class="menu" v-show="isMenuOpened">
   <h1 class="menu-el">Menu</h1>
   <div class="buttons">
-    <CustomButton :disabled="isMoving"  class="menu-el" :click="closeMenu">Resume</CustomButton>
+    <CustomButton :disabled="isMoving" class="menu-el" :click="closeMenu">Resume</CustomButton>
     <CustomButton :disabled="isMoving" class="menu-el" :click="click">Restart</CustomButton>
     <CustomButton :disabled="isMoving" class="menu-el" :click="click">Main menu</CustomButton>
-    <RoundButton :disabled="isMoving" class="menu-el" :icon="soundIcon" :click="toggleSound" />
-    <CustomButton :disabled="isMoving" class="menu-el" :click="click">Crédits</CustomButton>
+    <CustomButton :disabled="isMoving" class="menu-el" :click="toggleSound" :off="!isSoundOn">Sound {{ isSoundOn ? 'On' : 'Off' }}</CustomButton>
+    <CustomButton :disabled="isMoving" class="menu-el" :click="click">Credits</CustomButton>
   </div>
-  <RoundButton :disabled="isMoving" class="menu-el" id="close-menu" :icon="'close'" :click="closeMenu" />
 </div>
 </template>
 
@@ -152,11 +150,16 @@ const closeMenu = () => {
     align-items: center;
     gap: 15px;
   }
+}
 
-  #close-menu {
-    position: absolute;
-    top: 50px;
-    right: 50px;
+@media (max-width: 500px) {
+  .menu {
+
+    h1 {
+      font-size: 80px;
+      line-height: 50px;
+      margin-top: 100px;
+    }
   }
 }
 </style>

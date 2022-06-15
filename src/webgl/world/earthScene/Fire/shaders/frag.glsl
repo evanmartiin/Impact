@@ -1,10 +1,11 @@
-varying vec2 vUv;
-varying vec3 vPosition;
-varying vec3 vNormal;
-
 uniform float uTime;
 uniform vec3 fireColor;
 uniform sampler2D noise;
+uniform float uOpacity;
+
+varying vec2 vUv;
+varying vec3 vPosition;
+varying vec3 vNormal;
 
 void main() {
     vec3 noisetex = texture2D(noise, mod(vUv - uTime / 2000., 1.)).rgb;
@@ -17,4 +18,5 @@ void main() {
     }
 
     gl_FragColor *= vec4(smoothstep(0.3, 0.9, 1. - vUv.y));
+    gl_FragColor.a *= uOpacity;
 }

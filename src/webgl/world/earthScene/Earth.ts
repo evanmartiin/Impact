@@ -2,7 +2,7 @@ import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import Camera from "@/webgl/world/Camera";
 import type Renderer from "@/webgl/Renderer";
-import { Group, MeshBasicMaterial, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, type IUniform, Vector2, Color, type Shader, PlaneBufferGeometry, Vector3, CubeTextureLoader } from "three";
+import { Group, MeshBasicMaterial, Scene, Mesh, Texture, sRGBEncoding, DoubleSide, type IUniform, Vector2, Color, type Shader, PlaneBufferGeometry, Vector3, BoxBufferGeometry, BackSide } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Time from "@/webgl/controllers/Time";
 import Fire from "./Fire/Fire";
@@ -32,11 +32,12 @@ import anime from "animejs";
 import calcPosFromGPS from "@/utils/calcPosFromGPS";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import signal from 'signal-js';
+import Ashes from "./Ashes/Ashes";
 
 export default class Earth {
   private experience: Experience = new Experience();
   public scene: Scene = new Scene();
-  public cameraPos: Vector3 = new Vector3(0, 0, 6);
+  public cameraPos: Vector3 = new Vector3(500, 0, 0);
   private time: Time = this.experience.time as Time;
   public camera: Camera = new Camera(this.cameraPos, this.scene);
   private renderer: Renderer = this.experience.renderer as Renderer;
@@ -71,6 +72,7 @@ export default class Earth {
   public fire: Fire | null = null;
   public ISS: ISS | null = null;
   public stars: Stars | null = null;
+  // public ashes: Ashes | null = null;
   public clouds: Clouds | null = null;
 
   private hoveredDistrict = this.experience.renderer?.hoveredScene;
@@ -109,7 +111,8 @@ export default class Earth {
     this.fire = new Fire(this.scene);
     this.ISS = new ISS(this.scene);
     this.stars = new Stars(this.scene);
-    this.clouds = new Clouds(3, this.scene);
+    // this.ashes = new Ashes(this.scene);
+    this.clouds = new Clouds(6, this.scene);
 
     this.setDebug();
   }
@@ -162,8 +165,7 @@ export default class Earth {
               child.material = wiggleMaterial;
             } else {
               const bakedMaterial = new MeshBasicMaterial({
-                map: this.textures[index],
-                transparent: true,
+                map: this.textures[index]
               });
               child.material = bakedMaterial;
             }
@@ -200,12 +202,22 @@ export default class Earth {
   }
 
   setSkybox() {
-    const loader = new CubeTextureLoader();
-    loader.setPath('textures/skybox/earth/');
-
-    const textureCube = loader.load(['px.jpg', 'px.jpg', 'py.jpg', 'py.jpg', 'px.jpg', 'px.jpg']);
-    textureCube.encoding = sRGBEncoding;
-    this.scene.background = textureCube;
+    const up = this.loaders.items["sky-earth-up"] as Texture;
+    const dn = this.loaders.items["sky-earth-dn"] as Texture;
+    const ft = this.loaders.items["sky-earth-ft"] as Texture;
+    up.encoding = sRGBEncoding;
+    dn.encoding = sRGBEncoding;
+    ft.encoding = sRGBEncoding;
+    const geometry = new BoxBufferGeometry(600, 600, 600);
+    const materialArray = [];
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: up }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: dn }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    const skybox = new Mesh(geometry, materialArray);
+    this.scene.add(skybox);
   }
 
   appear() {
@@ -416,10 +428,10 @@ export default class Earth {
       this.debugTab?.addInput(this.brazierShaderUniforms.uBrazierThreshold, "value", { min: -1.5, max: 2.5, label: "brazier Y" });
       this.debugTab?.addInput(this.brazierShaderUniforms.uBrazierRange, "value", { min: 0, max: 2, label: "brazier range" });
       this.debugTab?.addInput(this.brazierShaderUniforms.uBrazierRandomRatio, "value", { min: 0, max: 20, label: "brazier random" });
-      // const changeSceneBtn = this.debugTab?.addButton({ title: "Change scene" });
-      // changeSceneBtn?.on("click", () => {
-      //   this.experience.renderer?.changeScene(this.experience.world?.districts?.scene as Scene);
-      // })
+      const outroBtn = this.debugTab?.addButton({ title: "Start Outro" });
+      outroBtn?.on("click", () => {
+        signal.emit("outro:start");
+      })
     }
   }
 

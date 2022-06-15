@@ -1,7 +1,7 @@
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import type Time from "@/webgl/controllers/Time";
 import Experience from "@/webgl/Experience";
-import { DoubleSide, Group, Mesh, MeshMatcapMaterial, Vector3, type Scene, type Texture } from "three";
+import { Group, Mesh, MeshMatcapMaterial, Vector3, type Scene, type Texture } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { CloudParams } from "./cloudsSettings";
 import cloudsSettings from "./cloudsSettings";

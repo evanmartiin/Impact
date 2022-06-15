@@ -1,6 +1,6 @@
 const seedGameSettings = {
   // in secondes
-  deltaLumberjackSpawn: 8,
+  deltaLumberjackSpawn: 5,
 
 };
 export default seedGameSettings;

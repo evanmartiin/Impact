@@ -9,6 +9,9 @@ const props = defineProps({
   icon: {
     type: String,
     required: true
+  },
+  disabled: {
+    type: Boolean
   }
 })
 
@@ -18,7 +21,7 @@ const clickSound = () => {
 </script>
 
 <template>
-<button @click="props.click(); clickSound();">
+<button @click="props.click(); clickSound();" :disabled="props.disabled">
   <div class="inner">
     <img :src="'/images/buttons/' + props.icon + '.png'" alt="Icône">
   </div>
@@ -49,6 +52,22 @@ button {
 
     img {
       width: 30px;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  button {
+    width: 50px;
+    height: 50px;
+
+    .inner {
+      width: 40px;
+      height: 40px;
+
+      img {
+        width: 25px;
+      }
     }
   }
 }

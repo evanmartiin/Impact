@@ -47,6 +47,7 @@ export default class Tree {
     this.animate(type);
     this.game.trees.push(this);
     signal.emit("updateLumberjackTarget");
+    this.game.score++;
   }
 
   setMaterials() {
@@ -84,7 +85,7 @@ export default class Tree {
     this.instance?.traverse((child) => {
       if (child instanceof Mesh && this.texture) {
         if (Array.isArray(child.material)) {
-          child.material.map((m) => {
+          child.material.forEach((m) => {
             m = this.material;
           });
         } else {
@@ -106,6 +107,22 @@ export default class Tree {
       z: treeSettings[type].scale,
       easing: "easeOutElastic(.5, .5)",
       duration: 700,
+    });
+  }
+
+  destroy() {
+    this.instance?.traverse((child) => {
+      if (child instanceof Mesh && this.texture) {
+        if (Array.isArray(child.material)) {
+          child.material.forEach((m) => {
+            m = this.material;
+          });
+        } else {
+          child.material = this.material;
+        }
+        child.geometry.dispose();
+      }
+      this.scene?.remove(this.instance as Group);
     });
   }
 }

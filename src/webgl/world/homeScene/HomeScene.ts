@@ -1,3 +1,4 @@
+import signal from "signal-js";
 import type Time from "@/webgl/controllers/Time";
 import Billy from "./Billy/Billy";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
@@ -11,8 +12,10 @@ import {
   Texture,
   sRGBEncoding,
   Mesh,
-  CubeTextureLoader,
   type IUniform,
+  BoxBufferGeometry,
+  MeshBasicMaterial,
+  BackSide,
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
@@ -26,10 +29,12 @@ import Plane from "./Plane/Plane";
 import wiggleVertex from "./Shaders/wiggle/vertex.glsl?raw";
 import wiggleFragment from "./Shaders/wiggle/fragment.glsl?raw";
 import Clouds from "./Clouds/Clouds";
+import type World from "../World";
 
 export default class HomeScene {
   private experience: Experience = new Experience();
   private loaders: Loaders = this.experience.loaders as Loaders;
+  private world: World = this.experience.world as World;
   private debugTab: FolderApi | undefined = undefined;
   private debug: Debug = this.experience.debug as Debug;
   private time: Time = this.experience.time as Time;
@@ -47,8 +52,9 @@ export default class HomeScene {
   private plane: Plane | null = null;
   private clouds: Clouds | null = null;
 
+
   private wiggleShaderUniforms: { [uniform: string]: IUniform<any> } = {
-    uWiggleRatio: { value: .2 },
+    uWiggleRatio: { value: 0.2 },
   };
 
   constructor() {
@@ -120,15 +126,22 @@ export default class HomeScene {
   }
 
   setSkybox() {
-    const loader = new CubeTextureLoader();
-    loader.setPath("textures/skybox/home/");
-    loader.load(
-      ["px.jpg", "px.jpg", "py.jpg", "ny.jpg", "px.jpg", "px.jpg"],
-      (textureCube) => {
-        textureCube.encoding = sRGBEncoding;
-        this.scene.background = textureCube;
-      }
-    );
+    const up = this.loaders.items["sky-home-up"] as Texture;
+    const dn = this.loaders.items["sky-home-dn"] as Texture;
+    const ft = this.loaders.items["sky-home-ft"] as Texture;
+    up.encoding = sRGBEncoding;
+    dn.encoding = sRGBEncoding;
+    ft.encoding = sRGBEncoding;
+    const geometry = new BoxBufferGeometry(100, 100, 100);
+    const materialArray = [];
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: up }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: dn }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    const skybox = new Mesh(geometry, materialArray);
+    this.scene.add(skybox);
   }
 
   update() {
@@ -190,7 +203,7 @@ export default class HomeScene {
     debugTab2?.addInput(this.wiggleShaderUniforms.uWiggleRatio, "value", {
       min: 0,
       max: 3,
-      label: "Ratio"
+      label: "Ratio",
     });
   }
 }

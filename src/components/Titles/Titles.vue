@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import signal from 'signal-js';
-import CustomButton from '@/components/CustomButton.vue'
 import anime from 'animejs';
 import { onMounted, ref } from 'vue';
 import { splitLetters } from 'textsplitter';
@@ -30,18 +29,16 @@ onMounted(() => {
 const subtitlesOn = () => {
   isSubtitlesOn.value = true;
 
+  startTimeline();
   const tl = anime.timeline({});
   tl.add(
     {
-      targets: '.subtitles-el',
+      targets: '.subtitles button',
       opacity: [0, 1],
       translateY: [100, 0],
       duration: 500,
-      delay: anime.stagger(50),
-      easing: 'easeOutBack',
-      complete: () => {
-        startTimeline();
-      }
+      delay: 1000,
+      easing: 'easeOutBack'
     },
     0
   );
@@ -140,7 +137,7 @@ const subtitlesOff = () => {
   position: absolute;
   width: 80vw;
   height: 100px;
-  bottom: 5vw;
+  bottom: 3vw;
   left: 10vw;
   display: flex;
   flex-direction: column;
@@ -176,6 +173,18 @@ const subtitlesOff = () => {
 
     &:hover:after {
       width: 90%;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .subtitles {
+    button {
+      bottom: 17vh;
+
+      &:after {
+        width: 90%;
+      }
     }
   }
 }

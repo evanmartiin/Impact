@@ -5,6 +5,7 @@ import type { FolderApi } from "tweakpane";
 import vert from './shaders/vert.glsl?raw'
 import frag from './shaders/frag.glsl?raw'
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
+import anime from "animejs";
 
 export default class Fire {
   private experience: Experience = new Experience();
@@ -34,7 +35,8 @@ export default class Fire {
         smoothness: { value: 5. },
         fireColor: { value: new Color('#ff8a1e') },
         perlinnoise: { value: new TextureLoader().load("https://raw.githubusercontent.com/pizza3/asset/master/water-min.jpg") },
-        noise: { value: new TextureLoader().load("https://raw.githubusercontent.com/pizza3/asset/master/noise9.jpg") }
+        noise: { value: new TextureLoader().load("https://raw.githubusercontent.com/pizza3/asset/master/noise9.jpg") },
+        uOpacity: { value: 1 }
       },
       vertexShader: vert,
       fragmentShader: frag,
@@ -45,6 +47,21 @@ export default class Fire {
     });
     this.mesh = new Mesh(this.geometry, this.material);
     this.mesh.position.set(0, 3, 0);
+  }
+
+  turnOn() {
+    this.setMesh();
+    this.scene?.add(this.mesh as Mesh);
+    this.isToggled = true;
+    const tl = anime.timeline({});
+    tl.add(
+      {
+        targets: this.material?.uniforms.uOpacity,
+        value: [0, 1],
+        duration: 5000
+      },
+      0
+    )
   }
 
   setDebug() {
