@@ -128,7 +128,7 @@ export default class Renderer {
             .intersectObjects(
               this.experience.world.earthScene.earthGroup.children
             )
-            .map((object) => {
+            .forEach((object) => {
               this.intersects.push(object);
             });
 
@@ -150,11 +150,11 @@ export default class Renderer {
         case "maison":
           let toRaycast: Object3D[] = [];
           if (this.experience.world.homeScene?.instance) {
-            this.experience.world.homeScene?.instance?.children.map((object) =>
+            this.experience.world.homeScene?.instance?.children.forEach((object) =>
               toRaycast.push(object)
             );
 
-            this.raycaster.intersectObjects(toRaycast).map((object) => {
+            this.raycaster.intersectObjects(toRaycast).forEach((object) => {
               this.intersects.push(object);
             });
           }

@@ -29,21 +29,21 @@ import type Debug from "@/webgl/controllers/Debug";
 import type Time from "@/webgl/controllers/Time";
 import type IAnimation from "@/models/animation";
 import type { FolderApi } from "tweakpane";
-import { MeshBVH, MeshBVHVisualizer } from "three-mesh-bvh";
-import physicSettings from "../Controllers/Physic/PhysicSettings";
 
-type TLumberjackAction = "walkToTree" | "cuting" | "idle";
+type TLumberjackAction = "walkToTree" | "cuting" | "idle" | "dance";
 type TAnimationName =
   | "cut"
   | "dance"
   | "fail"
   | "hit"
+  | "idle"
   | "rage cut"
   | "taunt"
   | "walk";
 
 export default class Lumberjack {
-  private lumberjacks: Lumberjack[] = [];
+  private id = -1;
+  static lastID = -1;
   private experience: Experience = new Experience();
   private loaders: Loaders = this.experience.loaders as Loaders;
   protected time: Time = this.experience.time as Time;
@@ -54,6 +54,7 @@ export default class Lumberjack {
   private hitDirection: Vector3 | null = null;
 
   private game: SeedGame = new SeedGame();
+  private lumberjacks: Lumberjack[] = this.game.lumberjacks;
   static physicCtrl: PhysicCtrl | null = null;
   private controls: OrbitControls | null = null;
   private geometry: BoxGeometry | null = null;
@@ -77,11 +78,13 @@ export default class Lumberjack {
   private lftPressed = false;
   private rgtPressed = false;
   private targetedTree: Tree | null = null;
+  private isTargetingDangerZone = false;
   private moveDirection: Vector3 | null = null;
+  private endVector: Vector3 = new Vector3(0, 0, 0);
   private action: TLumberjackAction = "idle";
   static gltf: GLTF | null = null;
   private model: Group | null = null;
-  private currentAnim: TAnimationName = "walk";
+  private currentAnim: TAnimationName = "idle";
   private animation: IAnimation = {
     mixer: null,
     actions: {},
@@ -89,6 +92,7 @@ export default class Lumberjack {
   };
 
   constructor(scene: Scene, camera: Camera) {
+    this.setID();
     this.lumberjacks.push(this);
     if (!Lumberjack.physicCtrl) Lumberjack.physicCtrl = new PhysicCtrl(scene);
     this.floor = Lumberjack.physicCtrl.floorMesh;
@@ -98,34 +102,55 @@ export default class Lumberjack {
     this.set();
     this.setAnimation();
     this.setAction("idle");
+    this.getNearestTree();
     signal.on("updateLumberjackTarget", () => this.getNearestTree());
   }
 
+  setID() {
+    this.id = Lumberjack.lastID + 1;
+    Lumberjack.lastID = this.id;
+  }
+
   getNearestTree() {
-    if (!this.targetedTree && this.game.trees.length > 0) {
-      let nearestTree: Tree | null = null;
-      let minDistance: number | null = null;
-      this.game.trees.map((t) => {
+    console.log("check");
+    if (this.action === "cuting") {
+      return;
+    }
+    if (this.targetedTree != null) return;
+
+    let nearestTree: Tree | null = null;
+    let minDistance: number | null = null;
+    this.game.trees.forEach((t) => {
+      if (t.isTargeted) return;
+      if (
+        t.instance &&
+        this.instance &&
+        t.instance?.position.z < this.instance?.position.z
+      ) {
         let tempDis = (t.instance as Group).position.distanceTo(
           this.instance?.position as Vector3
         );
-        if (!t.isTargeted) {
-          if (minDistance === null) {
-            minDistance = tempDis;
-            nearestTree = t;
-          } else if (tempDis < minDistance) {
-            minDistance = tempDis;
-            nearestTree = t;
-          }
+        if (minDistance === null) {
+          minDistance = tempDis;
+          nearestTree = t;
+        } else if (tempDis < minDistance) {
+          minDistance = tempDis;
+          nearestTree = t;
         }
-      });
-      if (nearestTree) {
-        (nearestTree as Tree).isTargeted = true;
-        this.targetedTree = nearestTree;
-        this.setAction("walkToTree");
       }
+    });
+
+    if (nearestTree) {
+      (nearestTree as Tree).isTargeted = true;
+      this.targetedTree = nearestTree;
+      this.setAction("walkToTree");
+      console.log("target tree");
+      this.isTargetingDangerZone = false;
+    } else {
+      this.isTargetingDangerZone = true;
+      console.log("target danger zone");
+      this.setAction("walkToTree");
     }
-    // this.getTreeDirection();
   }
 
   getTreeDirection() {
@@ -135,19 +160,14 @@ export default class Lumberjack {
         .subVectors(this.instance.position, this.targetedTree.instance.position)
         .normalize()
         .setLength(0.2);
-    const origin = this.instance?.position;
-    const length = 0.2;
-    const hex = 0xff0000;
-    const arrowHelper = new ArrowHelper(newDirection, origin, length, hex);
-    this.scene?.add(arrowHelper);
+    // const origin = this.instance?.position;
+    // const length = 0.2;
+    // const hex = 0xff0000;
+    // const arrowHelper = new ArrowHelper(newDirection, origin, length, hex);
+    // this.scene?.add(arrowHelper);
     this.moveDirection = newDirection;
   }
 
-  setDebug() {
-    this.debugFolder = this.debug.ui?.pages[2].addFolder({
-      title: "Character",
-    });
-  }
   setAnimation() {
     this.animation.mixer = new AnimationMixer(this.instance as Group);
 
@@ -187,23 +207,13 @@ export default class Lumberjack {
       this.animation.play = (name) => {
         const newAction = this.animation.actions[name];
         const oldAction = this.animation.actions.current;
-        newAction.reset();
-        newAction.play();
-        newAction.crossFadeFrom(oldAction, 1, false);
-        this.animation.actions.current = newAction;
+        if (newAction != oldAction) {
+          newAction.reset();
+          newAction.play();
+          newAction.crossFadeFrom(oldAction, 1, false);
+          this.animation.actions.current = newAction;
+        }
       };
-    }
-
-    // Debug
-    if (this.debug.active) {
-      const playCut = this.debugFolder?.addButton({
-        title: "Cut",
-      });
-      const playWalk = this.debugFolder?.addButton({
-        title: "Play walk",
-      });
-      playCut?.on("click", () => this.setAnim("cut"));
-      playWalk?.on("click", () => this.setAnim("walk"));
     }
   }
 
@@ -217,25 +227,19 @@ export default class Lumberjack {
   setAction(action: TLumberjackAction) {
     switch (action) {
       case "idle":
-        this.setColor(0x00ffff);
+        this.setAnim("idle");
         break;
       case "walkToTree":
-        this.setColor(0xffff00);
+        this.setAnim("walk");
+        break;
         break;
       case "cuting":
-        this.setColor(0xff0000);
+        this.setAnim("cut");
+        break;
+      case "dance":
+        this.setAnim("dance");
         break;
     }
-  }
-
-  setColor(color: number) {
-    // if (Array.isArray(this.instance?.material)) {
-    //   this.instance?.material.map((m) => {
-    //     (m as MeshBasicMaterial).color.setHex(color);
-    //   });
-    // } else {
-    //   (this.instance?.material as MeshBasicMaterial).color.setHex(color);
-    // }
   }
 
   set() {
@@ -245,8 +249,11 @@ export default class Lumberjack {
         this.geometry = new BoxGeometry(0.08, 0.12, 0.08);
       if (!Lumberjack.material)
         Lumberjack.material = new MeshBasicMaterial({
-          color: 0x00ff,
-          wireframe: true,
+          color: 0xffffff,
+          wireframe: false,
+          transparent: true,
+          opacity: 0,
+          depthWrite: false,
         });
 
       if (!Lumberjack.gltf) {
@@ -259,8 +266,8 @@ export default class Lumberjack {
         this.instance?.position.copy(lamberjackSettings.basePosition);
         this.instance.rotation.y += Math.PI;
         this.instance.scale.setScalar(0.5);
-        const skeletonHelper = new SkeletonHelper(this.instance);
-        this.scene?.add(skeletonHelper);
+        // const skeletonHelper = new SkeletonHelper(this.instance);
+        // this.scene?.add(skeletonHelper);
         if (this.geometry) {
           this.hitboxGeometry = new Mesh(this.geometry, Lumberjack.material);
           this.hitboxGeometry?.geometry.computeBoundingBox();
@@ -281,7 +288,7 @@ export default class Lumberjack {
         this.instance.position.x -= getRandomFloatBetween(0, 0.1, 2);
       }
       (this.instance as any).capsuleInfo = {
-        radius: 0.08,
+        radius: 0.06,
         floorDistance: 0.01,
         segment: new Line3(new Vector3(), new Vector3(0, 0.02, 0.0)),
       };
@@ -341,11 +348,17 @@ export default class Lumberjack {
   }
 
   update(delta: number) {
+    if (
+      this.instance &&
+      this.instance?.position.distanceTo(this.endVector) < 0.27
+    ) {
+      signal.emit("game:end");
+    }
     this.hitbox
       .copy(this.hitboxGeometry?.geometry.boundingBox as Box3)
       .applyMatrix4(this.hitboxGeometry?.matrixWorld as Matrix4);
 
-    this.animation.mixer?.update(this.time.delta * 0.001);
+    this.animation.mixer?.update(this.time.delta * 0.0005);
 
     this.playerVelocity.y += this.playerIsOnGround
       ? 0
@@ -354,14 +367,19 @@ export default class Lumberjack {
 
     const angle = this.controls?.getAzimuthalAngle() || 0;
 
-    const offsetMove = lamberjackSettings.speed * delta * 0.01;
-    if (this.targetedTree && this.instance && this.targetedTree.instance) {
-      if (
-        this.instance?.position.distanceTo(
-          this.targetedTree?.instance?.position
-        ) >
-        lamberjackSettings.maxDistanceBetweenLJAndTree * 0.0001
-      ) {
+    let offsetMove = lamberjackSettings.speed * delta * 0.01;
+    if (this.game.isGameEnded) {
+      offsetMove = 0;
+    }
+
+    // if (
+    //   this.targetedTree?.instance &&
+    //   this.instance &&
+    //   this.instance.position.distanceTo(this.targetedTree.instance.position) >
+    //     lamberjackSettings.maxDistanceBetweenLJAndTree * 0.001
+    // ) {
+    if (!this.isTargetingDangerZone) {
+      if (this.targetedTree && this.instance && this.targetedTree.instance) {
         if (
           this.instance?.position.x > this.targetedTree?.instance?.position.x
         ) {
@@ -383,10 +401,31 @@ export default class Lumberjack {
         ) {
           this.instance.position.z += offsetMove;
         }
-      } else {
-        this.setAction("cuting");
+      }
+    } else {
+      if (this.instance) {
+        if (this.instance?.position.x > 0) {
+          this.instance.position.x -= offsetMove;
+        }
+        if (this.instance?.position.x < 0) {
+          this.instance.position.x += offsetMove;
+        }
+
+        if (this.instance?.position.z > 0) {
+          this.instance.position.z -= offsetMove;
+        }
+        if (this.instance?.position.z < 0) {
+          this.instance.position.z += offsetMove;
+        }
       }
     }
+    // }
+    // else {
+    //   if (this.action != "cuting") {
+    //     this.action = "cuting";
+    //     this.setAction("cuting");
+    //   }
+    // }
 
     if (this.fwdPressed) {
       this.tempVector.set(0, 0, -0.2).applyAxisAngle(this.upVector, angle);
@@ -420,7 +459,6 @@ export default class Lumberjack {
       );
     }
     if (this.alreadyHit && this.hitDirection) {
-      console.log(this.hitDirection.length());
       this.hitDirection.setLength(this.hitDirection.length() + 0.2);
       this.instance?.position.add(this.hitDirection?.multiplyScalar(0.01));
     }
@@ -471,7 +509,7 @@ export default class Lumberjack {
         }
       },
     });
-    this.colliders.map((c) => {
+    this.colliders.forEach((c) => {
       c.collider.geometry.boundsTree!.shapecast({
         intersectsBounds: (box) => {
           return box.intersectsBox(this.tempBox);
@@ -549,7 +587,6 @@ export default class Lumberjack {
 
   setSeedHit(position: Vector3, seedDirection: Vector3) {
     this.hitDirection = seedDirection;
-    console.log("hittt");
 
     this.alreadyHit = true;
 
@@ -558,16 +595,31 @@ export default class Lumberjack {
       this.targetedTree = null;
     }
     this.instance?.position.add(this.hitDirection.multiplyScalar(1));
-    // const deltaVec = new Vector3();
-    // if (this.instance) {
-    //   deltaVec.subVectors(this.instance?.position, position).normalize();
-    //   this.instance?.position.copy(position);
-    // }
   }
 
   resetPos() {
     this.playerVelocity.set(0, 0, 0);
     this.instance?.position.copy(lamberjackSettings.basePosition);
   }
-  destroyOneLumberjack() {}
+  destroyOneLumberjack() {
+    this.instance?.traverse((child) => {
+      if (child instanceof Mesh) {
+        if (Array.isArray(child.material)) {
+          child.material.forEach((m) => {
+            m.dispose();
+          });
+        } else {
+          child.material.dispose();
+        }
+        child.geometry.dispose();
+      }
+    });
+    this.lumberjacks.forEach((l, index) => {
+      if (l.id == this.id) {
+        this.scene?.remove(this.instance as Group);
+        this.lumberjacks.splice(index, 1);
+        signal.off("updateLumberjackTarget", () => this.getNearestTree());
+      }
+    });
+  }
 }

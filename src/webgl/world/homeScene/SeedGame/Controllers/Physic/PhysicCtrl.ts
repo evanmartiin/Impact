@@ -80,7 +80,7 @@ export default class PhysicCtrl {
   }
 
   setBVHVisibility(state: boolean) {
-    this.visualizers.map((v) => {
+    this.visualizers.forEach((v) => {
       v.visualizer.visible = state;
     });
   }

@@ -68,7 +68,7 @@ export default class Seed {
     this.model?.scene.traverse((child) => {
       if (child instanceof Mesh && this.texture) {
         if (Array.isArray(child.material)) {
-          child.material.map((m) => {
+          child.material.forEach((m) => {
             m = this.material;
           });
         } else {
@@ -343,7 +343,7 @@ export default class Seed {
       scale = 1.0 - Math.pow(1.0 - scale, 2);
       hit.scale.setScalar(scale * (hit as any).maxScale);
       if (Array.isArray(hit.material)) {
-        hit.material.map((m) => {
+        hit.material.forEach((m) => {
           m.opacity = 1.0 - Math.sin((ratio * 2 * Math.PI) / 4);
         });
       } else {
@@ -355,7 +355,7 @@ export default class Seed {
         (hit as any).parent.remove(hit);
         hit.geometry.dispose();
         if (Array.isArray(hit.material)) {
-          hit.material.map((m) => {
+          hit.material.forEach((m) => {
             m.dispose();
           });
         } else {
