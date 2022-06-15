@@ -127,7 +127,6 @@ export default class SeedGame {
     this.dangertZone = new Mesh(this.dangertZoneGeo, this.dangertZoneMat);
     this.dangertZone.position.y = 0.009;
     this.dangertZone.rotation.x = Math.PI / 2;
-    console.log("initttt");
     this.scene?.add(this.dangertZone);
   }
 
@@ -390,25 +389,25 @@ export default class SeedGame {
     this.setLumberjackDebug();
     this.debugTab = this.debug.ui?.pages[2].addFolder({ title: "Game board" });
 
-    const freeMode = this.debugTab?.addButton({
-      title: "Free mode",
-    }) as ButtonApi;
+    // const freeMode = this.debugTab?.addButton({
+    //   title: "Free mode",
+    // }) as ButtonApi;
 
-    freeMode.on("click", () => {
-      if (this.world) {
-        this.world.PARAMS.isCtrlActive = true;
-      }
-      if (this.experience.world?.controls)
-        this.experience.world.controls.enabled = true;
-      setTimeout(() => {
-        signal.emit("close_menu");
-        if (this.world) {
-          this.world.PARAMS.isCtrlActive = true;
-        }
-        if (this.experience.world?.controls)
-          this.experience.world.controls.enabled = true;
-      }, 2000);
-    });
+    // freeMode.on("click", () => {
+    //   if (this.world) {
+    //     this.world.PARAMS.isCtrlActive = true;
+    //   }
+    //   if (this.experience.world?.controls)
+    //     this.experience.world.controls.enabled = true;
+    //   setTimeout(() => {
+    //     signal.emit("close_menu");
+    //     if (this.world) {
+    //       this.world.PARAMS.isCtrlActive = true;
+    //     }
+    //     if (this.experience.world?.controls)
+    //       this.experience.world.controls.enabled = true;
+    //   }, 2000);
+    // });
 
     // const stopButton = this.debugTab?.addButton({
     //   title: "Stop Game",
