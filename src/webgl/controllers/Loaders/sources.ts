@@ -262,6 +262,44 @@ const Sources: ISource[] = [
     type: "texture",
     path: "/textures/matcap-plane.png",
   },
+  // CENDRE
+  {
+    name: "ash-texture",
+    type: "texture",
+    path: "/textures/ash.png",
+  },
+  // SKYBOX HOME
+  {
+    name: "sky-home-dn",
+    type: "texture",
+    path: "/textures/skybox/home/dn.jpg",
+  },
+  {
+    name: "sky-home-up",
+    type: "texture",
+    path: "/textures/skybox/home/up.jpg",
+  },
+  {
+    name: "sky-home-ft",
+    type: "texture",
+    path: "/textures/skybox/home/ft.jpg",
+  },
+  // SKYBOX EARTH
+  {
+    name: "sky-earth-dn",
+    type: "texture",
+    path: "/textures/skybox/earth/dn.jpg",
+  },
+  {
+    name: "sky-earth-up",
+    type: "texture",
+    path: "/textures/skybox/earth/up.jpg",
+  },
+  {
+    name: "sky-earth-ft",
+    type: "texture",
+    path: "/textures/skybox/earth/ft.jpg",
+  },
 ];
 
 export default Sources;

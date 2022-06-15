@@ -6,8 +6,8 @@ import {
   Spherical,
   Object3D,
   CatmullRomCurve3,
-  MeshNormalMaterial,
-  Mesh,
+  Scene,
+  Camera,
 } from "three";
 import signal from "signal-js";
 import type Sizes from "../../../controllers/Sizes";
@@ -18,6 +18,10 @@ export default class Intro {
   private experience: Experience = new Experience();
   private time: Time = this.experience.time as Time;
   private sizes: Sizes = this.experience.sizes as Sizes;
+
+  private scene: Scene = this.experience.world?.homeScene?.scene as Scene;
+  private camera: Camera = this.experience.world?.homeScene?.camera
+    .instance as Camera;
 
   private geometry: TubeGeometry | null = null;
   private position: Vector3 = new Vector3();
@@ -36,9 +40,9 @@ export default class Intro {
 
   setCamera() {
     const { x, y, z } = introSettings.pipeSpline[0];
-    if (this.experience.activeCamera?.instance) {
-      this.experience.activeCamera.instance.position.set(x, y, z);
-      this.experience.activeCamera.instance.lookAt(0, 500, 0);
+    if (this.camera) {
+      this.camera.position.set(x, y, z);
+      this.camera.lookAt(0, 500, 0);
 
       const dummy = new Object3D();
       dummy.position.set(x, y, z);
@@ -56,13 +60,13 @@ export default class Intro {
           duration: 5000,
           easing: "easeOutExpo",
           change: () => {
-            this.experience.activeCamera?.instance?.lookAt(0, targetY.value, 0);
+            this.camera.lookAt(0, targetY.value, 0);
           },
           complete: () => {
             signal.emit("camera_ready");
             this.verifCam = true;
             this.nextCamPos =
-              this.experience.activeCamera?.instance?.position.clone() as Vector3;
+              this.camera.position.clone() as Vector3;
             this.handleMouse();
           },
         },
@@ -75,7 +79,7 @@ export default class Intro {
     signal.on("mouse_move", () => {
       if (
         this.experience.mouse &&
-        this.experience.activeCamera?.instance &&
+        this.camera &&
         this.baseCameraSpherical
       ) {
         const shift = {
@@ -83,7 +87,7 @@ export default class Intro {
           y: (-this.experience.mouse.yCenterBase / this.sizes.height) * 0.03,
         };
         const spherical = new Spherical().setFromVector3(
-          this.experience.activeCamera.instance.position
+          this.camera.position
         );
         spherical.phi = this.baseCameraSpherical.phi + shift.y;
         spherical.theta = this.baseCameraSpherical.theta + shift.x;
@@ -97,7 +101,7 @@ export default class Intro {
     this.verifCam = false;
 
     const points = [
-      this.experience.activeCamera?.instance?.position.clone() as Vector3,
+      this.camera.position.clone() as Vector3,
       ...introSettings.pipeSpline.slice(1),
     ];
 
@@ -119,6 +123,8 @@ export default class Intro {
     this.isIntroRunning = false;
     this.experience.world?.setControls();
     this.experience.world?.controls?.target.set(0, 0, 0);
+    // FIXME: uncomment
+
     signal.off("mouse_move");
     this.verifCam = false;
   }
@@ -133,13 +139,13 @@ export default class Intro {
       if (t <= 1) {
         this.geometry?.parameters.path.getPointAt(easeInOut, this.position);
         const { x, y, z } = this.position;
-        this.experience.activeCamera?.instance?.position.set(x, y, z);
-        this.experience.activeCamera?.instance?.lookAt(
+        this.camera.position.set(x, y, z);
+        this.camera.lookAt(
           0,
           0.1 - easeInOut / 10,
           0
         );
-        this.experience.activeCamera?.instance?.rotateZ(
+        this.camera.rotateZ(
           Math.PI * easeBounce * easeInOut
         );
       } else {
@@ -148,18 +154,18 @@ export default class Intro {
     }
 
     const distance =
-      this.experience.activeCamera?.instance?.position.distanceTo(
+      this.camera.position.distanceTo(
         this.nextCamPos
       ) as number;
     if (distance > 0.001 && this.verifCam) {
-      const { x, y, z } = this.experience.activeCamera?.instance
+      const { x, y, z } = this.camera
         ?.position as Vector3;
-      this.experience.activeCamera?.instance?.position.set(
+      this.camera.position.set(
         x + (this.nextCamPos.x - x) * 0.1,
         y + (this.nextCamPos.y - y) * 0.1,
         z + (this.nextCamPos.z - z) * 0.1
       );
-      this.experience.activeCamera?.instance?.lookAt(0, 0.1, 0);
+      this.camera.lookAt(0, 0.1, 0);
     }
   }
 }

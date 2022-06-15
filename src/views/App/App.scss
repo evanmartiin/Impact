@@ -108,7 +108,7 @@ select {
 button,
 a,
 a *,
-button * {
+button *, button, input:not(:disabled) {
   cursor: $cursor 5 5, auto;
   &:hover {
     cursor: $pointer 5 5, pointer;
@@ -177,7 +177,7 @@ main,
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    gap: 50vh;
+    gap: 55vh;
 
     .text {
       display: flex;
@@ -278,4 +278,44 @@ main,
   position: absolute;
   top: 50px;
   right: 50px;
+  z-index: 1;
+}
+
+@media (max-width: 500px) {
+  #menu-button {
+    top: 30px;
+    right: 30px;
+  }
+
+  #intro {
+    .content {
+      gap: 45vh;
+
+      .text {
+        .logo {
+          .impact-logo {
+            height: 50px;
+            margin: 0 1px;
+
+            &.letter-A {
+              margin: 0 -8px 0 -14px;
+            }
+          }
+        }
+
+        h2 {
+          font-size: 18px;
+          margin-top: 5px;
+          width: 90vw;
+          text-align: center;
+        }
+      }
+
+      #start-button {
+        &:after {
+          width: 90%;
+        }
+      }
+    }
+  }
 }

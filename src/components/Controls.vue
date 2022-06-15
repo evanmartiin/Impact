@@ -118,4 +118,17 @@ const closeControls = () => {
     width: 200px;
   }
 }
+
+@media (max-width: 500px) {
+  .controls {
+    h1 {
+      font-size: 30px;
+      width: 80vw;
+    }
+
+    img {
+      width: 150px;
+    }
+  }
+}
 </style>

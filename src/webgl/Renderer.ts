@@ -23,7 +23,6 @@ import anime from "animejs";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
-import Ashes from "./world/entities/Ashes/Ashes";
 import signal from 'signal-js';
 
 export default class Renderer {

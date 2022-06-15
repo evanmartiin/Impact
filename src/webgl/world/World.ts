@@ -1,6 +1,6 @@
 import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
-import { AmbientLight, AxesHelper, CatmullRomCurve3, DirectionalLight, HemisphereLight, Mesh, MeshBasicMaterial, MeshNormalMaterial, Object3D, PerspectiveCamera, TubeGeometry, Vector3, type Scene } from "three";
+import { AxesHelper, type Scene } from "three";
 import type { FolderApi } from "tweakpane";
 import type { district } from "./../../models/district.model";
 import Earth from "./earthScene/Earth";
@@ -14,6 +14,7 @@ import GrandmaScene from "./grandmaScene/grandmaScene";
 import signal from 'signal-js';
 import type Loaders from "../controllers/Loaders/Loaders";
 import Intro from "./homeScene/Intro/Intro";
+import Outro from "./earthScene/Outro/Outro";
 
 export default class World {
   private experience: Experience = new Experience();
@@ -35,6 +36,7 @@ export default class World {
     "isCtrlActive": true
   }
   private intro: Intro | null = null;
+  private outro: Outro | null = null;
 
   constructor() {
     signal.on("loaders_ready", () => {
@@ -71,15 +73,15 @@ export default class World {
         this.changeScene(name);
       })
 
-      this.setLight();
       // this.setAxis();
       this.setIntro();
+      this.setOutro();
       this.setDebug();
     });
   }
 
   setAxis() {
-    const axesHelper = new AxesHelper(1.4);
+    const axesHelper = new AxesHelper(1);
     this.experience.activeScene?.add(axesHelper);
   }
 
@@ -87,10 +89,15 @@ export default class World {
     this.intro = new Intro();
   }
 
+  setOutro() {
+    this.outro = new Outro();
+  }
+
   update() {
     this.earthScene?.update();
     this.homeScene?.update();
     this.intro?.update();
+    this.outro?.update();
     if (this.PARAMS.isCtrlActive) this.controls?.update();
   }
 
@@ -108,12 +115,6 @@ export default class World {
     this.controls?.addEventListener("change", () => {
       this.earthScene?.updateRelatedToCamera();
     });
-  }
-
-  setLight() {
-    const sunLight = new HemisphereLight("#ffffff", "#555555", 1);
-    sunLight.position.set(10, 0, 10);
-    this.experience.activeScene?.add(sunLight);
   }
 
   changeScene(name: district) {

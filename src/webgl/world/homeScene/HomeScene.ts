@@ -12,12 +12,10 @@ import {
   Texture,
   sRGBEncoding,
   Mesh,
-  CubeTextureLoader,
   type IUniform,
+  BoxBufferGeometry,
   MeshBasicMaterial,
-  DoubleSide,
-  LineDashedMaterial,
-  RingGeometry,
+  BackSide,
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { FolderApi, ButtonApi } from "tweakpane";
@@ -128,15 +126,22 @@ export default class HomeScene {
   }
 
   setSkybox() {
-    const loader = new CubeTextureLoader();
-    loader.setPath("textures/skybox/home/");
-    loader.load(
-      ["px.jpg", "px.jpg", "py.jpg", "ny.jpg", "px.jpg", "px.jpg"],
-      (textureCube) => {
-        textureCube.encoding = sRGBEncoding;
-        this.scene.background = textureCube;
-      }
-    );
+    const up = this.loaders.items["sky-home-up"] as Texture;
+    const dn = this.loaders.items["sky-home-dn"] as Texture;
+    const ft = this.loaders.items["sky-home-ft"] as Texture;
+    up.encoding = sRGBEncoding;
+    dn.encoding = sRGBEncoding;
+    ft.encoding = sRGBEncoding;
+    const geometry = new BoxBufferGeometry(100, 100, 100);
+    const materialArray = [];
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: up }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: dn }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    materialArray.push(new MeshBasicMaterial({ side: BackSide, map: ft }));
+    const skybox = new Mesh(geometry, materialArray);
+    this.scene.add(skybox);
   }
 
   update() {
