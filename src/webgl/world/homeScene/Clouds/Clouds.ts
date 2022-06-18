@@ -1,7 +1,14 @@
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import type Time from "@/webgl/controllers/Time";
 import Experience from "@/webgl/Experience";
-import { Group, Mesh, MeshMatcapMaterial, Vector3, type Scene, type Texture } from "three";
+import {
+  Group,
+  Mesh,
+  MeshMatcapMaterial,
+  Vector3,
+  type Scene,
+  type Texture,
+} from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type { CloudParams } from "./cloudsSettings";
 import cloudsSettings from "./cloudsSettings";
@@ -22,15 +29,18 @@ export default class Clouds {
   }
 
   setMeshes() {
-    this.model = this.loaders.items["cloud-model"] as GLTF;
+    this.model = this.loaders.items["common:cloud-model"] as GLTF;
     this.model.scene.traverse((child) => {
       if (child instanceof Mesh) {
         const matcap = this.loaders.items["plane-texture"] as Texture;
-        const material = new MeshMatcapMaterial({ matcap: matcap, color: 0xcff0ff });
+        const material = new MeshMatcapMaterial({
+          matcap: matcap,
+          color: 0xcff0ff,
+        });
         child.material = material;
         this.differentClouds.push(child);
       }
-    })
+    });
 
     cloudsSettings.forEach((cloudParams: CloudParams) => {
       const cloud = this.differentClouds[cloudParams.type].clone();
@@ -42,8 +52,8 @@ export default class Clouds {
       cloudParams.rotateZ = cloud.rotation.z;
       cloud.name = cloudParams.name;
       this.sceneClouds.add(cloud);
-    })
-    
+    });
+
     this.scene?.add(this.sceneClouds);
   }
 
@@ -52,16 +62,26 @@ export default class Clouds {
       if (child instanceof Mesh) {
         const params = cloudsSettings.find((el) => el.name === child.name);
         if (params) {
-          child.position.x = params.pos.x + Math.sin(this.time.elapsed * .001 * params.speed) * .005;
-          child.position.y = params.pos.y + Math.sin(this.time.elapsed * .001 * params.speed) * .005;
-          child.position.z = params.pos.z + Math.cos(this.time.elapsed * .001 * params.speed) * .005;
+          child.position.x =
+            params.pos.x +
+            Math.sin(this.time.elapsed * 0.001 * params.speed) * 0.005;
+          child.position.y =
+            params.pos.y +
+            Math.sin(this.time.elapsed * 0.001 * params.speed) * 0.005;
+          child.position.z =
+            params.pos.z +
+            Math.cos(this.time.elapsed * 0.001 * params.speed) * 0.005;
 
-          const rotateY = params.rotateY + Math.cos(this.time.elapsed * .001 * params.speed) * .05;
+          const rotateY =
+            params.rotateY +
+            Math.cos(this.time.elapsed * 0.001 * params.speed) * 0.05;
           child.rotation.y = rotateY;
-          const rotateZ = params.rotateZ + Math.sin(this.time.elapsed * .001 * params.speed) * .05;
+          const rotateZ =
+            params.rotateZ +
+            Math.sin(this.time.elapsed * 0.001 * params.speed) * 0.05;
           child.rotation.z = rotateZ;
         }
       }
-    })
+    });
   }
 }

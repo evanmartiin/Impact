@@ -29,7 +29,7 @@ export default class Clouds {
   }
 
   setClouds(count: number) {
-    const model = this.loaders.items["cloud-model"] as GLTF;
+    const model = this.loaders.items["common:cloud-model"] as GLTF;
     model.scene.traverse((child) => {
       if (child instanceof Mesh) {
         const matcap = this.loaders.items["plane-texture"] as Texture;

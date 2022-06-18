@@ -1,6 +1,6 @@
 import Debug from "@/webgl/controllers/Debug";
 import Loaders from "@/webgl/controllers/Loaders/Loaders";
-import Sources from "@/webgl/controllers/Loaders/sources";
+import Sources from "@/webgl/controllers/Loaders/Scenes/Scenes.sources";
 import SoundSources from "@/webgl/controllers/Sound/sources";
 import Mouse from "@/webgl/controllers/Mouse";
 import Sizes from "@/webgl/controllers/Sizes";
@@ -11,7 +11,7 @@ import Renderer from "./Renderer";
 import World from "./world/World";
 import type Camera from "./world/Camera";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
-import signal from 'signal-js';
+import signal from "signal-js";
 import Sound from "./controllers/Sound/Sound";
 import type { SoundSource } from "@/models/webgl/sound.model";
 
@@ -50,7 +50,7 @@ export default class Experience {
 
     // Options
     if (_canvas) this.canvas = _canvas;
-    this.sources = Sources;
+    this.sources = Sources();
     this.soundSources = SoundSources;
     this.loaders = new Loaders(this.sources);
     this.sound = new Sound(this.soundSources);

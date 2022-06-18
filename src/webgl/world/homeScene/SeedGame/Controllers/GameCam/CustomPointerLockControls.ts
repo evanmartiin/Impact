@@ -58,7 +58,6 @@ export default class CustomPointerLockControls {
 
   connect() {
     this.isMouseMove = true;
-    console.log("connect");
     document.addEventListener("mousemove", this.onMouseMove.bind(this));
     // lock change
     document.addEventListener(
@@ -79,7 +78,6 @@ export default class CustomPointerLockControls {
   disconnect() {
     this.isLocked = false;
     this.isMouseMove = false;
-    console.log("disconnect");
     document.removeEventListener("mousemove", this.onMouseMove.bind(this));
     document.removeEventListener(
       "pointerlockchange",

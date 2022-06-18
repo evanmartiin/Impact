@@ -51,7 +51,9 @@ export default class Tree {
   }
 
   setMaterials() {
-    this.texture = this.loaders.items["poppingtrees-seed-texture"] as Texture;
+    this.texture = this.loaders.items[
+      "home:poppingTreesAndSeed-texture"
+    ] as Texture;
     this.texture.flipY = false;
     this.texture.encoding = sRGBEncoding;
 
@@ -80,13 +82,13 @@ export default class Tree {
 
   setModels(type: TTreeSize) {
     if (Tree.bigModel === null) {
-      Tree.bigModel = this.loaders.items["big-tree-model"] as GLTF;
+      Tree.bigModel = this.loaders.items["home:bigTree-model"] as GLTF;
     }
     if (Tree.mediumModel === null) {
-      Tree.mediumModel = this.loaders.items["medium-tree-model"] as GLTF;
+      Tree.mediumModel = this.loaders.items["home:mediumTree-model"] as GLTF;
     }
     if (Tree.smallModel === null) {
-      Tree.smallModel = this.loaders.items["small-tree-model"] as GLTF;
+      Tree.smallModel = this.loaders.items["home:smallTree-model"] as GLTF;
     }
     if (Tree[`${type}Model`]) {
       this.instance = Tree[`${type}Model`]!.scene.clone();

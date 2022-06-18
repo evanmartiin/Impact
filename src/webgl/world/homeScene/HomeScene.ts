@@ -87,12 +87,12 @@ export default class HomeScene {
 
   setFloor() {
     this.models = [
-      this.loaders.items["housev1model"] as GLTF,
-      this.loaders.items["grassv1model"] as GLTF,
+      this.loaders.items["home:house-model"] as GLTF,
+      this.loaders.items["home:grass-model"] as GLTF,
     ];
     this.textures = [
-      this.loaders.items["housev1texture"] as Texture,
-      this.loaders.items["grassv1texture"] as Texture,
+      this.loaders.items["home:house-texture"] as Texture,
+      this.loaders.items["home:grass-texture"] as Texture,
     ];
     this.models.forEach((model, index) => {
       if (this.textures && this.textures[index]) {
@@ -126,9 +126,9 @@ export default class HomeScene {
   }
 
   setSkybox() {
-    const up = this.loaders.items["sky-home-up"] as Texture;
-    const dn = this.loaders.items["sky-home-dn"] as Texture;
-    const ft = this.loaders.items["sky-home-ft"] as Texture;
+    const up = this.loaders.items["home:skyboxUP-texture"] as Texture;
+    const dn = this.loaders.items["home:skyboxDN-texture"] as Texture;
+    const ft = this.loaders.items["home:skyboxFT-texture"] as Texture;
     up.encoding = sRGBEncoding;
     dn.encoding = sRGBEncoding;
     ft.encoding = sRGBEncoding;

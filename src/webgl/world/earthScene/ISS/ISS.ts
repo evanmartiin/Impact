@@ -29,8 +29,10 @@ export default class ISS {
   }
 
   setMesh() {
-    this.model = this.loaders.items["satellite-model"] as GLTF;
-    const bakedTexture = this.loaders.items["satellite-texture"] as Texture;
+    this.model = this.loaders.items["earth:satellite-model"] as GLTF;
+    const bakedTexture = this.loaders.items[
+      "earth:satellite-texture"
+    ] as Texture;
     bakedTexture.flipY = false;
     bakedTexture.encoding = sRGBEncoding;
     const bakedMaterial = new MeshBasicMaterial({ map: bakedTexture });

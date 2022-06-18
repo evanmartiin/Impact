@@ -95,7 +95,7 @@ export default class Renderer {
         this.shaderPass.uniforms.uTime.value = this.time.elapsed - this.transitionStartTime;
         this.shaderPass.uniforms.tDiffuse1.value = this.renderTargetPrev?.texture;
         this.shaderPass.uniforms.tDiffuse2.value = this.renderTargetNext?.texture;
-        this.shaderPass.uniforms.uPaperTexture.value = this.experience.loaders?.items["paper-texture"]; // dirty
+        this.shaderPass.uniforms.uPaperTexture.value = this.experience.loaders?.items["common:paper-texture"]; // dirty
       
         this.composer?.render(deltaTime);
       }
@@ -186,12 +186,14 @@ export default class Renderer {
       uniforms: {
         tDiffuse1: { value: null },
         tDiffuse2: { value: null },
-        uPaperTexture: { value: this.experience.loaders?.items["paper-texture"] },
+        uPaperTexture: {
+          value: this.experience.loaders?.items["common:paper-texture"],
+        },
         uTime: { value: 0 },
-        uEase: { value: 0 }
+        uEase: { value: 0 },
       },
       vertexShader: vert,
-      fragmentShader: frag
+      fragmentShader: frag,
     });
     this.shaderPass.material.transparent = true;
     this.shaderPass.renderToScreen = true;

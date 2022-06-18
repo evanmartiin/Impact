@@ -119,7 +119,6 @@ export default class Lumberjack {
 
     let nearestTree: Tree | null = null;
     let minDistance: number | null = null;
-    console.log("passs here");
     this.game.trees.forEach((t) => {
       if (t.isTargeted) return;
       if (
@@ -269,7 +268,7 @@ export default class Lumberjack {
         });
 
       if (!Lumberjack.gltf) {
-        Lumberjack.gltf = this.loaders.items["lumberjack-model"] as GLTF;
+        Lumberjack.gltf = this.loaders.items["common:lumberjack-model"] as GLTF;
       }
       this.model = (SkeletonUtils as any).clone(Lumberjack.gltf.scene);
 

@@ -1,6 +1,14 @@
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
-import { Color, DirectionalLight, Mesh, MeshMatcapMaterial, Scene, Texture, Vector3 } from "three";
+import {
+  Color,
+  DirectionalLight,
+  Mesh,
+  MeshMatcapMaterial,
+  Scene,
+  Texture,
+  Vector3,
+} from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Time from "@/webgl/controllers/Time";
 import type Debug from "@/webgl/controllers/Debug";
@@ -24,14 +32,19 @@ export default class GrandmaDistrict {
   }
 
   setModel() {
-    const districtModel = this.loaders.items["grandma-model"] as GLTF;
-    const districtMatcap = this.loaders.items["matcap-texture"] as Texture;
-    const districtMaterial = new MeshMatcapMaterial({ matcap: districtMatcap, color: 0x1b5f2f });
+    const districtModel = this.loaders.items["grandma:map-model"] as GLTF;
+    const districtMatcap = this.loaders.items[
+      "common:comingSoonMapsMatcap-texture"
+    ] as Texture;
+    const districtMaterial = new MeshMatcapMaterial({
+      matcap: districtMatcap,
+      color: 0x1b5f2f,
+    });
     districtModel.scene.traverse((child) => {
       if (child instanceof Mesh) {
         child.material = districtMaterial;
       }
-    })
+    });
     this.scene.add(districtModel.scene);
   }
 

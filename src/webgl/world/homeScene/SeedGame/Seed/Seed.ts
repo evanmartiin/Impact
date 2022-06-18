@@ -50,7 +50,9 @@ export default class Seed {
   }
   setMaterial() {
     if (!this.texture)
-      this.texture = this.loaders.items["poppingtrees-seed-texture"] as Texture;
+      this.texture = this.loaders.items[
+        "home:poppingTreesAndSeed-texture"
+      ] as Texture;
     this.texture.flipY = false;
     this.texture.encoding = sRGBEncoding;
     this.material = new ShaderBaseMaterial({
@@ -64,7 +66,7 @@ export default class Seed {
   }
 
   setModel() {
-    if (!this.model) this.model = this.loaders.items["seed-model"] as GLTF;
+    if (!this.model) this.model = this.loaders.items["home:seed-model"] as GLTF;
     this.model?.scene.traverse((child) => {
       if (child instanceof Mesh && this.texture) {
         if (Array.isArray(child.material)) {
@@ -165,7 +167,7 @@ export default class Seed {
         lumberjackCollided = l.isInHitBox(seed.position);
         if (lumberjackCollided) {
           const direction = new Vector3().copy(this.cameraDirection);
-          direction.y =0
+          direction.y = 0;
           direction.setLength(0.01);
           l.setSeedHit(seed.position, direction);
         }

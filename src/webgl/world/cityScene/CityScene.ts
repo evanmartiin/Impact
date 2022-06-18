@@ -35,8 +35,10 @@ export default class CityScene {
   }
 
   setModel() {
-    const districtModel = this.loaders.items["city"] as GLTF;
-    const districtMatcap = this.loaders.items["matcap-texture"] as Texture;
+    const districtModel = this.loaders.items["city:map"] as GLTF;
+    const districtMatcap = this.loaders.items[
+      "common:comingSoonMapsMatcap-texture"
+    ] as Texture;
     const districtMaterial = new MeshMatcapMaterial({ matcap: districtMatcap, color: 0x1b5f2f });
     districtModel.scene.traverse((child) => {
       if (child instanceof Mesh) {

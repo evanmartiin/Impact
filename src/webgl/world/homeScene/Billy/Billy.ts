@@ -57,8 +57,8 @@ export default class Billy {
   }
 
   init() {
-    this.model = this.loaders.items["billy-model"] as GLTF;
-    this.texture = this.loaders.items["billy-texture"] as Texture;
+    this.model = this.loaders.items["common:billy-model"] as GLTF;
+    this.texture = this.loaders.items["common:billy-texture"] as Texture;
     this.texture.flipY = false;
     this.texture.encoding = sRGBEncoding;
     this.material = new ShaderBaseMaterial({

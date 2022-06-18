@@ -30,12 +30,12 @@ export default class Plane {
   }
 
   setMesh() {
-    this.model = this.loaders.items["plane-model"] as GLTF;
+    this.model = this.loaders.items["home:plane-model"] as GLTF;
     this.model.scene.traverse((child) => {
       if (child instanceof Mesh) {
         this.mesh = child;
 
-        const matcap = this.loaders.items["plane-texture"] as Texture;
+        const matcap = this.loaders.items["home:plane-texture"] as Texture;
         const material = new MeshMatcapMaterial({ matcap: matcap, color: 0xffffff, side: DoubleSide });
         this.mesh.material = material;
 

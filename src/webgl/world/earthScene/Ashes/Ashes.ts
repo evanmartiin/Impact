@@ -1,9 +1,15 @@
 import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
-import { Scene, BufferGeometry, Points, BufferAttribute, AdditiveBlending } from "three";
+import {
+  Scene,
+  BufferGeometry,
+  Points,
+  BufferAttribute,
+  AdditiveBlending,
+} from "three";
 import type { FolderApi } from "tweakpane";
-import vert from './shaders/vert.glsl?raw'
-import frag from './shaders/frag.glsl?raw'
+import vert from "./shaders/vert.glsl?raw";
+import frag from "./shaders/frag.glsl?raw";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 
@@ -31,7 +37,7 @@ export default class Ashes {
     const positions = new Float32Array(count * 3);
     const params = new Float32Array(count * 3);
 
-    for(let i = 0; i < count * 3; i+=3) {
+    for (let i = 0; i < count * 3; i += 3) {
       positions[i + 0] = (Math.random() - 0.5) * 10;
       positions[i + 1] = (Math.random() - 0.5) * 10;
       positions[i + 2] = (Math.random() - 0.5) * 10;
@@ -41,21 +47,23 @@ export default class Ashes {
       params[i + 2] = Math.random();
     }
 
-    this.geometry.setAttribute('position', new BufferAttribute(positions, 3));
-    this.geometry.setAttribute('aParams', new BufferAttribute(params, 3));
+    this.geometry.setAttribute("position", new BufferAttribute(positions, 3));
+    this.geometry.setAttribute("aParams", new BufferAttribute(params, 3));
 
     this.material = new ShaderBaseMaterial({
       uniforms: {
-        uTexture: { value: this.experience.loaders?.items["ash-texture"] },
+        uTexture: {
+          value: this.experience.loaders?.items["earth:ash-texture"],
+        },
         uSize: { value: this.experience.renderer?.instance?.getPixelRatio() },
-        uScale: { value: 30. },
-        uRatio: { value: 4. },
-        uThreshold: { value: .2 }
+        uScale: { value: 30 },
+        uRatio: { value: 4 },
+        uThreshold: { value: 0.2 },
       },
       vertexShader: vert,
       fragmentShader: frag,
-      transparent: true
-    })
+      transparent: true,
+    });
     this.mesh = new Points(this.geometry, this.material);
     this.scene?.add(this.mesh);
   }
@@ -63,9 +71,21 @@ export default class Ashes {
   setDebug() {
     if (this.debug.active && this.material) {
       this.debugTab = this.debug.ui?.pages[1].addFolder({ title: "Ashes" });
-      this.debugTab?.addInput(this.material.uniforms.uScale, "value", { min: 5, max: 30, label: "scale" });
-      this.debugTab?.addInput(this.material.uniforms.uRatio, "value", { min: 0, max: 5, label: "ratio" });
-      this.debugTab?.addInput(this.material.uniforms.uThreshold, "value", { min: 0, max: 1, label: "threshold" });
+      this.debugTab?.addInput(this.material.uniforms.uScale, "value", {
+        min: 5,
+        max: 30,
+        label: "scale",
+      });
+      this.debugTab?.addInput(this.material.uniforms.uRatio, "value", {
+        min: 0,
+        max: 5,
+        label: "ratio",
+      });
+      this.debugTab?.addInput(this.material.uniforms.uThreshold, "value", {
+        min: 0,
+        max: 1,
+        label: "threshold",
+      });
     }
   }
 }

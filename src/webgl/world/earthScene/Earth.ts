@@ -65,7 +65,7 @@ export default class Earth {
   private brazierShaderUniforms: { [uniform: string]: IUniform<any> } = {
     uBrazierThreshold: { value: -1.5 },
     uBrazierRange: { value: 0.2 },
-    uBrazierTexture: { value: this.loaders.items["brazier-texture"] },
+    uBrazierTexture: { value: this.loaders.items["earth:brazier-texture"] },
     uBrazierRandomRatio: { value: 5 },
   };
   private halo: Mesh | null = null;
@@ -119,19 +119,19 @@ export default class Earth {
 
   setMesh() {
     this.models = [
-      this.loaders.items["oceans-model"] as GLTF,
-      this.loaders.items["continents-model"] as GLTF,
-      this.loaders.items["house-mini-model"] as GLTF,
-      this.loaders.items["city-mini-model"] as GLTF,
-      this.loaders.items["granny-mini-model"] as GLTF,
-      this.loaders.items["zones-model"] as GLTF,
+      this.loaders.items["earth:oceans-model"] as GLTF,
+      this.loaders.items["earth:continents-model"] as GLTF,
+      this.loaders.items["earth:home-model"] as GLTF,
+      this.loaders.items["earth:city-model"] as GLTF,
+      this.loaders.items["earth:grandma-model"] as GLTF,
+      this.loaders.items["earth:zones-model"] as GLTF,
     ];
     this.textures = [
-      this.loaders.items["oceans-texture"] as Texture,
-      this.loaders.items["continents-texture"] as Texture,
-      this.loaders.items["house-mini-texture"] as Texture,
-      this.loaders.items["city-mini-texture"] as Texture,
-      this.loaders.items["granny-mini-texture"] as Texture,
+      this.loaders.items["earth:oceans-texture"] as Texture,
+      this.loaders.items["earth:continents-texture"] as Texture,
+      this.loaders.items["earth:home-texture"] as Texture,
+      this.loaders.items["earth:city-texture"] as Texture,
+      this.loaders.items["earth:grandma-texture"] as Texture,
     ];
 
     this.models.forEach((model, index) => {
@@ -202,9 +202,9 @@ export default class Earth {
   }
 
   setSkybox() {
-    const up = this.loaders.items["sky-earth-up"] as Texture;
-    const dn = this.loaders.items["sky-earth-dn"] as Texture;
-    const ft = this.loaders.items["sky-earth-ft"] as Texture;
+    const up = this.loaders.items["earth:skyboxUP-texture"] as Texture;
+    const dn = this.loaders.items["earth:skyboxDN-texture"] as Texture;
+    const ft = this.loaders.items["earth:skyboxFT-texture"] as Texture;
     up.encoding = sRGBEncoding;
     dn.encoding = sRGBEncoding;
     ft.encoding = sRGBEncoding;
@@ -265,7 +265,6 @@ export default class Earth {
       "#include <fog_fragment>",
       fogFragment
     );
-    console.log(shader.vertexShader);
     
   };
 
@@ -295,7 +294,7 @@ export default class Earth {
   setHalo() {
     const geometry = new PlaneBufferGeometry(5.7, 5.7);
     const material = new MeshBasicMaterial({
-      map: this.loaders.items["earth-halo"] as Texture,
+      map: this.loaders.items["earth:halo"] as Texture,
       transparent: true,
     });
     this.halo = new Mesh(geometry, material);
