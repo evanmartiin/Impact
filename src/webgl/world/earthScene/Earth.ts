@@ -26,7 +26,7 @@ import brazierVertex from "./shaders/brazier/brazierVertex.glsl?raw";
 import brazierParsFragment from "./shaders/brazier/brazierParsFragment.glsl?raw";
 import brazierFragment from "./shaders/brazier/brazierFragment.glsl?raw";
 
-import type { GPSPos } from "@/models/webgl/GPSPos.model";
+import type { GPSPos } from "@/types/webgl/GPSPos.model";
 import calcGPSFromPos from "@/utils/calcGPSFromPos";
 import anime from "animejs";
 import calcPosFromGPS from "@/utils/calcPosFromGPS";

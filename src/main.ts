@@ -1,11 +1,12 @@
 import { createPinia } from "pinia";
 import { createApp } from "vue";
-import router from "./router";
-import App from "./views/App/App.vue";
+import { useSeedGame } from "./stores/SeedGame.store";
+import App from "./App.vue";
+import Experience from "./webgl/Experience";
+
+const pinia = createPinia();
 
 const app = createApp(App);
-
-app.use(createPinia());
-app.use(router);
+app.use(pinia);
 
 app.mount("#app");

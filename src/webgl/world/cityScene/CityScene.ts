@@ -2,7 +2,7 @@ import type Loaders from "@/webgl/controllers/Loaders/Loaders";
 import Experience from "@/webgl/Experience";
 import { DirectionalLight, Mesh, MeshMatcapMaterial, Scene, Texture, Vector3 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
-import Character from "@/webgl/world/homeScene/Billy/Billy";
+import Character from "@/webgl/world/homeScene/Entities/Billy/Billy";
 import type Time from "@/webgl/controllers/Time";
 import Waste from "./Waste";
 import Trash from "./Trash";

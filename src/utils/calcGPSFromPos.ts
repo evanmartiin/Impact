@@ -1,4 +1,4 @@
-import type { GPSPos } from "@/models/webgl/GPSPos.model";
+import type { GPSPos } from "@/types/webgl/GPSPos.model";
 import type { Vector3 } from "three";
 
 const calcGPSFromPos = (vector: Vector3, radius: number): GPSPos => {

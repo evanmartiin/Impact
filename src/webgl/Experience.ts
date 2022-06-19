@@ -5,7 +5,7 @@ import SoundSources from "@/webgl/controllers/Sound/sources";
 import Mouse from "@/webgl/controllers/Mouse";
 import Sizes from "@/webgl/controllers/Sizes";
 import Time from "@/webgl/controllers/Time";
-import type { ISource } from "@/models/webgl/source.model";
+import type { ISource } from "@/types/webgl/source.model";
 import { AxesHelper, Mesh, Scene } from "three";
 import Renderer from "./Renderer";
 import World from "./world/World";
@@ -13,7 +13,8 @@ import type Camera from "./world/Camera";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import signal from "signal-js";
 import Sound from "./controllers/Sound/Sound";
-import type { SoundSource } from "@/models/webgl/sound.model";
+import type { SoundSource } from "@/types/webgl/sound.model";
+import { useSeedGame } from "@/stores/SeedGame.store";
 
 declare global {
   interface Window {
@@ -47,6 +48,9 @@ export default class Experience {
 
     // Global access
     window.experience = this;
+
+    const test = useSeedGame();
+    console.log(test.$id);
 
     // Options
     if (_canvas) this.canvas = _canvas;

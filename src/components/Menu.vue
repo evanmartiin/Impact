@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import signal from 'signal-js';
 import CustomButton from '@/components/CustomButton.vue'
 import anime from 'animejs';
@@ -26,11 +26,11 @@ const toggleSound = () => {
   }
 }
 
-const openMenu = (e) => {
+const openMenu = (e: boolean | string) => {
   if(!isMoving.value){
     isMoving.value = true;
     isMenuOpened.value = true
-    menuMode.value = e;
+    menuMode.value = e as string;
     let blur = { value: 0 };
     
     const tl = anime.timeline({});
@@ -52,9 +52,9 @@ const openMenu = (e) => {
         duration: 1000,
         easing: 'easeOutBack',
         update: () => {
-          const menu = document.getElementsByClassName('menu')[0];
-          menu.style.backdropFilter = `blur(${blur.value}px)`;
-          menu.style.webkitBackdropFilter = `blur(${blur.value}px)`;
+          const menu = document.getElementsByClassName('menu')[0] as HTMLElement;
+          (menu.style as any).backdropFilter = `blur(${blur.value}px)`;
+          (menu.style as any).webkitBackdropFilter = `blur(${blur.value}px)`;
         },
         complete: () =>{
           isMoving.value = false;
@@ -93,9 +93,9 @@ const closeMenu = () => {
         duration: 1000,
         easing: 'easeOutBack',
         update: () => {
-          const menu = document.getElementsByClassName('menu')[0];
-          menu.style.backdropFilter = `blur(${blur.value}px)`;
-          menu.style.webkitBackdropFilter = `blur(${blur.value}px)`;
+          const menu = document.getElementsByClassName('menu')[0] as HTMLElement;
+          (menu.style as any).backdropFilter = `blur(${blur.value}px)`;
+          (menu.style as any).webkitBackdropFilter = `blur(${blur.value}px)`;
         },
         complete: () => {
           isMenuOpened.value = false;

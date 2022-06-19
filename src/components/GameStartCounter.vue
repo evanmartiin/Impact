@@ -1,21 +1,14 @@
-<script setup>
+<script setup lang="ts">
 
-import signal from 'signal-js';
-import { onMounted, ref } from 'vue';
+import { useSeedGame } from '@/stores/SeedGame.store';
 
-const props = defineProps({});
-
-const number = ref('3');
-
-onMounted(() => {
-  signal.on("set_counter_number", (e) => number.value = e);
-});
+const seedGameStore = useSeedGame()
 
 </script>
 
 <template>
   <p id="counter">
-    {{number}}
+    {{seedGameStore.startingBlock}}
   </p>
 </template>
 

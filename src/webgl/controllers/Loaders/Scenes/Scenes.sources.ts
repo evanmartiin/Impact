@@ -1,4 +1,4 @@
-import type { ISource } from "@/models/webgl/source.model";
+import type { ISource } from "@/types/webgl/source.model";
 import citySources from "./City.sources";
 import commonSources from "./Common.sources";
 import earthSources from "./Earth.sources";
@@ -20,7 +20,6 @@ const Sources = () => {
       sources.push(s);
     });
   });
-  console.log(sources);
   return sources;
 };
 

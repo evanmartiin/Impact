@@ -1,4 +1,4 @@
-import type IAnimation from "@/models/animation";
+import type IAnimation from "@/types/animation";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";

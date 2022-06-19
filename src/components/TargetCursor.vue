@@ -1,14 +1,12 @@
-<script setup>
+<script setup lang="ts">
 
 import signal from 'signal-js';
 import { onMounted, ref } from 'vue';
 
-const props = defineProps({});
-
 const isHidden = ref(true);
 
 onMounted(() => {
-  signal.on("set_target_cursor", (e) => isHidden.value = e);
+  signal.on("set_target_cursor", (e:boolean) => isHidden.value = e);
 });
 
 </script>

@@ -29,8 +29,10 @@ import seedGameSettings from "./SeedGameSettings";
 import type Tree from "./Tree/Tree";
 import CustomPointerLockControls from "./Controllers/GameCam/CustomPointerLockControls";
 import type World from "../../World";
+import { useSeedGame, type TSeedGameStore } from "@/stores/SeedGame.store";
 
 export default class SeedGame {
+  static seedGameStore: TSeedGameStore | null = null;
   static instance: SeedGame;
 
   public trees: Tree[] = [];
@@ -90,6 +92,10 @@ export default class SeedGame {
     }
     SeedGame.instance = this;
 
+    if (!SeedGame.seedGameStore) {
+      SeedGame.seedGameStore = useSeedGame();
+    }
+
     this.scene = scene as Scene;
     this.camera = camera as Camera;
 
@@ -136,7 +142,7 @@ export default class SeedGame {
       this.lumberjacks.forEach((l, index) => {
         l.setAction("dance");
       });
-      setTimeout(() => signal.emit('game:close'), 2000);
+      setTimeout(() => signal.emit("game:close"), 2000);
       setTimeout(() => {
         this.leaveGameView();
       }, 3000);
@@ -144,7 +150,7 @@ export default class SeedGame {
   }
 
   closeGame() {
-    this.world.changeScene('earth');
+    this.world.changeScene("earth");
     setTimeout(() => {
       signal.emit("outro:start", this.score);
     }, 2000);
@@ -319,7 +325,8 @@ export default class SeedGame {
       display: "block",
       duration: 1000,
       begin: () => {
-        signal.emit("set_counter_number", "3");
+        SeedGame.seedGameStore?.setStartingBlock("3");
+
         counter.style.display = "block";
         targetCursor.style.opacity = "0";
       },
@@ -327,20 +334,19 @@ export default class SeedGame {
     tl.add({
       duration: 1000,
       begin: () => {
-        signal.emit("set_counter_number", "2");
+        SeedGame.seedGameStore?.setStartingBlock("2");
       },
     });
     tl.add({
       duration: 1000,
       begin: () => {
-        signal.emit("set_counter_number", "1");
+        SeedGame.seedGameStore?.setStartingBlock("1");
       },
     });
-    // FIXME: uncomment counter
     tl.add({
       duration: 1000,
       begin: () => {
-        signal.emit("set_counter_number", "GO");
+        SeedGame.seedGameStore?.setStartingBlock("GO");
       },
       complete: () => {
         counter.style.display = "none";
@@ -387,34 +393,6 @@ export default class SeedGame {
   setDebug() {
     this.setLumberjackDebug();
     this.debugTab = this.debug.ui?.pages[2].addFolder({ title: "Game board" });
-
-    // const freeMode = this.debugTab?.addButton({
-    //   title: "Free mode",
-    // }) as ButtonApi;
-
-    // freeMode.on("click", () => {
-    //   if (this.world) {
-    //     this.world.PARAMS.isCtrlActive = true;
-    //   }
-    //   if (this.experience.world?.controls)
-    //     this.experience.world.controls.enabled = true;
-    //   setTimeout(() => {
-    //     signal.emit("close_menu");
-    //     if (this.world) {
-    //       this.world.PARAMS.isCtrlActive = true;
-    //     }
-    //     if (this.experience.world?.controls)
-    //       this.experience.world.controls.enabled = true;
-    //   }, 2000);
-    // });
-
-    // const stopButton = this.debugTab?.addButton({
-    //   title: "Stop Game",
-    // }) as ButtonApi;
-
-    // stopButton.on("click", () => {
-    //   this.stop();
-    // });
 
     this.debugTab?.addInput(seedSettings, "gravity", {
       min: -10,

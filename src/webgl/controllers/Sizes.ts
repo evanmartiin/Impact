@@ -1,4 +1,4 @@
-import type { IviewSizeAtDepth } from "@/models/webgl/sizes.model";
+import type { IviewSizeAtDepth } from "@/types/webgl/sizes.model";
 import getViewSizeAtDepth from "@/utils/getViewSizeAtDepth";
 import Experience from "@/webgl/Experience";
 import type { PerspectiveCamera } from "three";

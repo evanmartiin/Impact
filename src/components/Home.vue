@@ -1,5 +1,4 @@
-<script setup>
-import { webglStore } from '@/stores/webglStore'
+<script setup lang="ts">
 import signal from 'signal-js';
 import CustomButton from '@/components/CustomButton.vue'
 

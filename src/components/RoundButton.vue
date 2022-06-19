@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import signal from 'signal-js';
 
 const props = defineProps({

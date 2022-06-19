@@ -1,5 +1,5 @@
-import type { ILoaders, TfileLoader } from "@/models/webgl/loaders.model";
-import type { ISource } from "@/models/webgl/source.model";
+import type { ILoaders, TfileLoader } from "@/types/webgl/loaders.model";
+import type { ISource } from "@/types/webgl/source.model";
 import { TextureLoader } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";

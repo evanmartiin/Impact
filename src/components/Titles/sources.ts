@@ -1,4 +1,4 @@
-import type { TitleSource } from "@/models/title.model";
+import type { TitleSource } from "@/types/title.model";
 
 const TitlesSources: TitleSource[] = [
   {

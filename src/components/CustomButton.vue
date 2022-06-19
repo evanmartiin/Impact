@@ -1,15 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import signal from 'signal-js';
 
 const props = defineProps({
   click: {
-    type: Function
+    type: Function,
+    required: true
   },
   disabled: {
-    type: Boolean
+    type: Boolean,
+    required: false,
+    default: false,
   },
   off: {
-    type: Boolean
+    type: Boolean,
+    required: false,
+    default: false,
   }
 })
 

@@ -1,4 +1,4 @@
-import type { ISource } from "@/models/webgl/source.model";
+import type { ISource } from "@/types/webgl/source.model";
 
 const pathPrefix = "/3dAssets/Home";
 

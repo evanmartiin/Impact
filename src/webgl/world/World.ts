@@ -2,7 +2,7 @@ import type Debug from "@/webgl/controllers/Debug";
 import Experience from "@/webgl/Experience";
 import { AxesHelper, type Scene } from "three";
 import type { FolderApi } from "tweakpane";
-import type { district } from "./../../models/district.model";
+import type { district } from "../../types/district.model";
 import Earth from "./earthScene/Earth";
 import type Renderer from "../Renderer";
 import HomeScene from "./homeScene/HomeScene";

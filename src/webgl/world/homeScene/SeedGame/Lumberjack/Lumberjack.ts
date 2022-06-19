@@ -27,7 +27,7 @@ import type Tree from "../Tree/Tree";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import type Debug from "@/webgl/controllers/Debug";
 import type Time from "@/webgl/controllers/Time";
-import type IAnimation from "@/models/animation";
+import type IAnimation from "@/types/animation";
 import type { FolderApi } from "tweakpane";
 
 type TLumberjackAction = "walkToTree" | "cuting" | "idle" | "dance" | "basic";

@@ -1,4 +1,4 @@
-import type { SoundSource } from "@/models/webgl/sound.model";
+import type { SoundSource } from "@/types/webgl/sound.model";
 
 const SoundSources: SoundSource[] = [
   {

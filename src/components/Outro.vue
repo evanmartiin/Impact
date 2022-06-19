@@ -1,4 +1,5 @@
 <script setup>
+// TODO: pass in ts
 import signal from 'signal-js';
 import CustomButton from '@/components/CustomButton.vue'
 import anime from 'animejs';
@@ -15,6 +16,8 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FB_APP_ID,
   measurementId: import.meta.env.VITE_FB_MEASUREMENT_ID
 };
+
+//TODO: pass firebase in a service
 
 const back = initializeApp(firebaseConfig);
 const database = getFirestore(back);
@@ -179,7 +182,7 @@ const scoreboardIn = () => {
       delay: anime.stagger(100),
       easing: 'easeOutBack',
       complete: () => {
-        document.getElementById("nameInput").focus();
+        (document.getElementById("nameInput")).focus();
       }
     },
     0

@@ -1,5 +1,4 @@
-<script setup>
-import { webglStore } from '@/stores/webglStore'
+<script setup lang="ts">
 import signal from 'signal-js';
 import CustomButton from '@/components/CustomButton.vue'
 
@@ -10,11 +9,9 @@ const props = defineProps({
   }
 })
 
-const changeScene = (name) => {
+const changeScene = (name: string) => {
   signal.emit("change_scene", name);
 }
-
-const store = webglStore();
 </script>
 
 <template>

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import signal from 'signal-js';
 import CustomButton from '@/components/CustomButton.vue'
 import anime from 'animejs';
@@ -35,9 +35,9 @@ const openControls = () => {
       duration: 1000,
       easing: 'easeOutBack',
       update: () => {
-        const controls = document.getElementsByClassName('controls')[0];
-        controls.style.backdropFilter = `blur(${blur.value}px)`;
-        controls.style.webkitBackdropFilter = `blur(${blur.value}px)`;
+        const controls = document.getElementsByClassName('controls')[0] as HTMLElement;
+        (controls.style as any).backdropFilter = `blur(${blur.value}px)`;
+        (controls.style as any).webkitBackdropFilter = `blur(${blur.value}px)`;
         controls.style.backgroundColor = `rgba(13, 28, 81, ${blur.value/20})`;
       },
     },
@@ -67,10 +67,10 @@ const closeControls = () => {
       duration: 1000,
       easing: 'easeOutBack',
       update: () => {
-        const controls = document.getElementsByClassName('controls')[0];
-        controls.style.backdropFilter = `blur(${blur.value}px)`;
-        controls.style.webkitBackdropFilter = `blur(${blur.value}px)`;
-        controls.style.backgroundColor = `rgba(13, 28, 81, ${blur.value/20})`;
+        const controls = document.getElementsByClassName('controls')[0] as HTMLElement;
+        (controls.style as any).backdropFilter = `blur(${blur.value}px)`;
+        (controls.style as any).webkitBackdropFilter = `blur(${blur.value}px)`;
+        (controls.style as any).backgroundColor = `rgba(13, 28, 81, ${blur.value/20})`;
       },
       complete: () => {
         isControlsOpened.value = false;

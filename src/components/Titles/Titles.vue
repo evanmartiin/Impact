@@ -3,7 +3,7 @@ import signal from 'signal-js';
 import anime from 'animejs';
 import { onMounted, ref } from 'vue';
 import { splitLetters } from 'textsplitter';
-import type { TitleSource } from '@/models/title.model';
+import type { TitleSource } from '@/types/title.model';
 
 const props = defineProps({
   subtitles: {

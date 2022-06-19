@@ -1,4 +1,4 @@
-import type { SoundSource } from "@/models/webgl/sound.model";
+import type { SoundSource } from "@/types/webgl/sound.model";
 import { Howl } from "howler";
 import signal from 'signal-js';
 

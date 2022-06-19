@@ -1,4 +1,3 @@
-import { webglStore } from "./../../../../../../stores/webglStore";
 // import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
 import { isLocked, setLockMouseMode } from "@/utils/lockMouseMode";
 import { Euler, Vector3, PerspectiveCamera } from "three";

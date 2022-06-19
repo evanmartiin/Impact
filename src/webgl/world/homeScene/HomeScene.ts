@@ -1,6 +1,6 @@
 import signal from "signal-js";
 import type Time from "@/webgl/controllers/Time";
-import Billy from "./Billy/Billy";
+import Billy from "./Entities/Billy/Billy";
 import { ShaderBaseMaterial } from "@/utils/ShaderBaseMaterial/ShaderBaseMaterial";
 import type Debug from "@/webgl/controllers/Debug";
 import type Loaders from "@/webgl/controllers/Loaders/Loaders";
@@ -24,11 +24,11 @@ import SeedGame from "./SeedGame/SeedGame";
 import fragment from "./Shaders/Map/fragment.glsl?raw";
 import vertex from "./Shaders/Map/vertex.glsl?raw";
 import PhysicCtrl from "./SeedGame/Controllers/Physic/PhysicCtrl";
-import Plane from "./Plane/Plane";
+import Plane from "./Entities/Plane/Plane";
 
 import wiggleVertex from "./Shaders/wiggle/vertex.glsl?raw";
 import wiggleFragment from "./Shaders/wiggle/fragment.glsl?raw";
-import Clouds from "./Clouds/Clouds";
+import Clouds from "./Entities/Clouds/Clouds";
 import type World from "../World";
 
 export default class HomeScene {
